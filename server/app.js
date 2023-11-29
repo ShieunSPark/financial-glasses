@@ -3,7 +3,6 @@ const logger = require("morgan");
 const cors = require("cors");
 const session = require("express-session");
 const passport = require("passport");
-const mongoose = require("mongoose");
 
 const router = require("./router");
 
@@ -15,11 +14,8 @@ const dotenvExpand = require("dotenv-expand");
 const myEnv = dotenv.config();
 dotenvExpand.expand(myEnv);
 
-// Set up mongoose
-const mongoDb = process.env.MONGO_CONNECTION_STRING;
-mongoose.connect(mongoDb, { useUnifiedTopology: true, useNewUrlParser: true });
-const db = mongoose.connection;
-db.on("error", console.error.bind(console, "mongo connection error"));
+// Access MongoDB database from database.js file
+const database = require("./database");
 
 app.use(cors());
 app.use(logger("dev"));
@@ -59,10 +55,6 @@ app.use(function (err, req, res, next) {
     message: err.message,
     error: err,
   });
-});
-
-app.listen(3000, function () {
-  console.log("Server is running on http://localhost:3000");
 });
 
 module.exports = app;
