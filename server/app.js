@@ -5,6 +5,7 @@ const session = require("express-session");
 const passport = require("passport");
 
 const router = require("./router");
+const database = require("./database/db");
 
 const app = express();
 
@@ -15,7 +16,7 @@ const myEnv = dotenv.config();
 dotenvExpand.expand(myEnv);
 
 // Access MongoDB database from database.js file
-const database = require("./database");
+database();
 
 app.use(cors());
 app.use(logger("dev"));
@@ -55,6 +56,10 @@ app.use(function (err, req, res, next) {
     message: err.message,
     error: err,
   });
+});
+
+app.listen(3000, function () {
+  console.log("Server is running on http://localhost:3000");
 });
 
 module.exports = app;

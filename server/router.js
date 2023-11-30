@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 
-const home_controller = require("./controllers/homeController");
+const home_controller = require("./controllers/home");
+const auth_controller = require("./controllers/auth");
 
 // const checkLoggedIn = require("./middleware/isLoggedIn");
 // const checkAdmin = require("./middleware/isAdmin");
@@ -11,19 +12,19 @@ const home_controller = require("./controllers/homeController");
 router.get("/", home_controller.home_get);
 
 // GET signup
-router.get("/signup", home_controller.signup_get);
+router.get("/signup", auth_controller.signup_get);
 
 // POST signup
-router.post("/signup", home_controller.signup_post);
+router.post("/signup", auth_controller.signup_post);
 
 // GET login
-router.get("/login", home_controller.login_get);
+router.get("/login", auth_controller.login_get);
 
 // POST login
-router.post("/login", home_controller.login_post);
+router.post("/login", auth_controller.login_post);
 
 // // GET Google auth
-// // Placing these in homeController caused issues - maybe with asyncHandler?
+// // Placing these in authController caused issues - maybe with asyncHandler?
 // router.get(
 //   "/login/google",
 //   passport.authenticate("google", { scope: ["profile", "email"] })
@@ -42,7 +43,7 @@ router.post("/login", home_controller.login_post);
 // );
 
 // // GET blog
-// router.get("/blog", home_controller.blog_get);
+// router.get("/blog", auth_controller.blog_get);
 
 // // GET a singular post (and its attached comments)
 // router.get("/post/:post_id", home_controller.post_get);
