@@ -26,7 +26,7 @@ exports.signup_post = [
       const user = await User.find({ username: value });
       // Check if the user exists
       // For some reason, this logic is different from what I did in Members Only project... ¯\_(ツ)_/¯
-      if (user) {
+      if (user.length > 0) {
         throw new Error("Email already in use");
       }
     })
@@ -75,7 +75,7 @@ exports.signup_post = [
           // There are errors. Render form again with sanitized values/error messages.
 
           // Re-render the sign-up page
-          res.json({
+          res.status(401).json({
             message: "Sign up!",
             user: user,
             errors: errors.array(),
@@ -83,7 +83,7 @@ exports.signup_post = [
         } else {
           // Data from form is valid. Save user.
           await user.save();
-          res.json({
+          res.status(200).json({
             message: "Sign up successful!",
           });
 
