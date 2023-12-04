@@ -12,6 +12,6 @@
 
 @layer base {
   body {
-    @apply bg-black flex;
+    @apply bg-black text-white;
   }
 }
