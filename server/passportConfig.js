@@ -12,15 +12,11 @@ module.exports = function (passport) {
     new LocalStrategy(async (username, password, done) => {
       try {
         const user = await User.findOne({ username: username });
-        if (!user) {
-          return done(null, false, {
-            message: "The username does not exist in the database",
-          });
-        }
         const match = await bcrypt.compare(password, user.password);
-        if (!match) {
-          // passwords do not match!
-          return done(null, false, { message: "Incorrect password" });
+        if (!user || !match) {
+          return done(null, false, {
+            message: "Incorrect username and/or password",
+          });
         }
         return done(null, user);
       } catch (err) {
