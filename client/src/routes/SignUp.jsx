@@ -1,8 +1,42 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
+import signUpRequest from "../api/signUpRequest";
 import logo from "../assets/fgLogo.svg";
 
 export default function SignUp() {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    signUpRequest(firstName, lastName, email, password, confirmPassword)
+      .then((data) => {
+        console.log(data);
+        navigate("/");
+      })
+      .catch((err) => {
+        // Handle the response from the server
+        if (!err.error) {
+          console.error(`HTTP error! Status: ${err.status}`);
+          setError(err.errors);
+        } else {
+          // Handle other errors
+          console.error("Authentication error:", err.message);
+
+          // Access the error message from the JSON response
+          setError(err.message || "Unknown authentication error");
+        }
+      });
+  };
+
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
       <div className="flex flex-col items-center justify-start px-6 py-8 mx-auto">
@@ -14,7 +48,12 @@ export default function SignUp() {
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
               Create an account
             </h1>
-            <form className="space-y-4" action="#">
+            {error
+              ? error.map((err) => (
+                  <div className="text-red-400">{err.msg}</div>
+                ))
+              : null}
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label
                   htmlFor="firstName"
@@ -28,6 +67,7 @@ export default function SignUp() {
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="e.g., Grace"
                   required=""
+                  onChange={(e) => setFirstName(e.target.value)}
                 />
               </div>
               <div>
@@ -43,6 +83,7 @@ export default function SignUp() {
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="e.g., Hopper"
                   required=""
+                  onChange={(e) => setLastName(e.target.value)}
                 />
               </div>
               <div>
@@ -59,6 +100,7 @@ export default function SignUp() {
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="name@company.com"
                   required=""
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div>
@@ -75,6 +117,7 @@ export default function SignUp() {
                   placeholder="••••••••"
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   required=""
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
               <div>
@@ -86,11 +129,12 @@ export default function SignUp() {
                 </label>
                 <input
                   type="password"
-                  name="password"
-                  id="password"
+                  name="confirmPassword"
+                  id="confirmPassword"
                   placeholder="••••••••"
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   required=""
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                 />
               </div>
               <div className="flex items-center justify-between">
@@ -123,7 +167,7 @@ export default function SignUp() {
               <p className="text-sm text-center font-light text-gray-500 dark:text-gray-400">
                 Already have an account?{" "}
                 <a className="font-medium text-blue-600 hover:underline dark:text-blue-500">
-                  <Link to={`/login`}>Login here</Link>
+                  <Link to={`/login`}>Log in here</Link>
                 </a>
               </p>
             </form>

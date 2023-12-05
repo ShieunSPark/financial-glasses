@@ -31,7 +31,7 @@ exports.signup_post = [
       }
     })
     .withMessage(
-      "This email is already in use. Go to the 'Log In' button on the home page."
+      "This email is already in use. Click the 'Log in here' link below."
     )
     .escape(),
   body("firstName", "First name must be specified")
@@ -47,7 +47,7 @@ exports.signup_post = [
     .isLength({ min: 5 })
     .escape(),
   body(
-    "confirm-password",
+    "confirmPassword",
     "The second password does not match the first password"
   )
     .trim()
