@@ -1,8 +1,46 @@
 import { Link } from "react-router-dom";
+import { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
+import { TokenContext } from "../App";
+import loginRequest from "../api/loginRequest";
 import logo from "../assets/fgLogo.svg";
 
 export default function Login() {
+  const [token, setToken] = useContext(TokenContext);
+  const [user, setUser] = useContext(TokenContext);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    loginRequest(email, password)
+      .then((data) => {
+        console.log(data);
+        setToken(data.token);
+        setUser(data.user);
+
+        navigate("/dashboard");
+      })
+      .catch((err) => {
+        // Handle the response from the server
+        if (!err.error) {
+          console.error(`HTTP error! Status: ${err.status}`);
+          setError(err.errors);
+        } else {
+          // Handle other errors
+          console.error("Authentication error:", err.message);
+
+          // Access the error message from the JSON response
+          setError(err.message || "Unknown authentication error");
+        }
+      });
+  };
+
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
       <div className="flex flex-col items-center justify-start px-6 py-8 mx-auto">
@@ -14,7 +52,8 @@ export default function Login() {
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
               Sign in to your account
             </h1>
-            <form className="space-y-4" action="#">
+            {error ? <div className="text-red-400">{error}</div> : null}
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label
                   htmlFor="email"
@@ -29,6 +68,7 @@ export default function Login() {
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="name@company.com"
                   required=""
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div>
@@ -45,6 +85,7 @@ export default function Login() {
                   placeholder="••••••••"
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   required=""
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
               <div className="flex items-center justify-between">

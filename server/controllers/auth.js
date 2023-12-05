@@ -134,14 +134,11 @@ exports.login_post = asyncHandler(async (req, res, next) => {
   )(req, res, next);
 });
 
-// exports.blog_get = asyncHandler(async (req, res, next) => {
-//   // Get all posts in the blog
-//   const allPosts = await Post.find().populate("user").exec();
-//   res.json({
-//     title: "blog",
-//     posts: allPosts,
-//   });
-// });
+exports.dashboard_get = asyncHandler(async (req, res, next) => {
+  res.json({
+    title: "Dashboard",
+  });
+});
 
 // exports.post_get = asyncHandler(async (req, res, next) => {
 //   const post = await Post.findById(req.params.id).populate("user").exec();

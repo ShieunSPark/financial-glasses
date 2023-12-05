@@ -20,7 +20,7 @@ export default function SignUp() {
     signUpRequest(firstName, lastName, email, password, confirmPassword)
       .then((data) => {
         console.log(data);
-        navigate("/");
+        navigate("/login");
       })
       .catch((err) => {
         // Handle the response from the server

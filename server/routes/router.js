@@ -5,7 +5,7 @@ const passport = require("passport");
 const home_controller = require("../controllers/home");
 const auth_controller = require("../controllers/auth");
 
-// const checkLoggedIn = require("./middleware/isLoggedIn");
+const checkLoggedIn = require("../middleware/isLoggedIn");
 // const checkAdmin = require("./middleware/isAdmin");
 
 // GET home page
@@ -42,8 +42,8 @@ router.post("/login", auth_controller.login_post);
 //   }
 // );
 
-// // GET blog
-// router.get("/blog", auth_controller.blog_get);
+// GET dashboard
+router.get("/dashboard", checkLoggedIn, auth_controller.dashboard_get);
 
 // // GET a singular post (and its attached comments)
 // router.get("/post/:post_id", home_controller.post_get);
