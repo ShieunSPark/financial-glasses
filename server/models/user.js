@@ -13,6 +13,7 @@ const UserSchema = new Schema({
     enum: ["admin", "user"],
     default: "user",
   },
+  accessToken: { type: String },
 });
 
 // Virtual for user's URL

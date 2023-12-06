@@ -4,6 +4,7 @@ const passport = require("passport");
 
 const home_controller = require("../controllers/home");
 const auth_controller = require("../controllers/auth");
+const plaid_controller = require("../controllers/plaid");
 
 const checkLoggedIn = require("../middleware/isLoggedIn");
 // const checkAdmin = require("./middleware/isAdmin");
@@ -44,6 +45,9 @@ router.post("/login", auth_controller.login_post);
 
 // GET dashboard
 router.get("/dashboard", checkLoggedIn, auth_controller.dashboard_get);
+
+// POST Plaid link token
+router.post("/api/create_link_token", plaid_controller.create_link_token);
 
 // // GET a singular post (and its attached comments)
 // router.get("/post/:post_id", home_controller.post_get);

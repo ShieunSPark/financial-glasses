@@ -4,18 +4,18 @@ const cors = require("cors");
 const session = require("express-session");
 const passport = require("passport");
 
-const router = require("./routes/router");
-const database = require("./database/db");
-
-const app = express();
-
 // Configure dotenv and dotenv-expand
 const dotenv = require("dotenv");
 const dotenvExpand = require("dotenv-expand");
 const myEnv = dotenv.config();
 dotenvExpand.expand(myEnv);
 
-// Access MongoDB database from database.js file
+const router = require("./routes/router");
+const database = require("./api/mongodb");
+
+const app = express();
+
+// Access MongoDB database via the api folder
 database();
 
 app.use(cors());
@@ -37,6 +37,7 @@ app.use((req, res, next) => {
   next();
 });
 
+// Routes
 app.use("/", router);
 
 // catch 404 and forward to error handler
