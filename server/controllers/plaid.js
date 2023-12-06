@@ -39,9 +39,9 @@ const client = new PlaidApi(configuration);
 exports.create_link_token = asyncHandler(async (req, res, next) => {
   // Get the client_user_id by searching for the current user
   /* CHANGE CODE TO LOOK FOR CURRENT USER RATHER THAN "TEST" USER */
-  const user = await User.findById("656f7a8023f531af5e0ca18b");
   Promise.resolve()
     .then(async function () {
+      const user = await User.findById("656f7a8023f531af5e0ca18b");
       const configs = {
         user: {
           // This should correspond to a unique id for the current user.
@@ -60,10 +60,9 @@ exports.create_link_token = asyncHandler(async (req, res, next) => {
       if (PLAID_ANDROID_PACKAGE_NAME !== "") {
         configs.android_package_name = PLAID_ANDROID_PACKAGE_NAME;
       }
+
       const createTokenResponse = await client.linkTokenCreate(configs);
-      prettyPrintResponse(createTokenResponse);
-      console.log(createTokenResponse.data);
-      response.json(createTokenResponse.data);
+      res.json(createTokenResponse.data);
     })
     .catch(next);
 });

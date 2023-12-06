@@ -20,7 +20,6 @@ export default function Login() {
     e.preventDefault();
     loginRequest(email, password)
       .then((data) => {
-        console.log(data);
         setToken(data.token);
         setUser(data.user);
 

@@ -3,9 +3,18 @@ import { useContext, useState } from "react";
 
 import { TokenContext } from "../App";
 import logo from "../assets/fgLogo.svg";
+import plaidCreateLinkTokenRequest from "../api/plaidCreateLinkTokenRequest";
 
 export default function Dashboard() {
   const [user, setUser] = useContext(TokenContext);
+  const [linkToken, setLinkToken] = useState(null);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    plaidCreateLinkTokenRequest().then((data) => {
+      setLinkToken(data.link_token);
+    });
+  };
 
   return (
     <div>
@@ -22,7 +31,18 @@ export default function Dashboard() {
         </div>
         <Link className="text-2xl hover:text-blue-300">Profile</Link>
       </nav>
-      {user ? <div>Hello, {user.firstName}</div> : null}
+      {user ? (
+        <div className="text-center p-4">Hello, {user.firstName}</div>
+      ) : null}
+      <div className="flex justify-center items-center m-2 p-2">
+        <button
+          className=" p-2 transition ease-in-out delay-50 bg-blue-500 rounded-md hover:bg-indigo-500"
+          type="submit"
+          onClick={(e) => handleSubmit(e)}
+        >
+          Connect a Bank
+        </button>
+      </div>
     </div>
   );
 }
