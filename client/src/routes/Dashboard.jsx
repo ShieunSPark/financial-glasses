@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { usePlaidLink } from "react-plaid-link";
 
 import { TokenContext } from "../App";
 import logo from "../assets/fgLogo.svg";
@@ -9,12 +10,24 @@ export default function Dashboard() {
   const [user, setUser] = useContext(TokenContext);
   const [linkToken, setLinkToken] = useState(null);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    plaidCreateLinkTokenRequest().then((data) => {
-      setLinkToken(data.link_token);
-    });
-  };
+  useEffect(() => {
+    const createLinkToken = async () => {
+      const response = await plaidCreateLinkTokenRequest();
+      const { link_token } = await response;
+      setLinkToken(link_token);
+    };
+    createLinkToken();
+  }, []);
+
+  const { open, ready } = usePlaidLink(
+    {
+      token: linkToken,
+      onSuccess: (public_token, metadata) => {
+        console.log(public_token, metadata);
+      },
+    },
+    []
+  );
 
   return (
     <div>
@@ -38,7 +51,7 @@ export default function Dashboard() {
         <button
           className=" p-2 transition ease-in-out delay-50 bg-blue-500 rounded-md hover:bg-indigo-500"
           type="submit"
-          onClick={(e) => handleSubmit(e)}
+          onClick={() => open()}
         >
           Connect a Bank
         </button>
