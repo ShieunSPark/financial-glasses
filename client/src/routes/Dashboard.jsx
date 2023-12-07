@@ -3,10 +3,12 @@ import { useContext, useEffect, useState } from "react";
 import { usePlaidLink } from "react-plaid-link";
 
 import { TokenContext } from "../App";
-import logo from "../assets/fgLogo.svg";
 import plaidCreateLinkTokenRequest from "../api/plaidCreateLinkTokenRequest";
+import dashboardRequest from "../api/dashboardRequest";
+import logo from "../assets/fgLogo.svg";
 
 export default function Dashboard() {
+  const [JWTtoken, setJWTtoken] = useContext(TokenContext);
   const [user, setUser] = useContext(TokenContext);
   const [linkToken, setLinkToken] = useState(null);
 
@@ -17,6 +19,14 @@ export default function Dashboard() {
       setLinkToken(link_token);
     };
     createLinkToken();
+  }, []);
+
+  useEffect(() => {
+    const getDashboard = async () => {
+      const response = await dashboardRequest();
+      console.log(`api GET dashboard: ${response}`);
+    };
+    getDashboard();
   }, []);
 
   const { open, ready } = usePlaidLink(

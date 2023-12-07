@@ -7,7 +7,7 @@ import loginRequest from "../api/loginRequest";
 import logo from "../assets/fgLogo.svg";
 
 export default function Login() {
-  const [token, setToken] = useContext(TokenContext);
+  const [JWTtoken, setJWTtoken] = useContext(TokenContext);
   const [user, setUser] = useContext(TokenContext);
 
   const [email, setEmail] = useState("");
@@ -20,9 +20,8 @@ export default function Login() {
     e.preventDefault();
     loginRequest(email, password)
       .then((data) => {
-        setToken(data.token);
+        setJWTtoken(data.token);
         setUser(data.user);
-
         navigate("/dashboard");
       })
       .catch((err) => {

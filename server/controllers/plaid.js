@@ -66,3 +66,26 @@ exports.create_link_token = asyncHandler(async (req, res, next) => {
     })
     .catch(next);
 });
+
+// Convert Plaid public token to access token
+exports.set_access_token = asyncHandler(async (req, res, next) => {
+  // Get the client_user_id by searching for the current user
+  /* CHANGE CODE TO LOOK FOR CURRENT USER RATHER THAN "TEST" USER */
+  Promise.resolve()
+    .then(async function () {
+      const user = await User.findById("656f7a8023f531af5e0ca18b");
+
+      const tokenResponse = await client.itemPublicTokenExchange({
+        public_token: req.body.public_token,
+      });
+      console.log(`tokenResponse: ${tokenResponse}`);
+
+      // Append access_token to user in MongoDB
+
+      // ONLY FOR DEV MODE FOR LEARNING PURPOSES
+      res.json({
+        access_token: tokenResponse.data.access_token,
+      });
+    })
+    .catch(next);
+});

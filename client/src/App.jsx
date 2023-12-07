@@ -10,7 +10,7 @@ import Dashboard from "./routes/Dashboard";
 export const TokenContext = createContext(null);
 
 function App() {
-  const [token, setToken] = useState(null);
+  const [JWTtoken, setJWTtoken] = useState(null);
   const [user, setUser] = useState(null);
 
   const router = createBrowserRouter([
@@ -47,7 +47,7 @@ function App() {
   ]);
 
   return (
-    <TokenContext.Provider value={([token, setToken], [user, setUser])}>
+    <TokenContext.Provider value={([JWTtoken, setJWTtoken], [user, setUser])}>
       <RouterProvider router={router} />
     </TokenContext.Provider>
   );
