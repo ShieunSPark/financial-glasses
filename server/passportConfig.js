@@ -1,13 +1,13 @@
 const LocalStrategy = require("passport-local").Strategy;
-// const JwtStrategy = require("passport-jwt").Strategy;
-// const ExtractJwt = require("passport-jwt").ExtractJwt;
+const JwtStrategy = require("passport-jwt").Strategy;
+const ExtractJwt = require("passport-jwt").ExtractJwt;
 // const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const bcrypt = require("bcryptjs");
 
 const User = require("./models/user");
 
 module.exports = function (passport) {
-  // Set up LocalStrategy
+  // Authentication
   passport.use(
     new LocalStrategy(async (username, password, done) => {
       try {
@@ -23,6 +23,26 @@ module.exports = function (passport) {
         return done(err);
       }
     })
+  );
+
+  // Authorization
+  passport.use(
+    new JwtStrategy(
+      {
+        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+        secretOrKey: process.env.JWT_SECRET_KEY,
+      },
+      (jwt_payload, done) => {
+        const user = User.findById(jwt_payload._id);
+        console.log(`User found from JWTStrategy: ${user}`);
+
+        if (user) {
+          return done(null, user);
+        }
+
+        return done(null, false);
+      }
+    )
   );
 
   // // Set up GoogleStrategy

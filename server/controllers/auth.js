@@ -122,9 +122,13 @@ exports.login_post = asyncHandler(async (req, res, next) => {
         });
 
       const person = await User.findOne({ username: req.body.username });
-      const token = jwt.sign({ user: person }, process.env.JWT_SECRET_KEY, {
-        expiresIn: "1h",
-      });
+      const token = jwt.sign(
+        { id: person._id, username: person.email },
+        process.env.JWT_SECRET_KEY,
+        {
+          expiresIn: "1h",
+        }
+      );
 
       res.json({
         token: token,

@@ -1,8 +1,24 @@
-import { Link } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
 import logo from "../assets/fgLogo.svg";
+import { useEffect } from "react";
 
 export default function Home() {
+  // const getHome = useLoaderData();
+
+  useEffect(() => {
+    const res = fetch(`${API_URL}/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((response) => {
+      return response.json();
+    });
+    console.log(res);
+  }, []);
+
   return (
     <div className="flex flex-col h-screen justify-center items-center p-5">
       <img src={logo} className="w-48" alt="Financial Glasses logo" />
@@ -21,3 +37,14 @@ export default function Home() {
     </div>
   );
 }
+
+// export const homeLoader = async () => {
+//   const res = await fetch(`${API_URL}/`, {
+//     method: "GET",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//   });
+//   console.log(res);
+//   return res.json();
+// };

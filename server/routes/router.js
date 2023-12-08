@@ -44,7 +44,11 @@ router.post("/login", auth_controller.login_post);
 // );
 
 // GET dashboard
-router.get("/dashboard", checkLoggedIn, auth_controller.dashboard_get);
+router.get(
+  "/dashboard",
+  passport.authenticate("jwt", { session: false }),
+  auth_controller.dashboard_get
+);
 
 // POST Plaid link token
 router.post("/api/create_link_token", plaid_controller.create_link_token);

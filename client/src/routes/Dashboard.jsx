@@ -21,13 +21,13 @@ export default function Dashboard() {
     createLinkToken();
   }, []);
 
-  useEffect(() => {
-    const getDashboard = async () => {
-      const response = await dashboardRequest();
-      console.log(`api GET dashboard: ${response}`);
-    };
-    getDashboard();
-  }, []);
+  // useEffect(() => {
+  //   const getDashboard = async () => {
+  //     const response = await dashboardRequest();
+  //     console.log(`api GET dashboard: ${response}`);
+  //   };
+  //   getDashboard();
+  // }, [JWTtoken]);
 
   const { open, ready } = usePlaidLink(
     {
