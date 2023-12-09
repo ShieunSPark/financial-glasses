@@ -166,9 +166,12 @@ export default function SignUp() {
               </button>
               <p className="text-sm text-center font-light text-gray-500 dark:text-gray-400">
                 Already have an account?{" "}
-                <a className="font-medium text-blue-600 hover:underline dark:text-blue-500">
-                  <Link to={`/login`}>Log in here</Link>
-                </a>
+                <Link
+                  to={`/login`}
+                  className="font-medium text-blue-600 hover:underline dark:text-blue-500"
+                >
+                  Log in here
+                </Link>
               </p>
             </form>
           </div>

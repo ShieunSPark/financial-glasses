@@ -103,39 +103,44 @@ exports.login_get = asyncHandler(async (req, res, next) => {
 });
 
 exports.login_post = asyncHandler(async (req, res, next) => {
-  passport.authenticate(
-    "local",
-    {
-      failureRedirect: "/login",
-      failureMessage: true,
-    },
-    // Using an arrow function caused the code below to break...
-    // This totally didn't take me 6+ hours to figure out...
-    async function (err, user, info) {
-      if (err) return next(err);
-      if (!user)
-        return res.status(401).json({
-          // info.message comes from the logic I used in app.js when setting up LocalStrategy
-          error: "Authentication failed",
-          message: info.message,
-          user,
-        });
+  // passport.authenticate(
+  //   "local",
+  //   {
+  //     successRedirect: "/dashboard",
+  //     failureRedirect: "/login",
+  //     failureMessage: true,
+  //   },
+  // Using an arrow function caused the code below to break...
+  // This totally didn't take me 6+ hours to figure out...
+  // async function (err, user, info) {
+  //   if (err) return next(err);
+  //   if (!user)
+  //     return res.status(401).json({
+  //       // info.message comes from the logic I used in app.js when setting up LocalStrategy
+  //       error: "Authentication failed",
+  //       message: info.message,
+  //       user,
+  //     });
 
-      const person = await User.findOne({ username: req.body.username });
-      const token = jwt.sign(
-        { id: person._id, username: person.email },
-        process.env.JWT_SECRET_KEY,
-        {
-          expiresIn: "1h",
-        }
-      );
+  const person = await User.findOne({ username: req.body.username });
+  if (person) {
+    const token = jwt.sign(
+      { id: person._id, username: person.email },
+      process.env.JWT_SECRET_KEY,
+      {
+        expiresIn: "1h",
+      }
+    );
 
-      res.json({
-        token: token,
-        user: person,
-      });
-    }
-  )(req, res, next);
+    // FIND A WAY TO STORE JWT INTO COOKIES
+
+    res.json({
+      token: token,
+      user: person,
+    });
+  }
+  // }
+  // )(req, res, next);
 });
 
 exports.dashboard_get = asyncHandler(async (req, res, next) => {

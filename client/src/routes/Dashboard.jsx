@@ -11,6 +11,7 @@ export default function Dashboard() {
   const [JWTtoken, setJWTtoken] = useContext(TokenContext);
   const [user, setUser] = useContext(TokenContext);
   const [linkToken, setLinkToken] = useState(null);
+  const [title, setTitle] = useState("");
 
   useEffect(() => {
     const createLinkToken = async () => {
@@ -21,13 +22,11 @@ export default function Dashboard() {
     createLinkToken();
   }, []);
 
-  // useEffect(() => {
-  //   const getDashboard = async () => {
-  //     const response = await dashboardRequest();
-  //     console.log(`api GET dashboard: ${response}`);
-  //   };
-  //   getDashboard();
-  // }, [JWTtoken]);
+  useEffect(() => {
+    dashboardRequest().then((data) => {
+      setTitle(data.title);
+    });
+  }, []);
 
   const { open, ready } = usePlaidLink(
     {
@@ -41,6 +40,7 @@ export default function Dashboard() {
 
   return (
     <div>
+      <div>{title}</div>
       <nav className="flex justify-between items-center p-5 bg-slate-600">
         <Link to={`/dashboard`}>
           <img className="w-16" src={logo} alt="Financial Glasses logo" />

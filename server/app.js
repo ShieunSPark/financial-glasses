@@ -23,7 +23,11 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-require("./passportConfig")(passport);
+require("./passportConfig");
+app.use((req, res, next) => {
+  console.log(req.session);
+  next();
+});
 
 // Start passport session
 app.use(session({ secret: "cats", resave: false, saveUninitialized: true }));

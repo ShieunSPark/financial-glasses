@@ -1,28 +1,22 @@
-import { Link, useLoaderData } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import homeRequest from "../api/homeRequest";
 import logo from "../assets/fgLogo.svg";
-import { useEffect } from "react";
 
 export default function Home() {
-  // const getHome = useLoaderData();
+  const [title, setTitle] = useState("");
 
   useEffect(() => {
-    const res = fetch(`${API_URL}/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).then((response) => {
-      return response.json();
+    homeRequest().then((data) => {
+      setTitle(data.message);
     });
-    console.log(res);
   }, []);
 
   return (
     <div className="flex flex-col h-screen justify-center items-center p-5">
       <img src={logo} className="w-48" alt="Financial Glasses logo" />
-      <h1 className="animate-pulse text-5xl p-2">Financial Glasses</h1>
+      <h1 className="animate-pulse text-5xl p-2">{title}</h1>
       <h3 className="p-2">
         Continuing the budgeting app that Mint no longer is
       </h3>
@@ -38,13 +32,10 @@ export default function Home() {
   );
 }
 
-// export const homeLoader = async () => {
+// export async function homeLoader() {
 //   const res = await fetch(`${API_URL}/`, {
 //     method: "GET",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
 //   });
-//   console.log(res);
-//   return res.json();
-// };
+//   const jsonRes = await res.json();
+//   return jsonRes;
+// }

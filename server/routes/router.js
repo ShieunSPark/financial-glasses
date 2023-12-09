@@ -22,7 +22,14 @@ router.post("/signup", auth_controller.signup_post);
 router.get("/login", auth_controller.login_get);
 
 // POST login
-router.post("/login", auth_controller.login_post);
+router.post(
+  "/login",
+  passport.authenticate("local", {
+    failureRedirect: "/login",
+    failureMessage: true,
+  }),
+  auth_controller.login_post
+);
 
 // // GET Google auth
 // // Placing these in authController caused issues - maybe with asyncHandler?

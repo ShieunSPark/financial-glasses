@@ -1,6 +1,5 @@
-import { Link } from "react-router-dom";
 import { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 import { TokenContext } from "../App";
 import loginRequest from "../api/loginRequest";
@@ -121,9 +120,12 @@ export default function Login() {
               </button>
               <p className="text-sm text-center font-light text-gray-500 dark:text-gray-400">
                 Don’t have an account yet?{" "}
-                <a className="font-medium text-blue-600 hover:underline dark:text-blue-500">
-                  <Link to={`/signup`}>Sign up</Link>
-                </a>
+                <Link
+                  to={`/signup`}
+                  className="font-medium text-blue-600 hover:underline dark:text-blue-500"
+                >
+                  Sign up
+                </Link>
               </p>
             </form>
           </div>
