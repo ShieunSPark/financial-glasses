@@ -14,6 +14,7 @@ const UserSchema = new Schema({
     default: "user",
   },
   accessToken: { type: String },
+  itemID: { type: String },
 });
 
 // Virtual for user's URL

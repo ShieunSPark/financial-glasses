@@ -38,10 +38,9 @@ const client = new PlaidApi(configuration);
 
 exports.create_link_token = asyncHandler(async (req, res, next) => {
   // Get the client_user_id by searching for the current user
-  /* CHANGE CODE TO LOOK FOR CURRENT USER RATHER THAN "TEST" USER */
   Promise.resolve()
     .then(async function () {
-      const user = await User.findById("656f7a8023f531af5e0ca18b");
+      const user = await User.findById(req.body.user._id);
       const configs = {
         user: {
           // This should correspond to a unique id for the current user.
@@ -70,21 +69,22 @@ exports.create_link_token = asyncHandler(async (req, res, next) => {
 // Convert Plaid public token to access token
 exports.set_access_token = asyncHandler(async (req, res, next) => {
   // Get the client_user_id by searching for the current user
-  /* CHANGE CODE TO LOOK FOR CURRENT USER RATHER THAN "TEST" USER */
   Promise.resolve()
     .then(async function () {
-      const user = await User.findById("656f7a8023f531af5e0ca18b");
+      const user = await User.findById(req.body.user._id);
 
       const tokenResponse = await client.itemPublicTokenExchange({
         public_token: req.body.public_token,
       });
-      console.log(`tokenResponse: ${tokenResponse}`);
 
-      // Append access_token to user in MongoDB
+      // Append access_token and item_id to user in MongoDB
+      user.accessToken = tokenResponse.data.access_token;
+      user.itemID = tokenResponse.data.item_id;
+      user.save();
 
-      // ONLY FOR DEV MODE FOR LEARNING PURPOSES
+      // Do NOT send accessToken to client!!!
       res.json({
-        access_token: tokenResponse.data.access_token,
+        message: "Set Access Token complete",
       });
     })
     .catch(next);

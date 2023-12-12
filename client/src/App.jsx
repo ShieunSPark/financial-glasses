@@ -5,7 +5,6 @@ import Error from "./routes/Error";
 import Home from "./routes/Home";
 import SignUp from "./routes/SignUp";
 import Login from "./routes/Login";
-import Logout from "./components/Logout";
 import Dashboard from "./routes/Dashboard";
 
 export const TokenContext = createContext(null);

@@ -4,6 +4,7 @@ import { usePlaidLink } from "react-plaid-link";
 
 import { TokenContext, UserContext } from "../App";
 import plaidCreateLinkTokenRequest from "../api/plaidCreateLinkTokenRequest";
+import plaidSetAccessToken from "../api/plaidSetAccessToken";
 import dashboardRequest from "../api/dashboardRequest";
 import logo from "../assets/fgLogo.svg";
 
@@ -14,6 +15,7 @@ export default function Dashboard() {
   const [title, setTitle] = useState("");
 
   const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     dashboardRequest(JWTtoken).then((data) => {
@@ -21,34 +23,37 @@ export default function Dashboard() {
     });
   }, []);
 
+  const logout = () => {
+    fetch(`${API_URL}/logout`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then(() => {
+      navigate("/");
+    });
+  };
+
+  // Plaid logistics
   useEffect(() => {
     const createLinkToken = async () => {
-      const response = await plaidCreateLinkTokenRequest();
+      const response = await plaidCreateLinkTokenRequest(user);
       const { link_token } = await response;
       setLinkToken(link_token);
     };
     createLinkToken();
   }, []);
 
-  const logout = () => {
-    const API_URL = import.meta.env.VITE_API_URL;
-    fetch(`${API_URL}/logout`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).then((response) => {
-      const res = response.json();
-      console.log(res);
-      navigate("/");
-    });
-  };
-
   const { open, ready } = usePlaidLink(
     {
       token: linkToken,
       onSuccess: (public_token, metadata) => {
-        console.log(public_token, metadata);
+        const setAccessToken = async () => {
+          const response = await plaidSetAccessToken(public_token, user);
+          const { access_token } = await response;
+          console.log(access_token);
+        };
+        setAccessToken();
       },
     },
     []
@@ -56,7 +61,6 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div>{title}</div>
       <nav className="flex justify-between items-center p-5 bg-slate-100 dark:bg-slate-600 ">
         <Link to={`/dashboard`}>
           <img className="w-16" src={logo} alt="Financial Glasses logo" />
