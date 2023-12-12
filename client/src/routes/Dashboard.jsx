@@ -2,14 +2,14 @@ import { Link } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { usePlaidLink } from "react-plaid-link";
 
-import { TokenContext } from "../App";
+import { TokenContext, UserContext } from "../App";
 import plaidCreateLinkTokenRequest from "../api/plaidCreateLinkTokenRequest";
 import dashboardRequest from "../api/dashboardRequest";
 import logo from "../assets/fgLogo.svg";
 
 export default function Dashboard() {
-  const [JWTtoken, setJWTtoken] = useContext(TokenContext);
-  const [user, setUser] = useContext(TokenContext);
+  const { JWTtoken, setJWTtoken } = useContext(TokenContext);
+  const { user, setUser } = useContext(UserContext);
   const [linkToken, setLinkToken] = useState(null);
   const [title, setTitle] = useState("");
 
@@ -23,7 +23,7 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    dashboardRequest().then((data) => {
+    dashboardRequest(JWTtoken).then((data) => {
       setTitle(data.title);
     });
   }, []);

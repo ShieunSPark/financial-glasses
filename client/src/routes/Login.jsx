@@ -1,13 +1,13 @@
 import { useContext, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
-import { TokenContext } from "../App";
+import { TokenContext, UserContext } from "../App";
 import loginRequest from "../api/loginRequest";
 import logo from "../assets/fgLogo.svg";
 
 export default function Login() {
-  const [JWTtoken, setJWTtoken] = useContext(TokenContext);
-  const [user, setUser] = useContext(TokenContext);
+  const { JWTtoken, setJWTtoken } = useContext(TokenContext);
+  const { user, setUser } = useContext(UserContext);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

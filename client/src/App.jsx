@@ -8,6 +8,7 @@ import SignUp from "./routes/SignUp";
 import Dashboard from "./routes/Dashboard";
 
 export const TokenContext = createContext(null);
+export const UserContext = createContext(null);
 
 function App() {
   const [JWTtoken, setJWTtoken] = useState(null);
@@ -37,8 +38,10 @@ function App() {
   ]);
 
   return (
-    <TokenContext.Provider value={([JWTtoken, setJWTtoken], [user, setUser])}>
-      <RouterProvider router={router} />
+    <TokenContext.Provider value={{ JWTtoken, setJWTtoken }}>
+      <UserContext.Provider value={{ user, setUser }}>
+        <RouterProvider router={router} />
+      </UserContext.Provider>
     </TokenContext.Provider>
   );
 }

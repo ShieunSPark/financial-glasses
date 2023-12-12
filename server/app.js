@@ -18,19 +18,25 @@ const app = express();
 // Access MongoDB database via the api folder
 database();
 
-app.use(cors());
+app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 require("./passportConfig");
 app.use((req, res, next) => {
-  console.log(req.session);
+  console.log("Session: " + req.session);
   next();
 });
 
 // Start passport session
-app.use(session({ secret: "cats", resave: false, saveUninitialized: true }));
+app.use(
+  session({
+    secret: process.env.EXPRESS_SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.urlencoded({ extended: false }));

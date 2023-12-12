@@ -11,10 +11,6 @@ export default (username, password) => {
       password,
     }),
   }).then((response) => {
-    if (!response.ok) {
-      // Reject the Promise with the error response
-      return response.json().then((data) => Promise.reject(data));
-    }
     return response.json();
   });
 };

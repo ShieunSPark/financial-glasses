@@ -132,7 +132,10 @@ exports.login_post = asyncHandler(async (req, res, next) => {
       }
     );
 
-    // FIND A WAY TO STORE JWT INTO COOKIES
+    res.cookie("token", token, {
+      withCredentials: true,
+      httpOnly: false,
+    });
 
     res.json({
       token: token,
