@@ -137,6 +137,7 @@ exports.logout_get = asyncHandler(async (req, res, next) => {
 });
 
 exports.dashboard_get = asyncHandler(async (req, res, next) => {
+  console.log("accessing dashboard: " + req);
   res.json({
     title: "Dashboard",
   });

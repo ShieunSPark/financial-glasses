@@ -24,10 +24,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 require("./passportConfig");
-app.use((req, res, next) => {
-  console.log("Session: " + req.session);
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log("Session: " + req.session);
+//   next();
+// });
 
 // Start passport session
 app.use(

@@ -52,9 +52,10 @@ passport.use(
       const user = User.findById(jwt_payload.id);
 
       if (user) {
+        console.log("user found");
         return cb(null, user);
       }
-
+      console.log("user not found!!!");
       return cb(null, false);
     }
   )
