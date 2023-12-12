@@ -50,7 +50,6 @@ passport.use(
     },
     (jwt_payload, cb) => {
       const user = User.findById(jwt_payload.id);
-      console.log(`User found from JWTStrategy: ${user}`);
 
       if (user) {
         return cb(null, user);

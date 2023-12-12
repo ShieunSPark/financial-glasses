@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { usePlaidLink } from "react-plaid-link";
 
@@ -13,6 +13,14 @@ export default function Dashboard() {
   const [linkToken, setLinkToken] = useState(null);
   const [title, setTitle] = useState("");
 
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    dashboardRequest(JWTtoken).then((data) => {
+      setTitle(data.title);
+    });
+  }, []);
+
   useEffect(() => {
     const createLinkToken = async () => {
       const response = await plaidCreateLinkTokenRequest();
@@ -22,11 +30,19 @@ export default function Dashboard() {
     createLinkToken();
   }, []);
 
-  useEffect(() => {
-    dashboardRequest(JWTtoken).then((data) => {
-      setTitle(data.title);
+  const logout = () => {
+    const API_URL = import.meta.env.VITE_API_URL;
+    fetch(`${API_URL}/logout`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((response) => {
+      const res = response.json();
+      console.log(res);
+      navigate("/");
     });
-  }, []);
+  };
 
   const { open, ready } = usePlaidLink(
     {
@@ -41,25 +57,33 @@ export default function Dashboard() {
   return (
     <div>
       <div>{title}</div>
-      <nav className="flex justify-between items-center p-5 bg-slate-600">
+      <nav className="flex justify-between items-center p-5 bg-slate-100 dark:bg-slate-600 ">
         <Link to={`/dashboard`}>
           <img className="w-16" src={logo} alt="Financial Glasses logo" />
         </Link>
         <div className="flex gap-x-10">
-          <Link to={`/dashboard`} className="text-2xl hover:text-blue-300">
+          <Link to={`/dashboard`} className="text-xl hover:text-blue-300">
             Overview
           </Link>
-          <Link className="text-2xl hover:text-blue-300">Transactions</Link>
-          <Link className="text-2xl hover:text-blue-300">Budgets</Link>
+          <Link className="text-xl hover:text-blue-300">Transactions</Link>
+          <Link className="text-xl hover:text-blue-300">Budgets</Link>
         </div>
-        <Link className="text-2xl hover:text-blue-300">Profile</Link>
+        <div className="flex gap-x-5">
+          <Link className="text-xl hover:text-blue-300">Profile</Link>
+          <Link
+            onClick={() => logout()}
+            className="text-xl hover:text-blue-300"
+          >
+            Logout
+          </Link>
+        </div>
       </nav>
       {user ? (
         <div className="text-center p-4">Hello, {user.firstName}</div>
       ) : null}
       <div className="flex justify-center items-center m-2 p-2">
         <button
-          className=" p-2 transition ease-in-out delay-50 bg-blue-500 rounded-md hover:bg-indigo-500"
+          className=" p-2 transition ease-in-out delay-50 bg-blue-500 text-white rounded-md hover:bg-indigo-500"
           type="submit"
           onClick={() => open()}
         >

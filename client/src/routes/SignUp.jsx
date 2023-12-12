@@ -38,7 +38,7 @@ export default function SignUp() {
   };
 
   return (
-    <section className="bg-gray-50 dark:bg-gray-900">
+    <section>
       <div className="flex flex-col items-center justify-start px-6 py-8 mx-auto">
         <Link to={`/`}>
           <img className="w-48 my-5" src={logo} alt="logo" />

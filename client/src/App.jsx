@@ -3,8 +3,9 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import Error from "./routes/Error";
 import Home from "./routes/Home";
-import Login from "./routes/Login";
 import SignUp from "./routes/SignUp";
+import Login from "./routes/Login";
+import Logout from "./components/Logout";
 import Dashboard from "./routes/Dashboard";
 
 export const TokenContext = createContext(null);
@@ -21,13 +22,13 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/login",
-      element: <Login />,
+      path: "/signup",
+      element: <SignUp />,
       errorElement: <Error />,
     },
     {
-      path: "/signup",
-      element: <SignUp />,
+      path: "/login",
+      element: <Login />,
       errorElement: <Error />,
     },
     {
@@ -38,6 +39,10 @@ function App() {
   ]);
 
   return (
+    /* Not fully understanding how useContext() works in React led to 2 weeks of
+     * me trying to debug JWT stuff because I thought passport-jwt wasn't working...
+     * I'm not mad, you're mad
+     */
     <TokenContext.Provider value={{ JWTtoken, setJWTtoken }}>
       <UserContext.Provider value={{ user, setUser }}>
         <RouterProvider router={router} />
