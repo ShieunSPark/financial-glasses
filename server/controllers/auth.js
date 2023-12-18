@@ -103,6 +103,7 @@ exports.login_get = asyncHandler(async (req, res, next) => {
 });
 
 exports.login_post = asyncHandler(async (req, res, next) => {
+  console.log("calling post-auth login-post logic");
   const person = await User.findOne({ username: req.body.username });
   if (person) {
     const token = jwt.sign(
@@ -137,7 +138,6 @@ exports.logout_get = asyncHandler(async (req, res, next) => {
 });
 
 exports.dashboard_get = asyncHandler(async (req, res, next) => {
-  console.log("accessing dashboard: " + req);
   res.json({
     title: "Dashboard",
   });

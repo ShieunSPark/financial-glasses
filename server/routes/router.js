@@ -24,10 +24,20 @@ router.get("/login", auth_controller.login_get);
 // POST login
 router.post(
   "/login",
-  passport.authenticate("local", {
-    failureRedirect: "/login",
-    failureMessage: true,
-  }),
+  function (req, res, next) {
+    passport.authenticate("local", function (err, user, info) {
+      if (err) {
+        return next(err);
+      }
+      if (!user) {
+        req.session.error = info;
+        return next(info);
+      }
+
+      // NEED TO CALL req.login()!!!
+      req.login(user, next);
+    })(req, res, next);
+  },
   auth_controller.login_post
 );
 

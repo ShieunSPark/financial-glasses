@@ -1,7 +1,9 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const logger = require("morgan");
 const cors = require("cors");
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
 const passport = require("passport");
 
 // Configure dotenv and dotenv-expand
@@ -11,23 +13,21 @@ const myEnv = dotenv.config();
 dotenvExpand.expand(myEnv);
 
 const router = require("./routes/router");
-const database = require("./api/mongodb");
 
 const app = express();
 
-// Access MongoDB database via the api folder
-database();
+// Set up mongoose
+mongoose.connect(process.env.MONGO_CONNECTION_STRING);
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "mongo connection error"));
 
 app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Set up Passportjs
 require("./passportConfig");
-// app.use((req, res, next) => {
-//   console.log("Session: " + req.session);
-//   next();
-// });
 
 // Start passport session
 app.use(
@@ -35,11 +35,22 @@ app.use(
     secret: process.env.EXPRESS_SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
+    // Save session in Mongo rather than local memory
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_CONNECTION_STRING }),
+    cookie: {
+      maxAge: 1000 * 60 * 10, // 1000 ms/sec * 60 sec/min * 10 min
+    },
   })
 );
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.urlencoded({ extended: false }));
+
+// Custom middleware to show current express-session details
+// app.use((req, res, next) => {
+//   console.log(req.session);
+//   next();
+// });
 
 // Custom passport middleware to access the current user
 app.use((req, res, next) => {

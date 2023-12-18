@@ -19,11 +19,14 @@ export default function Login() {
     e.preventDefault();
     loginRequest(email, password)
       .then((data) => {
-        setJWTtoken(data.token);
-        setUser(data.user);
-        navigate("/dashboard");
+        if (!data) {
+          setJWTtoken(data.token);
+          setUser(data.user);
+          navigate("/dashboard");
+        }
       })
       .catch((err) => {
+        console.log(err);
         // Handle the response from the server
         if (!err.error) {
           console.error(`HTTP error! Status: ${err.status}`);

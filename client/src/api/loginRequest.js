@@ -11,6 +11,12 @@ export default (username, password) => {
       password,
     }),
   }).then((response) => {
+    console.log(response);
+    if (!response.ok) {
+      // Reject the Promise with the error response
+      return new Error("error!");
+    }
+
     return response.json();
   });
 };

@@ -25,20 +25,21 @@ passport.use(
   })
 );
 
+//
 passport.serializeUser(function (user, cb) {
-  // process.nextTick(function () {
-  console.log("serializing user...");
-  cb(null, {
-    id: user.id,
+  process.nextTick(function () {
+    console.log("serializing user...");
+    cb(null, {
+      id: user.id,
+    });
   });
-  // });
 });
 
 passport.deserializeUser(async function (user, cb) {
-  // process.nextTick(function () {
-  console.log("Deserializing user...");
-  return cb(null, user);
-  // });
+  process.nextTick(function () {
+    console.log("Deserializing user...");
+    return cb(null, user);
+  });
 });
 
 // Authorization
