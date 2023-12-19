@@ -6,15 +6,15 @@ export default (username, password) => {
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify({
       username,
       password,
     }),
   }).then((response) => {
-    console.log(response);
     if (!response.ok) {
       // Reject the Promise with the error response
-      return new Error("error!");
+      return response.json().then((data) => Promise.reject(data));
     }
 
     return response.json();

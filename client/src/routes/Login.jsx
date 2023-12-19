@@ -6,7 +6,7 @@ import loginRequest from "../api/loginRequest";
 import logo from "../assets/fgLogo.svg";
 
 export default function Login() {
-  const { JWTtoken, setJWTtoken } = useContext(TokenContext);
+  // const { JWTtoken, setJWTtoken } = useContext(TokenContext);
   const { user, setUser } = useContext(UserContext);
 
   const [email, setEmail] = useState("");
@@ -19,14 +19,13 @@ export default function Login() {
     e.preventDefault();
     loginRequest(email, password)
       .then((data) => {
-        if (!data) {
-          setJWTtoken(data.token);
+        if (data) {
+          // setJWTtoken(data.token);
           setUser(data.user);
           navigate("/dashboard");
         }
       })
       .catch((err) => {
-        console.log(err);
         // Handle the response from the server
         if (!err.error) {
           console.error(`HTTP error! Status: ${err.status}`);
@@ -52,7 +51,7 @@ export default function Login() {
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
               Sign in to your account
             </h1>
-            {error ? <div className="text-red-400">{error}</div> : null}
+            {error ? <div className="text-red-400 m-0">{error}</div> : null}
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label

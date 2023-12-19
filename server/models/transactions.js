@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const TransactionsSchema = new Schema({
+  // id in Plaid; maybe assign it to Mongo's _id field?
+  transaction_id: { type: String, required: true },
   user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   bank: { type: Schema.Types.ObjectId, ref: "Bank", required: true },
   account_id: { type: String, required: true },
@@ -15,6 +17,8 @@ const TransactionsSchema = new Schema({
   date: { type: Date, required: true },
   // Prefer personal_finance_category
   category: { type: Object, required: true },
+  pending_transaction_id: { type: String, required: true },
+  is_pending: { type: Boolean, required: true },
 });
 
 // Virtual for user's URL

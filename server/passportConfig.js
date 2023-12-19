@@ -12,8 +12,16 @@ passport.use(
   new LocalStrategy(async (username, password, cb) => {
     try {
       const user = await User.findOne({ username: username });
+      if (!user) {
+        return cb(null, false, {
+          message: "Incorrect username and/or password",
+        });
+      }
+      // The reason for separating finding user and checkiing password logic
+      // is because the database might try to find the user's password
+      // when the user doesn't exist. So check user first before checking their password
       const match = await bcrypt.compare(password, user.password);
-      if (!user || !match) {
+      if (!match) {
         return cb(null, false, {
           message: "Incorrect username and/or password",
         });
@@ -27,40 +35,37 @@ passport.use(
 
 //
 passport.serializeUser(function (user, cb) {
-  process.nextTick(function () {
-    console.log("serializing user...");
-    cb(null, {
-      id: user.id,
-    });
-  });
+  console.log("serializing user...");
+  cb(null, user.id);
 });
 
-passport.deserializeUser(async function (user, cb) {
-  process.nextTick(function () {
-    console.log("Deserializing user...");
-    return cb(null, user);
-  });
+passport.deserializeUser(function (user, cb) {
+  console.log("Deserializing user...");
+  try {
+    const userInDB = User.findById(user);
+    cb(null, userInDB);
+  } catch (err) {
+    cb(err);
+  }
 });
 
 // Authorization
-passport.use(
-  new JwtStrategy(
-    {
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: process.env.JWT_SECRET_KEY,
-    },
-    (jwt_payload, cb) => {
-      const user = User.findById(jwt_payload.id);
+// passport.use(
+//   new JwtStrategy(
+//     {
+//       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+//       secretOrKey: process.env.JWT_SECRET_KEY,
+//     },
+//     (jwt_payload, cb) => {
+//       const user = User.findById(jwt_payload.id);
 
-      if (user) {
-        console.log("user found");
-        return cb(null, user);
-      }
-      console.log("user not found!!!");
-      return cb(null, false);
-    }
-  )
-);
+//       if (user) {
+//         return cb(null, user);
+//       }
+//       return cb(null, false);
+//     }
+//   )
+// );
 
 // // Set up GoogleStrategy
 // passport.use(

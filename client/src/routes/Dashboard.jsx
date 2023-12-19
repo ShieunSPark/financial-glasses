@@ -1,38 +1,32 @@
-import { Link, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { usePlaidLink } from "react-plaid-link";
 
-import { TokenContext, UserContext } from "../App";
 import plaidCreateLinkTokenRequest from "../api/plaidCreateLinkTokenRequest";
 import plaidSetAccessToken from "../api/plaidSetAccessToken";
+
+import { TokenContext, UserContext } from "../App";
 import dashboardRequest from "../api/dashboardRequest";
-import logo from "../assets/fgLogo.svg";
 
 export default function Dashboard() {
-  const { JWTtoken, setJWTtoken } = useContext(TokenContext);
+  // const { JWTtoken, setJWTtoken } = useContext(TokenContext);
   const { user, setUser } = useContext(UserContext);
   const [linkToken, setLinkToken] = useState(null);
-  const [title, setTitle] = useState("");
 
   const navigate = useNavigate();
-  const API_URL = import.meta.env.VITE_API_URL;
 
+  // Verify user is logged in
   useEffect(() => {
-    dashboardRequest(JWTtoken).then((data) => {
-      setTitle(data.title);
-    });
+    const checkLoggedIn = async () => {
+      dashboardRequest().then((data) => {
+        if (data === "Unauthorized") {
+          navigate("/");
+          // Perhaps display a message saying the user is not logged in
+        }
+      });
+    };
+    checkLoggedIn();
   }, []);
-
-  const logout = () => {
-    fetch(`${API_URL}/logout`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).then(() => {
-      navigate("/");
-    });
-  };
 
   // Plaid logistics
   useEffect(() => {
@@ -61,27 +55,6 @@ export default function Dashboard() {
 
   return (
     <div>
-      <nav className="flex justify-between items-center p-5 bg-slate-100 dark:bg-slate-600 ">
-        <Link to={`/dashboard`}>
-          <img className="w-16" src={logo} alt="Financial Glasses logo" />
-        </Link>
-        <div className="flex gap-x-10">
-          <Link to={`/dashboard`} className="text-xl hover:text-blue-300">
-            Overview
-          </Link>
-          <Link className="text-xl hover:text-blue-300">Transactions</Link>
-          <Link className="text-xl hover:text-blue-300">Budgets</Link>
-        </div>
-        <div className="flex gap-x-5">
-          <Link className="text-xl hover:text-blue-300">Profile</Link>
-          <Link
-            onClick={() => logout()}
-            className="text-xl hover:text-blue-300"
-          >
-            Logout
-          </Link>
-        </div>
-      </nav>
       {user ? (
         <div className="text-center p-4">Hello, {user.firstName}</div>
       ) : null}

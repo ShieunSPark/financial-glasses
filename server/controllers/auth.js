@@ -8,14 +8,6 @@ const User = require("../models/user");
 // const Post = require("../models/post");
 // const Comment = require("../models/comment");
 
-exports.signup_get = asyncHandler(async (req, res, next) => {
-  res.json({
-    message: "Sign Up",
-  });
-});
-
-// For POST signup:
-// Sanitize and validate data, then create user in db
 exports.signup_post = [
   // Sanitize and validate all fields
   body("username")
@@ -96,36 +88,26 @@ exports.signup_post = [
   }),
 ];
 
-exports.login_get = asyncHandler(async (req, res, next) => {
-  res.json({
-    message: "Log in!",
-  });
-});
-
 exports.login_post = asyncHandler(async (req, res, next) => {
-  console.log("calling post-auth login-post logic");
   const person = await User.findOne({ username: req.body.username });
-  if (person) {
-    const token = jwt.sign(
-      { id: person._id, username: person.email },
-      process.env.JWT_SECRET_KEY,
-      {
-        expiresIn: "1h",
-      }
-    );
 
-    // res.cookie("token", token, {
-    //   withCredentials: true,
-    //   httpOnly: false,
-    // });
+  // const token = jwt.sign(
+  //   { id: person._id, username: person.email },
+  //   process.env.JWT_SECRET_KEY,
+  //   {
+  //     expiresIn: "1h",
+  //   }
+  // );
 
-    res.json({
-      token: token,
-      user: person,
-    });
-  }
-  // }
-  // )(req, res, next);
+  // res.cookie("token", token, {
+  //   withCredentials: true,
+  //   httpOnly: false,
+  // });
+
+  res.json({
+    // token: token,
+    user: person,
+  });
 });
 
 exports.logout_get = asyncHandler(async (req, res, next) => {
@@ -134,12 +116,6 @@ exports.logout_get = asyncHandler(async (req, res, next) => {
   });
   res.json({
     message: "Logout successful",
-  });
-});
-
-exports.dashboard_get = asyncHandler(async (req, res, next) => {
-  res.json({
-    title: "Dashboard",
   });
 });
 

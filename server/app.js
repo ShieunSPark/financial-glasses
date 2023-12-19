@@ -21,13 +21,19 @@ mongoose.connect(process.env.MONGO_CONNECTION_STRING);
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "mongo connection error"));
 
-app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+    methods: ["GET", "POST", "HEAD", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type"],
+    exposedHeaders: ["Content-Type"],
+  })
+);
 app.use(logger("dev"));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 
-// Set up Passportjs
-require("./passportConfig");
+app.use(express.urlencoded({ extended: false }));
 
 // Start passport session
 app.use(
@@ -39,12 +45,16 @@ app.use(
     store: MongoStore.create({ mongoUrl: process.env.MONGO_CONNECTION_STRING }),
     cookie: {
       maxAge: 1000 * 60 * 10, // 1000 ms/sec * 60 sec/min * 10 min
+      secure: false,
     },
   })
 );
+
+// Configure Passportjs strategies (and serialization)
+require("./passportConfig");
+
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(express.urlencoded({ extended: false }));
 
 // Custom middleware to show current express-session details
 // app.use((req, res, next) => {

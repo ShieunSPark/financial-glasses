@@ -2,41 +2,36 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 
-const home_controller = require("../controllers/home");
 const auth_controller = require("../controllers/auth");
+const dashboard_controller = require("../controllers/dashboard");
 const plaid_controller = require("../controllers/plaid");
 
 const checkLoggedIn = require("../middleware/isLoggedIn");
 // const checkAdmin = require("./middleware/isAdmin");
 
-// GET home page
-router.get("/", home_controller.home_get);
-
-// GET signup
-router.get("/signup", auth_controller.signup_get);
-
 // POST signup
 router.post("/signup", auth_controller.signup_post);
-
-// GET login
-router.get("/login", auth_controller.login_get);
 
 // POST login
 router.post(
   "/login",
   function (req, res, next) {
-    passport.authenticate("local", function (err, user, info) {
-      if (err) {
-        return next(err);
-      }
-      if (!user) {
-        req.session.error = info;
-        return next(info);
-      }
+    passport.authenticate(
+      "local",
+      { failureMessage: true },
+      function (err, user, info) {
+        if (err) return next(err);
+        if (!user)
+          return res.status(401).json({
+            error: "Authentication failed",
+            message: info.message,
+            user,
+          });
 
-      // NEED TO CALL req.login()!!!
-      req.login(user, next);
-    })(req, res, next);
+        // This code below is VERY important
+        req.login(user, next);
+      }
+    )(req, res, next);
   },
   auth_controller.login_post
 );
@@ -64,11 +59,7 @@ router.post(
 router.post("/logout", auth_controller.logout_get);
 
 // GET dashboard
-router.get(
-  "/dashboard",
-  passport.authenticate("jwt", { session: false }),
-  auth_controller.dashboard_get
-);
+router.get("/dashboard", checkLoggedIn, dashboard_controller.dashboard_get);
 
 // POST Plaid link token
 router.post("/api/create_link_token", plaid_controller.create_link_token);

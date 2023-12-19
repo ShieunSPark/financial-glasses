@@ -5,13 +5,14 @@ import Error from "./routes/Error";
 import Home from "./routes/Home";
 import SignUp from "./routes/SignUp";
 import Login from "./routes/Login";
+import Navbar from "./components/Navbar";
 import Dashboard from "./routes/Dashboard";
 
 export const TokenContext = createContext(null);
 export const UserContext = createContext(null);
 
 function App() {
-  const [JWTtoken, setJWTtoken] = useState(null);
+  // const [JWTtoken, setJWTtoken] = useState(null);
   const [user, setUser] = useState(null);
 
   const router = createBrowserRouter([
@@ -31,9 +32,20 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/dashboard",
-      element: <Dashboard />,
+      element: <Navbar />,
       errorElement: <Error />,
+      children: [
+        {
+          path: "/dashboard",
+          element: <Dashboard />,
+        },
+        {
+          path: "/transactions",
+        },
+        {
+          path: "/budgets",
+        },
+      ],
     },
   ]);
 
@@ -42,11 +54,11 @@ function App() {
      * me trying to debug JWT stuff because I thought passport-jwt wasn't working...
      * I'm not mad, you're mad
      */
-    <TokenContext.Provider value={{ JWTtoken, setJWTtoken }}>
-      <UserContext.Provider value={{ user, setUser }}>
-        <RouterProvider router={router} />
-      </UserContext.Provider>
-    </TokenContext.Provider>
+    // <TokenContext.Provider value={{ JWTtoken, setJWTtoken }}>
+    <UserContext.Provider value={{ user, setUser }}>
+      <RouterProvider router={router} />
+    </UserContext.Provider>
+    // </TokenContext.Provider>
   );
 }
 
