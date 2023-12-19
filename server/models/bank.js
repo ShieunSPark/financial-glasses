@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const BankSchema = new Schema({
-  user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  // Get institution_id via '/institutions/get_by_id'
+  institution_id: { type: String, required: true },
   name: { type: String, required: true },
 });
 

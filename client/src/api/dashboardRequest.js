@@ -8,7 +8,6 @@ export default () => {
     },
     credentials: "include",
   }).then((response) => {
-    // if (response.statusText === "Unauthorized") return response.statusText;
     return response.json();
   });
 };

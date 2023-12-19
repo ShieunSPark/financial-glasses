@@ -35,12 +35,10 @@ passport.use(
 
 //
 passport.serializeUser(function (user, cb) {
-  console.log("serializing user...");
   cb(null, user.id);
 });
 
 passport.deserializeUser(function (user, cb) {
-  console.log("Deserializing user...");
   try {
     const userInDB = User.findById(user);
     cb(null, userInDB);

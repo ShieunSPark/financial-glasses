@@ -15,27 +15,23 @@ export default function Dashboard() {
 
   const navigate = useNavigate();
 
-  // Verify user is logged in
+  // Verify user is logged in, then configure Plaid
   useEffect(() => {
-    const checkLoggedIn = async () => {
-      dashboardRequest().then((data) => {
-        if (data === "Unauthorized") {
-          navigate("/");
-          // Perhaps display a message saying the user is not logged in
-        }
-      });
+    const setup = async () => {
+      dashboardRequest()
+        .then((data) => {
+          if (data.message) {
+            navigate("/");
+            // Perhaps display a message saying the user is not logged in
+          }
+        })
+        .then(async () => {
+          const response = await plaidCreateLinkTokenRequest(user);
+          const { link_token } = await response;
+          setLinkToken(link_token);
+        });
     };
-    checkLoggedIn();
-  }, []);
-
-  // Plaid logistics
-  useEffect(() => {
-    const createLinkToken = async () => {
-      const response = await plaidCreateLinkTokenRequest(user);
-      const { link_token } = await response;
-      setLinkToken(link_token);
-    };
-    createLinkToken();
+    setup();
   }, []);
 
   const { open, ready } = usePlaidLink(
