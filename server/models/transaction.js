@@ -6,7 +6,7 @@ const TransactionSchema = new Schema({
   // id in Plaid; maybe assign it to Mongo's _id field?
   transaction_id: { type: String, required: true },
   user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  bank: { type: Schema.Types.ObjectId, ref: "Bank", required: true },
+  item: { type: Schema.Types.ObjectId, ref: "Item", required: true },
   account: { ype: Schema.Types.ObjectId, ref: "Account", required: true },
   // Prefer merchant_name, then name
   name: { type: String, required: true },
@@ -23,7 +23,7 @@ const TransactionSchema = new Schema({
 
 // Virtual for user's URL
 TransactionSchema.virtual("url").get(function () {
-  return `/bank/${this._id}`;
+  return `/transaction/${this._id}`;
 });
 
 module.exports = mongoose.model("Transaction", TransactionSchema);

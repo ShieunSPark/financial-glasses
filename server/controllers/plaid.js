@@ -8,6 +8,7 @@ const {
 
 const User = require("../models/user");
 const Item = require("../models/item");
+const Account = require("../models/account");
 
 const APP_PORT = process.env.APP_PORT || 8000;
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
@@ -69,43 +70,82 @@ exports.create_link_token = asyncHandler(async (req, res, next) => {
 
 // Convert Plaid public token to access token
 exports.set_access_token = asyncHandler(async (req, res, next) => {
-  // Get the client_user_id by searching for the current user
   Promise.resolve()
     .then(async function () {
       const tokenResponse = await client.itemPublicTokenExchange({
         public_token: req.body.public_token,
       });
 
+      const USER = req.body.user;
       const ACCESS_TOKEN = tokenResponse.data.access_token;
       const ITEM_ID = tokenResponse.data.item_id;
       try {
         // Get info on the Item (i.e., financial institution log in) the user just connected to
-        const plaidItem = await client.itemGet({ access_token: ACCESS_TOKEN });
-        const INSTITUTION_ID = plaidItem.data.item.institution_id;
+        const resPlaidItem = await client.itemGet({
+          access_token: ACCESS_TOKEN,
+        });
+        const INSTITUTION_ID = resPlaidItem.data.item.institution_id;
 
-        const institution = await client.institutionsGetById({
+        const resInstitution = await client.institutionsGetById({
           institution_id: INSTITUTION_ID,
           country_codes: ["US"],
         });
-        const NAME = institution.data.institution.name;
+        const NAME = resInstitution.data.institution.name;
 
         // Create new Item and insert access_token and item_id
         const newItem = new Item({
           institution_id: INSTITUTION_ID,
+          user: USER,
           name: NAME,
           accessToken: ACCESS_TOKEN,
           item_id: ITEM_ID,
         });
 
-        newItem.save();
-      } catch (err) {
-        console.log(err.data);
-      }
+        // Double check the new item doesn't already exist in the database
+        const checkItem = await Item.find({
+          institution_id: INSTITUTION_ID,
+          user: USER,
+        });
+        console.log(checkItem);
 
-      // Do NOT send accessToken to client!!!
-      res.json({
-        message: "Set Access Token complete",
-      });
+        if (checkItem.length > 0) {
+          res.json({
+            message: "You already added this financial institution!",
+          });
+          return;
+        } else {
+          newItem.save();
+        }
+
+        // Create accounts (but first, use access token to get accounts from Plaid)
+        const resAccounts = await client.accountsBalanceGet({
+          access_token: ACCESS_TOKEN,
+        });
+
+        resAccounts.data.accounts.forEach((account) => {
+          // Create new account
+          const newAccount = new Account({
+            account_id: account.account_id,
+            user: USER,
+            item: newItem,
+            name: account.name,
+            balance: account.balances.current,
+            subtype: account.subtype,
+            type: account.type,
+          });
+
+          newAccount.save();
+        });
+
+        res.json({
+          message:
+            "Set Access Token complete; new financial insitution and corresponding accounts added",
+        });
+      } catch (err) {
+        res.status(403).json({
+          error: err,
+        });
+      }
     })
     .catch(next);
 });

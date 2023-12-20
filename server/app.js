@@ -40,13 +40,17 @@ app.use(
   session({
     secret: process.env.EXPRESS_SESSION_SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     // Save session in Mongo rather than local memory
-    store: MongoStore.create({ mongoUrl: process.env.MONGO_CONNECTION_STRING }),
-    cookie: {
-      maxAge: 1000 * 60 * 10, // 1000 ms/sec * 60 sec/min * 10 min
-      secure: false,
-    },
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_CONNECTION_STRING,
+      ttl: 10 * 60, // 10 minutes * 60 seconds/min
+      touchAfter: 9 * 60, // only update session after __ seconds
+    }),
+    // cookie: {
+    //   maxAge: 1000 * 60 * 10, // 1000 ms/sec * 60 sec/min * 10 min
+    //   secure: false,
+    // },
   })
 );
 

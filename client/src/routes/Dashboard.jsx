@@ -15,24 +15,30 @@ export default function Dashboard() {
 
   const navigate = useNavigate();
 
-  // Verify user is logged in, then generate Plaid link token
+  // Verify user is logged in
   useEffect(() => {
-    const setup = async () => {
-      dashboardRequest()
-        .then((data) => {
-          if (data.message) {
-            navigate("/");
-            // Perhaps display a message saying the user is not logged in
-          }
-        })
-        .then(async () => {
-          const response = await plaidCreateLinkTokenRequest(user);
-          const { link_token } = await response;
-          setLinkToken(link_token);
-        });
+    const verifyLoggedIn = async () => {
+      dashboardRequest().then((data) => {
+        if (data.message) {
+          navigate("/");
+          // Perhaps display a message saying the user is not logged in
+        } else {
+          setUser(data.user);
+        }
+      });
     };
-    setup();
+    verifyLoggedIn();
   }, []);
+
+  // Generate Plaid link token
+  useEffect(() => {
+    const generateLinkToken = async () => {
+      const response = await plaidCreateLinkTokenRequest(user);
+      const { link_token } = await response;
+      setLinkToken(link_token);
+    };
+    generateLinkToken();
+  }, [user]);
 
   // Convert Plaid link token -> public token -> access token
   const { open, ready } = usePlaidLink(
@@ -42,7 +48,6 @@ export default function Dashboard() {
         const setAccessToken = async () => {
           const response = await plaidSetAccessToken(public_token, user);
           const { access_token } = await response;
-          console.log(access_token);
         };
         setAccessToken();
       },

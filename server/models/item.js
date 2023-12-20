@@ -11,7 +11,7 @@ const Schema = mongoose.Schema;
 // is too long of a name. I'll use Plaid's name for it: "Item"
 const ItemSchema = new Schema({
   institution_id: { type: String, required: true },
-  // Get name via '/institutions/get_by_id' (or institutionsGetById() function)
+  user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   name: { type: String, required: true },
   accessToken: { type: String },
   item_id: { type: String },
@@ -19,7 +19,7 @@ const ItemSchema = new Schema({
 
 // Virtual for Item's URL
 ItemSchema.virtual("url").get(function () {
-  return `/bank/${this._id}`;
+  return `/item/${this._id}`;
 });
 
 module.exports = mongoose.model("Item", ItemSchema);

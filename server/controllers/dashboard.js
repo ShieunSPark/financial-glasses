@@ -4,8 +4,10 @@ const asyncHandler = require("express-async-handler");
 const User = require("../models/user");
 
 exports.dashboard_get = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.session.passport.user);
   res.json({
     title: "Dashboard",
+    user: user,
   });
 });
 
