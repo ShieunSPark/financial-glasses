@@ -15,7 +15,7 @@ export default function Dashboard() {
 
   const navigate = useNavigate();
 
-  // Verify user is logged in, then configure Plaid
+  // Verify user is logged in, then generate Plaid link token
   useEffect(() => {
     const setup = async () => {
       dashboardRequest()
@@ -34,6 +34,7 @@ export default function Dashboard() {
     setup();
   }, []);
 
+  // Convert Plaid link token -> public token -> access token
   const { open, ready } = usePlaidLink(
     {
       token: linkToken,

@@ -7,6 +7,7 @@ const {
 } = require("plaid");
 
 const User = require("../models/user");
+const Item = require("../models/item");
 
 const APP_PORT = process.env.APP_PORT || 8000;
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
@@ -71,16 +72,35 @@ exports.set_access_token = asyncHandler(async (req, res, next) => {
   // Get the client_user_id by searching for the current user
   Promise.resolve()
     .then(async function () {
-      const user = await User.findById(req.body.user._id);
-
       const tokenResponse = await client.itemPublicTokenExchange({
         public_token: req.body.public_token,
       });
 
-      // Append access_token and item_id to user in MongoDB
-      user.accessToken = tokenResponse.data.access_token;
-      user.itemID = tokenResponse.data.item_id;
-      user.save();
+      const ACCESS_TOKEN = tokenResponse.data.access_token;
+      const ITEM_ID = tokenResponse.data.item_id;
+      try {
+        // Get info on the Item (i.e., financial institution log in) the user just connected to
+        const plaidItem = await client.itemGet({ access_token: ACCESS_TOKEN });
+        const INSTITUTION_ID = plaidItem.data.item.institution_id;
+
+        const institution = await client.institutionsGetById({
+          institution_id: INSTITUTION_ID,
+          country_codes: ["US"],
+        });
+        const NAME = institution.data.institution.name;
+
+        // Create new Item and insert access_token and item_id
+        const newItem = new Item({
+          institution_id: INSTITUTION_ID,
+          name: NAME,
+          accessToken: ACCESS_TOKEN,
+          item_id: ITEM_ID,
+        });
+
+        newItem.save();
+      } catch (err) {
+        console.log(err.data);
+      }
 
       // Do NOT send accessToken to client!!!
       res.json({

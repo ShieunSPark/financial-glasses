@@ -20,4 +20,4 @@ AccountSchema.virtual("url").get(function () {
   return `/bank/${this._id}`;
 });
 
-module.exports = mongoose.model("Bank", AccountSchema);
+module.exports = mongoose.model("Account", AccountSchema);
