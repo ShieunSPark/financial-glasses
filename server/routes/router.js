@@ -67,6 +67,9 @@ router.post("/api/create_link_token", plaid_controller.create_link_token);
 // POST Plaid access token
 router.post("/api/set_access_token", plaid_controller.set_access_token);
 
+// GET accounts
+router.get("/dashboard/accounts", checkLoggedIn, plaid_controller.accounts_get);
+
 // // GET a singular post (and its attached comments)
 // router.get("/post/:post_id", home_controller.post_get);
 

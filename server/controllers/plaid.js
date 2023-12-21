@@ -106,7 +106,6 @@ exports.set_access_token = asyncHandler(async (req, res, next) => {
           institution_id: INSTITUTION_ID,
           user: USER,
         });
-        console.log(checkItem);
 
         // Skip adding item if the user already added it before
         if (checkItem.length > 0) {
@@ -142,6 +141,7 @@ exports.set_access_token = asyncHandler(async (req, res, next) => {
           res.json({
             message:
               "Set Access Token complete; new financial insitution and corresponding accounts added",
+            itemName: newItem.name,
           });
         }
       } catch (err) {
@@ -151,4 +151,30 @@ exports.set_access_token = asyncHandler(async (req, res, next) => {
       }
     })
     .catch(next);
+});
+
+exports.accounts_get = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.session.passport.user);
+  const item = await Item.findOne({ user: user });
+  if (!item) {
+    res.json({
+      message: "No accounts",
+    });
+  } else {
+    const access_token = item.accessToken;
+
+    const response = await client.accountsGet({ access_token: access_token });
+    const accounts = response.data.accounts;
+
+    res.json({
+      title: "Accounts",
+      accounts: accounts,
+    });
+  }
+});
+
+exports.transactions_get = asyncHandler(async (req, res, next) => {
+  res.json({
+    title: "Transactions",
+  });
 });

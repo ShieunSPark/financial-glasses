@@ -7,11 +7,14 @@ import plaidSetAccessToken from "../api/plaidSetAccessToken";
 
 import { TokenContext, UserContext } from "../App";
 import dashboardRequest from "../api/dashboardRequest";
+import accountsRequest from "../api/accountsRequest";
 
 export default function Dashboard() {
   // const { JWTtoken, setJWTtoken } = useContext(TokenContext);
   const { user, setUser } = useContext(UserContext);
   const [linkToken, setLinkToken] = useState(null);
+  const [itemName, setItemName] = useState("");
+  const [accounts, setAccounts] = useState([]);
 
   const navigate = useNavigate();
 
@@ -19,11 +22,12 @@ export default function Dashboard() {
   useEffect(() => {
     const verifyLoggedIn = async () => {
       dashboardRequest().then((data) => {
-        if (data.message) {
+        if (data.error) {
           navigate("/");
           // Perhaps display a message saying the user is not logged in
         } else {
           setUser(data.user);
+          setItemName(data.itemName);
         }
       });
     };
@@ -46,8 +50,8 @@ export default function Dashboard() {
       token: linkToken,
       onSuccess: (public_token, metadata) => {
         const setAccessToken = async () => {
-          const response = await plaidSetAccessToken(public_token, user);
-          const { access_token } = await response;
+          await plaidSetAccessToken(public_token, user);
+          navigate(0);
         };
         setAccessToken();
       },
@@ -55,11 +59,26 @@ export default function Dashboard() {
     []
   );
 
+  useEffect(() => {
+    const getAccounts = async () => {
+      const response = await accountsRequest();
+      setAccounts(response.accounts);
+    };
+    getAccounts();
+  }, []);
+
   return (
     <div>
       {user ? (
-        <div className="text-center p-4">Hello, {user.firstName}</div>
+        <div className="text-center pt-4">Hello, {user.firstName}</div>
       ) : null}
+      {itemName ? (
+        <div className="text-center pt-4">You are connected to {itemName}</div>
+      ) : (
+        <div className="text-center pt-4">
+          You are not connected to any financial institution
+        </div>
+      )}
       <div className="flex justify-center items-center m-2 p-2">
         <button
           className=" p-2 transition ease-in-out delay-50 bg-blue-500 text-white rounded-md hover:bg-indigo-500"
@@ -68,6 +87,11 @@ export default function Dashboard() {
         >
           Connect a Bank
         </button>
+      </div>
+      <div className="text-center pt-4">
+        {accounts.map((account) => (
+          <div key={account.account_id}>{account.name}</div>
+        ))}
       </div>
     </div>
   );
