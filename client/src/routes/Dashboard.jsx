@@ -89,9 +89,11 @@ export default function Dashboard() {
         </button>
       </div>
       <div className="text-center pt-4">
-        {accounts.map((account) => (
-          <div key={account.account_id}>{account.name}</div>
-        ))}
+        {accounts
+          ? accounts.map((account) => (
+              <div key={account.account_id}>{account.name}</div>
+            ))
+          : null}
       </div>
     </div>
   );

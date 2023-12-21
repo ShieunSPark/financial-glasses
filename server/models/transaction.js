@@ -7,7 +7,7 @@ const TransactionSchema = new Schema({
   transaction_id: { type: String, required: true },
   user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   item: { type: Schema.Types.ObjectId, ref: "Item", required: true },
-  account: { ype: Schema.Types.ObjectId, ref: "Account", required: true },
+  account_id: { type: String, required: true },
   // Prefer merchant_name, then name
   name: { type: String, required: true },
   // Note that positive amount is $ going OUT of the account and negative is $ going INTO the account
@@ -17,7 +17,8 @@ const TransactionSchema = new Schema({
   date: { type: Date, required: true },
   // Prefer personal_finance_category
   category: { type: Object, required: true },
-  pending_transaction_id: { type: String, required: true },
+  // Can be either String or null
+  pending_transaction_id: { type: Schema.Types.Mixed },
   is_pending: { type: Boolean, required: true },
 });
 
