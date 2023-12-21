@@ -68,7 +68,7 @@ exports.create_link_token = asyncHandler(async (req, res, next) => {
     .catch(next);
 });
 
-// Convert Plaid public token to access token
+// Convert Plaid public token to access token, then add item, account(s), and transactions to the database
 exports.set_access_token = asyncHandler(async (req, res, next) => {
   Promise.resolve()
     .then(async function () {
@@ -108,6 +108,7 @@ exports.set_access_token = asyncHandler(async (req, res, next) => {
         });
         console.log(checkItem);
 
+        // Skip adding item if the user already added it before
         if (checkItem.length > 0) {
           res.json({
             message: "You already added this financial institution!",
@@ -115,32 +116,34 @@ exports.set_access_token = asyncHandler(async (req, res, next) => {
           return;
         } else {
           newItem.save();
-        }
 
-        // Create accounts (but first, use access token to get accounts from Plaid)
-        const resAccounts = await client.accountsBalanceGet({
-          access_token: ACCESS_TOKEN,
-        });
-
-        resAccounts.data.accounts.forEach((account) => {
-          // Create new account
-          const newAccount = new Account({
-            account_id: account.account_id,
-            user: USER,
-            item: newItem,
-            name: account.name,
-            balance: account.balances.current,
-            subtype: account.subtype,
-            type: account.type,
+          // Create accounts (but first, use access token to get accounts from Plaid)
+          const resAccounts = await client.accountsBalanceGet({
+            access_token: ACCESS_TOKEN,
           });
 
-          newAccount.save();
-        });
+          resAccounts.data.accounts.forEach((account) => {
+            // Create new account
+            const newAccount = new Account({
+              account_id: account.account_id,
+              user: USER,
+              item: newItem,
+              name: account.name,
+              balance: account.balances.current,
+              subtype: account.subtype,
+              type: account.type,
+            });
 
-        res.json({
-          message:
-            "Set Access Token complete; new financial insitution and corresponding accounts added",
-        });
+            newAccount.save();
+
+            // Go through all transactions linked to the specific account
+          });
+
+          res.json({
+            message:
+              "Set Access Token complete; new financial insitution and corresponding accounts added",
+          });
+        }
       } catch (err) {
         res.status(403).json({
           error: err,
