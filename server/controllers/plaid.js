@@ -146,34 +146,32 @@ exports.set_access_token = asyncHandler(async (req, res, next) => {
 
           const transactions = resTransactions.data.added;
           transactions.forEach(async (transaction) => {
-            try {
-              // Create new transaction
-              const newTransaction = new Transaction({
-                transaction_id: transaction.transaction_id,
-                user: USER,
-                item: newItem,
-                // Couldn't figure out how to get Account object here for some reason...
-                account_id: transaction.account_id,
-                name: transaction.merchant_name
-                  ? transaction.merchant_name
-                  : transaction.name,
-                // Note that positive amount is $ going OUT of the account and negative is $ going INTO the account
-                amount: transaction.amount,
-                iso_currency_code: transaction.iso_currency_code,
-                // Prefer authorized-date
-                date: transaction.authorized_date
-                  ? transaction.authorized_date
-                  : transaction.date,
-                // Prefer personal_finance_category
-                category: transaction.personal_finance_category,
-                pending_transaction_id: transaction.pending_transaction_id,
-                is_pending: transaction.pending,
-              });
+            const ACCOUNT = await Account.findOne({
+              account_id: transaction.account_id,
+            });
+            // Create new transaction
+            const newTransaction = new Transaction({
+              transaction_id: transaction.transaction_id,
+              user: USER,
+              item: newItem,
+              account: ACCOUNT,
+              name: transaction.merchant_name
+                ? transaction.merchant_name
+                : transaction.name,
+              // Note that positive amount is $ going OUT of the account and negative is $ going INTO the account
+              amount: transaction.amount,
+              iso_currency_code: transaction.iso_currency_code,
+              // Prefer authorized-date
+              date: transaction.authorized_date
+                ? transaction.authorized_date
+                : transaction.date,
+              // Prefer personal_finance_category
+              category: transaction.personal_finance_category,
+              pending_transaction_id: transaction.pending_transaction_id,
+              is_pending: transaction.pending,
+            });
 
-              newTransaction.save();
-            } catch (err) {
-              console.log("error!");
-            }
+            newTransaction.save();
           });
 
           res.json({
@@ -199,10 +197,8 @@ exports.accounts_get = asyncHandler(async (req, res, next) => {
       message: "No accounts",
     });
   } else {
-    const access_token = item.accessToken;
-
-    const response = await client.accountsGet({ access_token: access_token });
-    const accounts = response.data.accounts;
+    // Find accounts for specified user and item in database
+    const accounts = await Account.find({ user: user, item: item });
 
     res.json({
       title: "Accounts",
@@ -212,7 +208,18 @@ exports.accounts_get = asyncHandler(async (req, res, next) => {
 });
 
 exports.transactions_get = asyncHandler(async (req, res, next) => {
-  res.json({
-    title: "Transactions",
-  });
+  const user = await User.findById(req.session.passport.user);
+  if (!user) {
+    res.json({
+      message: "No transactions",
+    });
+  } else {
+    // Find accounts for specified user and item in database
+    const transactions = await Transaction.find({ user: user });
+
+    res.json({
+      title: "Transactions",
+      transactions: transactions,
+    });
+  }
 });

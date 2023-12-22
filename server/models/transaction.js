@@ -7,7 +7,7 @@ const TransactionSchema = new Schema({
   transaction_id: { type: String, required: true },
   user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   item: { type: Schema.Types.ObjectId, ref: "Item", required: true },
-  account_id: { type: String, required: true },
+  account: { type: Schema.Types.ObjectId, ref: "Account", required: true },
   // Prefer merchant_name, then name
   name: { type: String, required: true },
   // Note that positive amount is $ going OUT of the account and negative is $ going INTO the account

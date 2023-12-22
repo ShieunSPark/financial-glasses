@@ -70,6 +70,13 @@ router.post("/api/set_access_token", plaid_controller.set_access_token);
 // GET accounts
 router.get("/dashboard/accounts", checkLoggedIn, plaid_controller.accounts_get);
 
+// GET transactions via /transactions/sync Plaid API route
+router.get(
+  "/dashboard/transactions/get",
+  checkLoggedIn,
+  plaid_controller.transactions_get
+);
+
 // // GET a singular post (and its attached comments)
 // router.get("/post/:post_id", home_controller.post_get);
 

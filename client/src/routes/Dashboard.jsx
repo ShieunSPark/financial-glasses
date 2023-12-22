@@ -8,6 +8,7 @@ import plaidSetAccessToken from "../api/plaidSetAccessToken";
 import { TokenContext, UserContext } from "../App";
 import dashboardRequest from "../api/dashboardRequest";
 import accountsRequest from "../api/accountsRequest";
+import transactionsRequest from "../api/transactionsRequest";
 
 export default function Dashboard() {
   // const { JWTtoken, setJWTtoken } = useContext(TokenContext);
@@ -15,6 +16,7 @@ export default function Dashboard() {
   const [linkToken, setLinkToken] = useState(null);
   const [itemName, setItemName] = useState("");
   const [accounts, setAccounts] = useState([]);
+  const [transactions, setTransactions] = useState([]);
 
   const navigate = useNavigate();
 
@@ -67,6 +69,14 @@ export default function Dashboard() {
     getAccounts();
   }, []);
 
+  useEffect(() => {
+    const getTransactions = async () => {
+      const response = await transactionsRequest();
+      setTransactions(response.transactions);
+    };
+    getTransactions();
+  }, []);
+
   return (
     <div>
       {user ? (
@@ -88,13 +98,53 @@ export default function Dashboard() {
           Connect a Bank
         </button>
       </div>
-      <div className="text-center pt-4">
-        {accounts
-          ? accounts.map((account) => (
-              <div key={account.account_id}>{account.name}</div>
-            ))
-          : null}
-      </div>
+
+      {accounts
+        ? accounts.map((account) => (
+            <div key={account.account_id} className="text-center pt-4 mx-4">
+              <div>{account.name}</div>
+              <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                  <tr>
+                    <th scope="col" className="px-6 py-3">
+                      Name
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Amount
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Category
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Date
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {transactions
+                    ? transactions.map((transaction) => (
+                        <>
+                          <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                            <th
+                              scope="row"
+                              className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                            >
+                              {transaction.name}
+                            </th>
+                            <td className="px-6 py-4">{transaction.amount}</td>
+                            <td className="px-6 py-4">
+                              {transaction.category.primary}
+                            </td>
+                            <td className="px-6 py-4">{transaction.date}</td>
+                          </tr>
+                        </>
+                      ))
+                    : null}
+                </tbody>
+              </table>
+            </div>
+          ))
+        : null}
     </div>
   );
 }
