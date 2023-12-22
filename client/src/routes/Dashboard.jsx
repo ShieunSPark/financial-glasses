@@ -131,11 +131,21 @@ export default function Dashboard() {
                             >
                               {transaction.name}
                             </th>
-                            <td className="px-6 py-4">{transaction.amount}</td>
+                            {transaction.amount > 0 ? (
+                              <td className="px-6 py-4">
+                                ${transaction.amount.toFixed(2)}
+                              </td>
+                            ) : (
+                              <td className="px-6 py-4">
+                                -${transaction.amount.toFixed(2) * -1}
+                              </td>
+                            )}
                             <td className="px-6 py-4">
                               {transaction.category.primary}
                             </td>
-                            <td className="px-6 py-4">{transaction.date}</td>
+                            <td className="px-6 py-4">
+                              {transaction.date.substring(0, 10)}
+                            </td>
                           </tr>
                         </>
                       ))
