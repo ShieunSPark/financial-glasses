@@ -101,7 +101,7 @@ export default function Dashboard() {
 
       {accounts
         ? accounts.map((account) => (
-            <div key={account.account_id} className="text-center pt-4 mx-4">
+            <div key={account.account_id} className="text-center pt-4 mx-6">
               <div>{account.name}</div>
               <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -124,7 +124,10 @@ export default function Dashboard() {
                   {transactions
                     ? transactions.map((transaction) => (
                         <>
-                          <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                          <tr
+                            key={transaction.transaction_id}
+                            className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                          >
                             <th
                               scope="row"
                               className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
