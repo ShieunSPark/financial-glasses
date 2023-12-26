@@ -39,7 +39,9 @@ export default function Navbar() {
           <Link to={`/dashboard`} className="text-xl hover:text-blue-300">
             Overview
           </Link>
-          <Link className="text-xl hover:text-blue-300">Transactions</Link>
+          <Link to={`/transactions`} className="text-xl hover:text-blue-300">
+            Transactions
+          </Link>
           <Link className="text-xl hover:text-blue-300">Budgets</Link>
         </div>
         <div className="flex w-[64px]">
@@ -48,7 +50,7 @@ export default function Navbar() {
             className="relative justify-end inline-block text-left ml-auto"
           >
             <div>
-              <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+              <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-200">
                 <HiDotsVertical
                   className="-mr-1 h-5 w-5 text-gray-400"
                   aria-hidden="true"

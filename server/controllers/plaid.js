@@ -191,18 +191,33 @@ exports.set_access_token = asyncHandler(async (req, res, next) => {
 
 exports.accounts_get = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
-  const item = await Item.findOne({ user: user });
-  if (!item) {
+  const items = await Item.find({ user: user });
+  const accounts = await Account.find({ user: user }).populate("item");
+  if (accounts.length === 0) {
     res.json({
       message: "No accounts",
     });
   } else {
-    // Find accounts for specified user and item in database
-    const accounts = await Account.find({ user: user, item: item });
+    // Sort accounts by their respective item
+    const itemsAndAccounts = [];
+    items.forEach((item) => {
+      const entry = {
+        item: item,
+        accounts: [],
+      };
+
+      accounts.forEach((account) => {
+        if (account.item.item_id === item.item_id) {
+          entry.accounts.push(account);
+        }
+      });
+
+      itemsAndAccounts.push(entry);
+    });
 
     res.json({
       title: "Accounts",
-      accounts: accounts,
+      itemsAndAccounts: itemsAndAccounts,
     });
   }
 });

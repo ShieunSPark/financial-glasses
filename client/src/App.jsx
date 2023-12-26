@@ -7,6 +7,7 @@ import SignUp from "./routes/SignUp";
 import Login from "./routes/Login";
 import Navbar from "./components/Navbar";
 import Dashboard from "./routes/Dashboard";
+import Transactions from "./routes/Transactions";
 
 export const TokenContext = createContext(null);
 export const UserContext = createContext(null);
@@ -41,6 +42,7 @@ function App() {
         },
         {
           path: "/transactions",
+          element: <Transactions />,
         },
         {
           path: "/budgets",

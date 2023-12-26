@@ -6,8 +6,9 @@ const Item = require("../models/item");
 
 exports.dashboard_get = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
-  const item = await Item.findOne({ user: user });
-  if (!item) {
+  const numOfItems = await Item.countDocuments();
+  const items = await Item.find({ user: user });
+  if (items.length === 0) {
     res.json({
       title: "Dashboard",
       user: user,
@@ -16,7 +17,8 @@ exports.dashboard_get = asyncHandler(async (req, res, next) => {
     res.json({
       title: "Dashboard",
       user: user,
-      itemName: item.name,
+      numOfItems: numOfItems,
+      items: items,
     });
   }
 });
