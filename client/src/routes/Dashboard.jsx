@@ -103,18 +103,16 @@ export default function Dashboard() {
       {itemsAndAccounts
         ? itemsAndAccounts.map((entry) => (
             <div key={entry.item.item_id} className="text-center pt-4 mx-6">
-              <div>{entry.item.name}</div>
-              {entry.accounts.map((account) => {
+              <div className="underline">{entry.item.name}</div>
+              {entry.accounts.map((account) => (
                 <div key={account.account_id} className="text-center pt-4 mx-6">
                   <div>{account.name}</div>
                   <div>{account.balance}</div>
-                </div>;
-              })}
+                </div>
+              ))}
             </div>
           ))
         : null}
-
-      <div>Other stuff</div>
     </div>
   );
 }

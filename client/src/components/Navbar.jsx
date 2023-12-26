@@ -36,13 +36,24 @@ export default function Navbar() {
           <img className="w-16" src={logo} alt="Financial Glasses logo" />
         </Link>
         <div className="flex gap-x-10">
-          <Link to={`/dashboard`} className="text-xl hover:text-blue-300">
+          <Link
+            to={`/dashboard`}
+            className="text-xl hover:text-blue-300 duration-200"
+          >
             Overview
           </Link>
-          <Link to={`/transactions`} className="text-xl hover:text-blue-300">
+          <Link
+            to={`/transactions`}
+            className="text-xl hover:text-blue-300 duration-200"
+          >
             Transactions
           </Link>
-          <Link className="text-xl hover:text-blue-300">Budgets</Link>
+          <Link
+            to={`/budgets`}
+            className="text-xl hover:text-blue-300 duration-200"
+          >
+            Budgets
+          </Link>
         </div>
         <div className="flex w-[64px]">
           <Menu

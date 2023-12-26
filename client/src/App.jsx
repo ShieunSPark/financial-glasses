@@ -8,6 +8,7 @@ import Login from "./routes/Login";
 import Navbar from "./components/Navbar";
 import Dashboard from "./routes/Dashboard";
 import Transactions from "./routes/Transactions";
+import Budgets from "./routes/Budgets";
 
 export const TokenContext = createContext(null);
 export const UserContext = createContext(null);
@@ -46,6 +47,7 @@ function App() {
         },
         {
           path: "/budgets",
+          element: <Budgets />,
         },
       ],
     },
