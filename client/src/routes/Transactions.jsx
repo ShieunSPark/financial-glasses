@@ -50,19 +50,20 @@ export default function Transactions() {
               {entry.accounts.map((account) => (
                 <div key={account.account_id} className="py-2">
                   <Disclosure>
-                    <Disclosure.Button className="w-full">
+                    <Disclosure.Button className="w-full bg-green-100 dark:bg-green-800">
                       {account.name}
                     </Disclosure.Button>
 
                     <Transition
-                      enter="transition duration-200 ease-out"
-                      enterFrom="transform scale-95 opacity-0"
-                      enterTo="transform scale-100 opacity-100"
-                      leave="transition duration-75 ease-out"
-                      leaveFrom="transform scale-200 opacity-100"
-                      leaveTo="transform scale-95 opacity-0"
+                      className="origin-top"
+                      enter="transition duration-150 ease-in"
+                      enterFrom="transform scale-y-50 opacity-0"
+                      enterTo="transform scale-y-100 opacity-100"
+                      leave="transition duration-150 ease-in"
+                      leaveFrom="transform scale-y-100 opacity-100"
+                      leaveTo="transform scale-y-50 opacity-0"
                     >
-                      <Disclosure.Panel>
+                      <Disclosure.Panel className="h-96 overflow-y-scroll">
                         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>

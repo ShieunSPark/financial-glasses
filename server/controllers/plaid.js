@@ -222,6 +222,14 @@ exports.accounts_get = asyncHandler(async (req, res, next) => {
   }
 });
 
+exports.accounts_delete = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.session.passport.user);
+  const items = await Item.find({ user: user });
+  const accounts = await Account.find({ user: user }).populate("item");
+
+  // Delete item if no accounts remain for that specific item
+});
+
 exports.transactions_get = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
   if (!user) {

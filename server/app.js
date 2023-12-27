@@ -44,7 +44,7 @@ app.use(
     // Save session in Mongo rather than local memory
     store: MongoStore.create({
       mongoUrl: process.env.MONGO_CONNECTION_STRING,
-      ttl: 10 * 60, // 10 minutes * 60 seconds/min
+      ttl: 30 * 60, // 30 minutes * 60 seconds/min
       touchAfter: 9 * 60, // only update session after __ seconds
     }),
     // cookie: {
