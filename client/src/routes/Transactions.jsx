@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Disclosure, Transition } from "@headlessui/react";
 
 import { UserContext } from "../App";
 import dashboardRequest from "../api/dashboardRequest";
@@ -47,61 +48,77 @@ export default function Transactions() {
         ? itemsAndAccounts.map((entry) => (
             <div key={entry.item.item_id} className="text-center pt-4 mx-6">
               {entry.accounts.map((account) => (
-                <>
-                  <div>{account.name}</div>
-                  <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                    <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                      <tr>
-                        <th scope="col" className="px-6 py-3">
-                          Name
-                        </th>
-                        <th scope="col" className="px-6 py-3">
-                          Amount
-                        </th>
-                        <th scope="col" className="px-6 py-3">
-                          Category
-                        </th>
-                        <th scope="col" className="px-6 py-3">
-                          Date
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {transactions
-                        ? transactions.map((transaction) => (
-                            <>
-                              <tr
-                                key={transaction.transaction_id}
-                                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
-                              >
-                                <th
-                                  scope="row"
-                                  className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                                >
-                                  {transaction.name}
-                                </th>
-                                {transaction.amount > 0 ? (
-                                  <td className="px-6 py-4">
-                                    ${transaction.amount.toFixed(2)}
-                                  </td>
-                                ) : (
-                                  <td className="px-6 py-4">
-                                    -${transaction.amount.toFixed(2) * -1}
-                                  </td>
-                                )}
-                                <td className="px-6 py-4">
-                                  {transaction.category.primary}
-                                </td>
-                                <td className="px-6 py-4">
-                                  {transaction.date.substring(0, 10)}
-                                </td>
-                              </tr>
-                            </>
-                          ))
-                        : null}
-                    </tbody>
-                  </table>
-                </>
+                <div key={account.account_id} className="py-2">
+                  <Disclosure>
+                    <Disclosure.Button className="w-full">
+                      {account.name}
+                    </Disclosure.Button>
+
+                    <Transition
+                      enter="transition duration-200 ease-out"
+                      enterFrom="transform scale-95 opacity-0"
+                      enterTo="transform scale-100 opacity-100"
+                      leave="transition duration-75 ease-out"
+                      leaveFrom="transform scale-200 opacity-100"
+                      leaveTo="transform scale-95 opacity-0"
+                    >
+                      <Disclosure.Panel>
+                        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                              <th scope="col" className="px-6 py-3">
+                                Name
+                              </th>
+                              <th scope="col" className="px-6 py-3">
+                                Amount
+                              </th>
+                              <th scope="col" className="px-6 py-3">
+                                Category
+                              </th>
+                              <th scope="col" className="px-6 py-3">
+                                Date
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {transactions
+                              ? transactions.map((transaction) => (
+                                  <>
+                                    <tr
+                                      key={transaction.transaction_id}
+                                      className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                                    >
+                                      <th
+                                        scope="row"
+                                        className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                      >
+                                        {transaction.name}
+                                      </th>
+                                      {transaction.amount > 0 ? (
+                                        <td className="px-6 py-4">
+                                          ${transaction.amount.toFixed(2)}
+                                        </td>
+                                      ) : (
+                                        <td className="px-6 py-4">
+                                          -${transaction.amount.toFixed(2) * -1}
+                                        </td>
+                                      )}
+                                      <td className="px-6 py-4">
+                                        {transaction.category.primary}
+                                      </td>
+                                      <td className="px-6 py-4">
+                                        {transaction.date.substring(0, 10)}
+                                      </td>
+                                    </tr>
+                                  </>
+                                ))
+                              : null}
+                          </tbody>
+                        </table>
+                      </Disclosure.Panel>
+                    </Transition>
+                  </Disclosure>
+                </div>
               ))}
             </div>
           ))
