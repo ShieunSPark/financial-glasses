@@ -158,7 +158,7 @@ export default function Dashboard() {
                           selectedAccount === account.account_id &&
                           createPortal(
                             <Confirm
-                              id={account.account_id}
+                              accountID={account.account_id}
                               onClose={() => setShowConfirm(false)}
                             />,
                             document.body

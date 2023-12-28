@@ -70,6 +70,13 @@ router.post("/api/set_access_token", plaid_controller.set_access_token);
 // GET accounts
 router.get("/dashboard/accounts", checkLoggedIn, plaid_controller.accounts_get);
 
+// DELETE accounts
+router.delete(
+  "/dashboard/account",
+  checkLoggedIn,
+  plaid_controller.account_delete
+);
+
 // GET transactions via /transactions/sync Plaid API route
 router.get(
   "/dashboard/transactions/get",
