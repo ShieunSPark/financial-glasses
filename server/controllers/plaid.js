@@ -197,7 +197,9 @@ exports.set_access_token = asyncHandler(async (req, res, next) => {
 exports.accounts_get = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
   const items = await Item.find({ user: user });
-  const accounts = await Account.find({ user: user }).populate("item");
+  const accounts = await Account.find({ user: user })
+    .populate("item")
+    .sort({ name: 1 });
   if (accounts.length === 0) {
     res.json({
       message: "No accounts",
@@ -242,7 +244,6 @@ exports.account_delete = asyncHandler(async (req, res, next) => {
       item: account.item,
       user: user,
     });
-    console.log(account.item.id);
     if (accountsInItem.length === 0) {
       await Item.findByIdAndDelete(account.item.id);
     }

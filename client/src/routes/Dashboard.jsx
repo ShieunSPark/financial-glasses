@@ -55,6 +55,8 @@ export default function Dashboard() {
       token: linkToken,
       onSuccess: (public_token, metadata) => {
         const setAccessToken = async () => {
+          // Show loading symbol
+          setIsLoading(true);
           await plaidSetAccessToken(public_token, user);
           navigate(0);
         };
@@ -74,6 +76,7 @@ export default function Dashboard() {
   }, []);
 
   if (isLoading) {
+    // Show spinner
     return (
       <div role="status" className="flex justify-center mt-4">
         <svg
