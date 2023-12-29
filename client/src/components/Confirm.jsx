@@ -6,7 +6,7 @@ import { UserContext } from "../App";
 
 export default function Confirm({ accountID, onClose }) {
   const { user, setUser } = useContext(UserContext);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
@@ -50,6 +50,7 @@ export default function Confirm({ accountID, onClose }) {
           />
         </svg>
         <span className="sr-only">Loading...</span>
+        <div>LOADING</div>
       </div>
     );
   } else {

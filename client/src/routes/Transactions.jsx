@@ -50,14 +50,13 @@ export default function Transactions() {
     } else {
       setSelectedAccountID(accountID);
     }
-    console.log(transactions);
   };
 
   return (
-    <div className="grid grid-cols-5 grid-rows-1 border-2 border-green-500 max-h-majority m-4">
+    <div className="grid grid-cols-5 grid-rows-1 border-2 border-green-500 h-majority m-4">
       <div className="col-span-1 flex flex-col space-y-1">
         <div
-          className="flex justify-center items-center h-12 bg-yellow-800 text-center cursor-pointer"
+          className="flex justify-center items-center h-12 bg-yellow-800 text-center cursor-pointer hover:bg-yellow-900"
           onClick={() => selectAccount("all")}
         >
           All Accounts
@@ -67,7 +66,7 @@ export default function Transactions() {
               entry.accounts.map((account) => (
                 <div
                   key={account.account_id}
-                  className="flex flex-col justify-center items-center h-12 bg-yellow-800 text-center cursor-pointer"
+                  className="flex flex-col justify-center items-center h-12 bg-yellow-800 text-center cursor-pointer hover:bg-yellow-900"
                   onClick={() => selectAccount(account.account_id)}
                 >
                   <div>{account.name}</div>
@@ -77,7 +76,7 @@ export default function Transactions() {
             )
           : null}
       </div>
-      <div className="col-span-4 text-center h-full overflow-y-auto">
+      <div className="transition-all duration-200 animate-fade col-span-4 text-center h-full overflow-y-auto">
         <table className="table-auto w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 ">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 sticky top-0">
             <tr>

@@ -21,6 +21,9 @@ const PLAID_ANDROID_PACKAGE_NAME = process.env.PLAID_ANDROID_PACKAGE_NAME || "";
 const PLAID_PRODUCTS = (
   process.env.PLAID_PRODUCTS || Products.Transactions
 ).split(",");
+const PLAID_OPTIONAL_PRODUCTS = (
+  process.env.PLAID_OPTIONAL_PRODUCTS || Products.Liabilities
+).split(",");
 const PLAID_COUNTRY_CODES = (process.env.PLAID_COUNTRY_CODES || "US").split(
   ","
 );
@@ -51,6 +54,7 @@ exports.create_link_token = asyncHandler(async (req, res, next) => {
         },
         client_name: "Financial Glasses",
         products: PLAID_PRODUCTS,
+        optional_products: PLAID_OPTIONAL_PRODUCTS,
         country_codes: PLAID_COUNTRY_CODES,
         language: "en",
       };

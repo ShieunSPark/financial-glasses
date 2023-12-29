@@ -19,5 +19,5 @@ export default function Budgets() {
     verifyLoggedIn();
   }, []);
 
-  return <div>Budgets</div>;
+  return <div className="text-center">work in progress...</div>;
 }
