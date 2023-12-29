@@ -266,7 +266,11 @@ exports.transactions_get = asyncHandler(async (req, res, next) => {
     });
   } else {
     // Find accounts for specified user and item in database
-    const transactions = await Transaction.find({ user: user });
+    const transactions = await Transaction.find({ user: user })
+      .populate("account")
+      .sort({
+        date: -1,
+      });
 
     res.json({
       title: "Transactions",
