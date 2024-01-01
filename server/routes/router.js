@@ -36,24 +36,19 @@ router.post(
   auth_controller.login_post
 );
 
-// // GET Google auth
-// // Placing these in authController caused issues - maybe with asyncHandler?
-// router.get(
-//   "/login/google",
-//   passport.authenticate("google", { scope: ["profile", "email"] })
-// );
+// GET Google auth
+router.get(
+  "/auth/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
 
-// router.get(
-//   "/oauth2/redirect/google",
-//   passport.authenticate("google", {
-//     failureRedirect: "/login",
-//     failureMessage: true,
-//   }),
-//   function (req, res) {
-//     // Successful authentication, redirect home.
-//     res.redirect("http://localhost:5173/");
-//   }
-// );
+router.get(
+  "/auth/google/callback",
+  passport.authenticate("google", {
+    successRedirect: process.env.CLIENT_DOMAIN + "/dashboard",
+    failureMessage: true,
+  })
+);
 
 // GET logout
 router.post("/logout", auth_controller.logout_get);
@@ -83,27 +78,5 @@ router.get(
   checkLoggedIn,
   plaid_controller.transactions_get
 );
-
-// // GET a singular post (and its attached comments)
-// router.get("/post/:post_id", home_controller.post_get);
-
-// // POST (i.e., make) a singular post
-// router.post("/post/:post_id", checkAdmin, home_controller.post_post);
-
-// // UPDATE a singular post
-// router.put("/post/:post_id", home_controller.post_update);
-
-// // DELETE a singular post
-// router.delete("/post/:post_id", home_controller.post_delete);
-
-// // POST a comment on a post
-// router.post(
-//   "/post/:post_id/comment/:comment_id",
-//   checkLoggedIn,
-//   home_controller.comment_post
-// );
-
-// // GET about
-// router.get("/about", home_controller.about_get);
 
 module.exports = router;

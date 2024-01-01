@@ -2,7 +2,7 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
-// const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const bcrypt = require("bcryptjs");
 
 const User = require("./models/user");
@@ -33,20 +33,6 @@ passport.use(
   })
 );
 
-//
-passport.serializeUser(function (user, cb) {
-  cb(null, user.id);
-});
-
-passport.deserializeUser(function (user, cb) {
-  try {
-    const userInDB = User.findById(user);
-    cb(null, userInDB);
-  } catch (err) {
-    cb(err);
-  }
-});
-
 // Authorization
 // passport.use(
 //   new JwtStrategy(
@@ -65,21 +51,51 @@ passport.deserializeUser(function (user, cb) {
 //   )
 // );
 
-// // Set up GoogleStrategy
-// passport.use(
-//   new GoogleStrategy(
-//     {
-//       clientID: process.env.GOOGLE_CLIENT_ID,
-//       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-//       callbackURL: "/oauth2/redirect/google",
-//       scope: ["profile"],
-//     },
-//     // "cb" stands for "callback"
-//     function verify(accessToken, refreshToken, profile, cb) {
-//       // Perform any additional verification or user lookup here
-//       // and return the user object
-//       console.log(profile);
-//       return cb(null, profile);
-//     }
-//   )
-// );
+// Set up GoogleStrategy
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: process.env.SERVER_DOMAIN + "/auth/google/callback",
+      scope: ["profile"],
+    },
+    async function verify(accessToken, refreshToken, profile, cb) {
+      // Perform any additional verification or user lookup here
+      // and return the user object
+      const user = await User.findOneAndUpdate(
+        {
+          firstName: profile._json.given_name,
+          lastName: profile._json.family_name,
+          username: profile._json.email,
+        },
+        { googleID: profile.id }
+      );
+      if (!user) {
+        const newUser = new User({
+          googleID: profile.id,
+          firstName: profile._json.given_name,
+          lastName: profile._json.family_name,
+          username: profile._json.email,
+          status: "user",
+        });
+        await newUser.save();
+        return cb(null, newUser);
+      }
+      return cb(null, user);
+    }
+  )
+);
+
+passport.serializeUser(function (user, cb) {
+  cb(null, user.id);
+});
+
+passport.deserializeUser(function (user, cb) {
+  try {
+    const userInDB = User.findById(user);
+    cb(null, userInDB);
+  } catch (err) {
+    cb(err);
+  }
+});

@@ -10,12 +10,12 @@ export default function Home() {
       <h3 className="p-2">The budgeting app that Mint no longer is</h3>
       <div>
         <Link to={`signup`}>
-          <button className="transition duration-200 ease-in-out delay-50 hover:scale-110 hover:bg-indigo-500 rounded-md bg-blue-500 text-white p-2 m-2">
+          <button className="transition duration-200 ease-in-out delay-50  hover:bg-indigo-500 rounded-md bg-blue-500 text-white p-2 m-2">
             Sign Up
           </button>
         </Link>
         <Link to={`login`}>
-          <button className="transition duration-200 ease-in-out delay-50 hover:scale-110 hover:bg-indigo-500  rounded-md bg-blue-500 text-white p-2 m-2">
+          <button className="transition duration-200 ease-in-out delay-50  hover:bg-indigo-500  rounded-md bg-blue-500 text-white p-2 m-2">
             Log In
           </button>
         </Link>
