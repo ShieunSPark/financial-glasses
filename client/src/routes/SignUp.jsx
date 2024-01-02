@@ -1,11 +1,15 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { UserContext } from "../App";
 import signUpRequest from "../api/signUpRequest";
 import logo from "../assets/fgLogo.svg";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function SignUp() {
+  const { setUser } = useContext(UserContext);
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -15,12 +19,37 @@ export default function SignUp() {
 
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const signupSubmit = (e) => {
     e.preventDefault();
     signUpRequest(firstName, lastName, email, password, confirmPassword)
       .then((data) => {
         console.log(data);
         navigate("/login");
+      })
+      .catch((err) => {
+        // Handle the response from the server
+        if (!err.error) {
+          console.error(`HTTP error! Status: ${err.status}`);
+          setError(err.errors);
+        } else {
+          // Handle other errors
+          console.error("Authentication error:", err.message);
+
+          // Access the error message from the JSON response
+          setError(err.message || "Unknown authentication error");
+        }
+      });
+  };
+
+  const googleLogin = (e) => {
+    e.preventDefault();
+    window
+      .open(API_URL + "/auth/google", "_self")
+      .then((data) => {
+        if (data) {
+          setUser(data.user);
+          navigate("/dashboard");
+        }
       })
       .catch((err) => {
         // Handle the response from the server
@@ -53,7 +82,24 @@ export default function SignUp() {
                   <div className="text-red-400">{err.msg}</div>
                 ))
               : null}
-            <form className="space-y-4" onSubmit={handleSubmit}>
+            <button
+              className="flex w-full justify-center items-center gap-4 bg-slate-600 outline-none hover:outline-2 hover:outline-blue-500 font-medium rounded-lg text-sm px-5 py-2.5"
+              onClick={googleLogin}
+            >
+              <img
+                className="w-6 h-6"
+                src="https://www.svgrepo.com/show/475656/google-color.svg"
+                loading="lazy"
+                alt="google logo"
+              />
+              <div>Continue with Google</div>
+            </button>
+            <div className="flex items-center gap-2">
+              <hr className="h-0.5 w-1/2 my-2 bg-gray-100 border-0" />
+              <div>OR</div>
+              <hr className="h-0.5 w-1/2 my-2 bg-gray-100 border-0" />
+            </div>
+            <form className="space-y-4" onSubmit={signupSubmit}>
               <div>
                 <label
                   htmlFor="firstName"

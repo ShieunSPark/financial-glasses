@@ -20,7 +20,15 @@ passport.use(
       // The reason for separating finding user and checkiing password logic
       // is because the database might try to find the user's password
       // when the user doesn't exist. So check user first before checking their password
-      const match = await bcrypt.compare(password, user.password);
+
+      // But first, check if the user has a password. If they used Google OAuth, they won't have a password
+      // in the database
+      if (!user.password) {
+        return cb(null, false, {
+          message: "Incorrect username and/or password",
+        });
+      }
+      const match = bcrypt.compare(password, user.password);
       if (!match) {
         return cb(null, false, {
           message: "Incorrect username and/or password",

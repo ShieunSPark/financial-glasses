@@ -78,7 +78,7 @@ export default function Transactions() {
       </div>
       <div className="transition-all duration-200 animate-fade col-span-4 text-center h-full overflow-y-auto">
         <table className="table-auto w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 ">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 sticky top-0">
+          <thead className="h-12 text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 sticky top-0">
             <tr>
               <th scope="col" className="px-6 py-3">
                 Name
