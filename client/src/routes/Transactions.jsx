@@ -56,7 +56,7 @@ export default function Transactions() {
     <div className="grid grid-cols-5 grid-rows-1 border-2 border-green-500 h-majority m-4">
       <div className="col-span-1 flex flex-col space-y-1">
         <div
-          className="flex justify-center items-center h-12 bg-yellow-800 text-center cursor-pointer hover:bg-yellow-900"
+          className="flex justify-center items-center h-12 bg-yellow-400 dark:bg-yellow-800 text-center cursor-pointer hover:bg-yellow-500  dark:hover:bg-yellow-900"
           onClick={() => selectAccount("all")}
         >
           All Accounts
@@ -66,7 +66,7 @@ export default function Transactions() {
               entry.accounts.map((account) => (
                 <div
                   key={account.account_id}
-                  className="flex flex-col justify-center items-center h-12 bg-yellow-800 text-center cursor-pointer hover:bg-yellow-900"
+                  className="flex flex-col justify-center items-center h-12 bg-yellow-400 dark:bg-yellow-800text-center cursor-pointer hover:bg-yellow-500  dark:hover:bg-yellow-900"
                   onClick={() => selectAccount(account.account_id)}
                 >
                   <div>{account.name}</div>

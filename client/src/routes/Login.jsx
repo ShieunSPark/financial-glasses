@@ -43,27 +43,7 @@ export default function Login() {
 
   const googleLogin = (e) => {
     e.preventDefault();
-    window
-      .open(API_URL + "/auth/google", "_self")
-      .then((data) => {
-        if (data) {
-          setUser(data.user);
-          navigate("/dashboard");
-        }
-      })
-      .catch((err) => {
-        // Handle the response from the server
-        if (!err.error) {
-          console.error(`HTTP error! Status: ${err.status}`);
-          setError(err.errors);
-        } else {
-          // Handle other errors
-          console.error("Authentication error:", err.message);
-
-          // Access the error message from the JSON response
-          setError(err.message || "Unknown authentication error");
-        }
-      });
+    window.open(API_URL + "/auth/google", "_self");
   };
 
   return (
@@ -78,7 +58,7 @@ export default function Login() {
               Sign in to your account
             </h1>
             <button
-              className="flex w-full justify-center items-center gap-4 bg-slate-600 outline-none hover:outline-2 hover:outline-blue-500 font-medium rounded-lg text-sm px-5 py-2.5"
+              className="flex w-full justify-center items-center gap-4 bg-slate-200 dark:bg-slate-600 hover:ring-2 hover:ring-blue-500 font-medium rounded-lg text-sm px-5 py-2.5"
               onClick={googleLogin}
             >
               <img

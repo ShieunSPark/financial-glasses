@@ -83,7 +83,7 @@ export default function SignUp() {
                 ))
               : null}
             <button
-              className="flex w-full justify-center items-center gap-4 bg-slate-600 outline-none hover:outline-2 hover:outline-blue-500 font-medium rounded-lg text-sm px-5 py-2.5"
+              className="flex w-full justify-center items-center gap-4 bg-slate-200 dark:bg-slate-600 outline-none hover:outline-2 hover:outline-blue-500 font-medium rounded-lg text-sm px-5 py-2.5"
               onClick={googleLogin}
             >
               <img
