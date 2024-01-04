@@ -76,9 +76,16 @@ router.delete(
   dashboard_controller.account_delete
 );
 
-// GET transactions via /transactions/sync Plaid API route
+// GET synced transactions via /transactions/sync Plaid API route
 router.get(
-  "/dashboard/transactions/get",
+  "/dashboard/transactions/sync",
+  checkLoggedIn,
+  plaid_controller.transactions_sync
+);
+
+// GET transactions
+router.get(
+  "/dashboard/transactions",
   checkLoggedIn,
   dashboard_controller.transactions_get
 );

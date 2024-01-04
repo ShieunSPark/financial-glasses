@@ -15,7 +15,7 @@ const ItemSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   name: { type: String, required: true },
   accessToken: { type: String },
-  nextCursor: { type: String, required: true },
+  cursor: { type: String },
   hasMore: { type: Boolean, required: true },
 });
 

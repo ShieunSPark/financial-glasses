@@ -9,6 +9,7 @@ import plaidCreateLinkTokenRequest from "../api/plaidCreateLinkTokenRequest";
 import plaidSetAccessToken from "../api/plaidSetAccessToken";
 import dashboardRequest from "../api/dashboardRequest";
 import accountsRequest from "../api/accountsRequest";
+import transactionsSyncRequest from "../api/transactionsSyncRequest";
 
 import Confirm from "../components/Confirm";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -35,7 +36,7 @@ export default function Dashboard() {
         } else {
           setUser(data.user);
           setNumOfItems(data.numOfItems);
-          setIsLoading(false);
+          // setIsLoading(false);
 
           // Generate Plaid link token
           const generateLinkToken = async () => {
@@ -74,6 +75,16 @@ export default function Dashboard() {
     };
 
     getAccounts();
+  }, []);
+
+  useEffect(() => {
+    const syncTransactions = async () => {
+      transactionsSyncRequest().then(() => {
+        setIsLoading(false);
+      });
+    };
+
+    syncTransactions();
   }, []);
 
   if (isLoading) {

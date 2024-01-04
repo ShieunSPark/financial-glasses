@@ -1,6 +1,8 @@
 const { body, validationResult } = require("express-validator");
 const asyncHandler = require("express-async-handler");
 
+const { plaidClient } = require("./plaid");
+
 const User = require("../models/user");
 const Item = require("../models/item");
 const Account = require("../models/account");
@@ -83,10 +85,6 @@ exports.account_delete = asyncHandler(async (req, res, next) => {
   }
 });
 
-exports.transactions_sync = asyncHandler(async (req, res, next) => {
-  // Call Plaid's transaction/sync API
-});
-
 exports.transactions_get = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
   if (!user) {
@@ -94,8 +92,11 @@ exports.transactions_get = asyncHandler(async (req, res, next) => {
       message: "No transactions",
     });
   } else {
-    // Find accounts for specified user and item in database
-    const transactions = await Transaction.find({ user: user })
+    // Find non-deleted transactions for specified user and item in database
+    const transactions = await Transaction.find({
+      user: user,
+      is_deleted: false,
+    })
       .populate("account")
       .sort({
         date: -1,

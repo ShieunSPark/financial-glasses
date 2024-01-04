@@ -39,7 +39,7 @@ const configuration = new Configuration({
   },
 });
 
-const client = new PlaidApi(configuration);
+const plaidClient = new PlaidApi(configuration);
 
 exports.create_link_token = asyncHandler(async (req, res, next) => {
   // Get the client_user_id by searching for the current user
@@ -66,7 +66,7 @@ exports.create_link_token = asyncHandler(async (req, res, next) => {
         configs.android_package_name = PLAID_ANDROID_PACKAGE_NAME;
       }
 
-      const createTokenResponse = await client.linkTokenCreate(configs);
+      const createTokenResponse = await plaidClient.linkTokenCreate(configs);
       res.json(createTokenResponse.data);
     })
     .catch(next);
@@ -76,7 +76,7 @@ exports.create_link_token = asyncHandler(async (req, res, next) => {
 exports.set_access_token = asyncHandler(async (req, res, next) => {
   // Promise.resolve()
   //   .then(async function () {
-  const tokenResponse = await client.itemPublicTokenExchange({
+  const tokenResponse = await plaidClient.itemPublicTokenExchange({
     public_token: req.body.public_token,
   });
 
@@ -85,16 +85,18 @@ exports.set_access_token = asyncHandler(async (req, res, next) => {
   const ITEM_ID = tokenResponse.data.item_id;
   try {
     // Get info on the Item (i.e., financial institution log in) the user just connected to
-    const resPlaidItem = await client.itemGet({
+    const resPlaidItem = await plaidClient.itemGet({
       access_token: ACCESS_TOKEN,
     });
     const INSTITUTION_ID = resPlaidItem.data.item.institution_id;
 
-    const resInstitution = await client.institutionsGetById({
+    const resInstitution = await plaidClient.institutionsGetById({
       institution_id: INSTITUTION_ID,
       country_codes: ["US"],
     });
     const NAME = resInstitution.data.institution.name;
+    const CURSOR = resInstitution.data.institution.next_cursor;
+    const HASMORE = resInstitution.data.institution.has_more;
 
     // Create new Item and insert access_token and item_id
     let newItem = new Item({
@@ -103,6 +105,8 @@ exports.set_access_token = asyncHandler(async (req, res, next) => {
       name: NAME,
       accessToken: ACCESS_TOKEN,
       item_id: ITEM_ID,
+      cursor: CURSOR === undefined ? "" : CURSOR,
+      hasMore: HASMORE ? HASMORE : false,
     });
 
     // Save the item only if it doesn't already exist
@@ -119,7 +123,7 @@ exports.set_access_token = asyncHandler(async (req, res, next) => {
     }
 
     // Create accounts (but first, use access token to get accounts from Plaid)
-    const resAccounts = await client.accountsBalanceGet({
+    const resAccounts = await plaidClient.accountsBalanceGet({
       access_token: ACCESS_TOKEN,
     });
 
@@ -146,43 +150,6 @@ exports.set_access_token = asyncHandler(async (req, res, next) => {
       }
     });
 
-    // Sync transactions for the new Item
-    // Include logic for cursor later
-    const resTransactions = await client.transactionsSync({
-      access_token: ACCESS_TOKEN,
-      cursor: null,
-    });
-
-    const transactions = resTransactions.data.added;
-    transactions.forEach(async (transaction) => {
-      const ACCOUNT = await Account.findOne({
-        account_id: transaction.account_id,
-      });
-      // Create new transaction
-      const newTransaction = new Transaction({
-        transaction_id: transaction.transaction_id,
-        user: USER,
-        item: newItem,
-        account: ACCOUNT,
-        name: transaction.merchant_name
-          ? transaction.merchant_name
-          : transaction.name,
-        // Note that positive amount is $ going OUT of the account and negative is $ going INTO the account
-        amount: transaction.amount,
-        iso_currency_code: transaction.iso_currency_code,
-        // Prefer authorized-date
-        date: transaction.authorized_date
-          ? transaction.authorized_date
-          : transaction.date,
-        // Prefer personal_finance_category
-        category: transaction.personal_finance_category,
-        pending_transaction_id: transaction.pending_transaction_id,
-        is_pending: transaction.pending,
-      });
-
-      newTransaction.save();
-    });
-
     res.json({
       message:
         "Set Access Token complete; new financial insitution and corresponding accounts added",
@@ -195,4 +162,127 @@ exports.set_access_token = asyncHandler(async (req, res, next) => {
   }
   // })
   // .catch(next);
+});
+
+exports.transactions_sync = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.session.passport.user);
+  const items = await Item.find({ user: user });
+
+  const result = await Promise.all(
+    items.map(async (item) => {
+      // Get access token and cursor for specified Item
+      const accessToken = item.accessToken;
+      const cursor = item.cursor;
+
+      const allData = {
+        added: [],
+        removed: [],
+        modified: [],
+        nextCursor: cursor,
+      };
+
+      // Call Plaid's transaction/sync API
+      try {
+        let keepGoing = false;
+        do {
+          const results = await plaidClient.transactionsSync({
+            access_token: accessToken,
+            cursor: allData.nextCursor,
+          });
+          const newData = results.data;
+          allData.added = allData.added.concat(newData.added);
+          allData.modified = allData.modified.concat(newData.modified);
+          allData.removed = allData.removed.concat(newData.removed);
+          allData.nextCursor = newData.next_cursor;
+          keepGoing = newData.has_more;
+          console.log(
+            `Added: ${newData.added.length} Modified: ${newData.modified.length} Removed: ${newData.removed.length} `
+          );
+        } while (keepGoing === true);
+      } catch (err) {
+        res.status(401).json({
+          error: err,
+        });
+      }
+
+      // Save added transactions to database
+      await Promise.all(
+        allData.added.map(async (transaction) => {
+          // Get account to add to the transaction
+          const account = await Account.findOne({
+            account_id: transaction.account_id,
+          });
+
+          // Create new transaction
+          const newTransaction = new Transaction({
+            transaction_id: transaction.transaction_id,
+            user: user,
+            item: item,
+            account: account,
+            name: transaction.merchant_name
+              ? transaction.merchant_name
+              : transaction.name,
+            // Note that positive amount is $ going OUT of the account and negative is $ going INTO the account
+            amount: transaction.amount,
+            iso_currency_code: transaction.iso_currency_code,
+            // Prefer authorized-date
+            date: transaction.authorized_date
+              ? transaction.authorized_date
+              : transaction.date,
+            // Prefer personal_finance_category
+            category: transaction.personal_finance_category,
+            pending_transaction_id: transaction.pending_transaction_id,
+            is_pending: transaction.pending,
+            is_deleted: false,
+          });
+
+          newTransaction.save();
+        })
+      );
+
+      // Update modified transactions in database
+      await Promise.all(
+        allData.modified.map(async (transaction) => {
+          const dbTransaction = await Transaction.find({
+            transaction_id: transaction.transaction_id,
+          });
+
+          // Update specific parts of the transaction in the database
+          dbTransaction.name = transaction.merchant_name
+            ? transaction.merchant_name
+            : transaction.name;
+          dbTransaction.amount = transaction.amount;
+          dbTransaction.iso_currency_code = transaction.iso_currency_code;
+          dbTransaction.date = transaction.authorized_date
+            ? transaction.authorized_date
+            : transaction.date;
+          dbTransaction.category = transaction.personal_finance_category;
+          dbTransaction.pending_transaction_id =
+            transaction.pending_transaction_id;
+          dbTransaction.is_pending = transaction.pending;
+          dbTransaction.save();
+        })
+      );
+
+      // Update removed transactions in database
+      await Promise.all(
+        allData.removed.map(async (transaction) => {
+          const dbTransaction = await Transaction.find({
+            transaction_id: transaction.transaction_id,
+          });
+
+          dbTransaction.is_deleted = true;
+          dbTransaction.save();
+        })
+      );
+
+      // Update cursor in Item
+      item.cursor = allData.nextCursor;
+      await item.save();
+    })
+  );
+
+  res.json({
+    result: result,
+  });
 });

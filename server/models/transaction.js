@@ -20,6 +20,7 @@ const TransactionSchema = new Schema({
   // Can be either String or null
   pending_transaction_id: { type: Schema.Types.Mixed },
   is_pending: { type: Boolean, required: true },
+  is_deleted: { type: Boolean, required: true, default: false },
 });
 
 // Virtual for user's URL
