@@ -8,6 +8,7 @@ module.exports = (req, res, next) => {
       .status(401)
       .json({ error: "You are not authorized to view this resource" });
   }
+
   // JWT AUTHORIZATION LOGIC
   // const authHeader = req.headers.authorization;
   // if (!authHeader) {

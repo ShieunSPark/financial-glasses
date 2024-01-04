@@ -3,17 +3,13 @@
 I used Intuit Mint for my budgeting needs since 2019. But since Mint has been migrated over to Credit Karma and doesn't have budgeting capabilities (and I need a web dev project to work on for my portfolio), Financial Glasses was born.
 
 <!-- ![Financial Glasses home page](client\src\assets\financial-glasses-home-screenshot.png) -->
-<div style="text-align: center;">
-    <img src="client\src\assets\financial-glasses-home-screenshot.png" style="width: 300px;"/>
-</div>
+<img src="client\src\assets\financial-glasses-home-screenshot.png" style="width: 300px;"/>
 
 This is a MERN stack project that uses the Plaid API to get access to bank information. I use Tailwind for CSS.
 
-<div style="display: flex; justify-content: center; text-align: center;">
-    <img src="client\src\assets\MERN.png" style="width: 300px;"/>
-    <img src="client\src\assets\tailwind.png" style="width: 300px;"/>
-    <img src="client\src\assets\plaid.png" style="height: 125px;"/>
-</div>
+<img src="client\src\assets\MERN.png" style="width: 300px;"/>
+<img src="client\src\assets\tailwind.png" style="width: 300px;"/>
+<img src="client\src\assets\plaid.png" style="height: 125px;"/>
 
 Here's how to get the code running on your computer:
 
@@ -37,9 +33,11 @@ cd financial-glasses
 
 ## 2. Set Up Environment Variables
 
-Change the directory to /server and copy the .env.exmample file to a new .env file:
+Change the directory to /server and copy the .env.example file to a new .env file:
 
 ```
 cd server/
 cp .env.example .env
 ```
+
+**(wip)**

@@ -10,11 +10,13 @@ const Schema = mongoose.Schema;
 // a route to /institution/get (which might be confusing), and "InstitutionLogin"
 // is too long of a name. I'll use Plaid's name for it: "Item"
 const ItemSchema = new Schema({
+  item_id: { type: String },
   institution_id: { type: String, required: true },
   user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   name: { type: String, required: true },
   accessToken: { type: String },
-  item_id: { type: String },
+  nextCursor: { type: String, required: true },
+  hasMore: { type: Boolean, required: true },
 });
 
 // Virtual for Item's URL
