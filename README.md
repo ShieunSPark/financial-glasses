@@ -7,9 +7,11 @@ I used Intuit Mint for my budgeting needs since 2019. But since Mint has been mi
 
 This is a MERN stack project that uses the Plaid API to get access to bank information. I use Tailwind for CSS.
 
-<img src="client\src\assets\MERN.png" style="width: 300px;"/>
-<img src="client\src\assets\tailwind.png" style="width: 300px;"/>
-<img src="client\src\assets\plaid.png" style="height: 125px;"/>
+<div style="display: flex; gap: 20px;">
+    <img src="client\src\assets\MERN.png" style="height: 150px;"/>
+    <img src="client\src\assets\tailwind.webp" style="height: 150px;"/>
+    <img src="client\src\assets\plaid.png" style="height: 150px;"/>
+</div>
 
 Here's how to get the code running on your computer:
 
@@ -33,11 +35,29 @@ cd financial-glasses
 
 ## 2. Set Up Environment Variables
 
-Change the directory to /server and copy the .env.example file to a new .env file:
+Change the directory to `/server` and copy the `.env.example` file to a new `.env` file:
 
 ```
 cd server/
 cp .env.example .env
+```
+
+Open your new `.env` file and follow the instructions there. If you're unfamiliar with Mongo Atlas, Google Cloud Console, and/or Plaid, read up on documentation as needed.
+
+Change the directory to `/client` and copy the `.env.example` file to a new `.env` file:
+
+```
+cd ..
+cd client/
+cp .env.example .env
+```
+
+## 3. Run the Website
+
+In two separate terminals, start the server and the client with the following:
+
+```
+npm run dev
 ```
 
 **(wip)**
