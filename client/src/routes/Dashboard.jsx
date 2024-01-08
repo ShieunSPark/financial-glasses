@@ -128,7 +128,7 @@ export default function Dashboard() {
         <div className="flex-col">
           {itemsAndAccounts
             ? itemsAndAccounts.map((entry) => (
-                <>
+                <div key={entry.item.item_id}>
                   {entry.accounts.map((account) => (
                     <div
                       key={account.account_id}
@@ -161,7 +161,7 @@ export default function Dashboard() {
                       </div>
                     </div>
                   ))}
-                </>
+                </div>
               ))
             : null}
         </div>

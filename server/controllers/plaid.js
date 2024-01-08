@@ -213,30 +213,36 @@ exports.transactions_sync = asyncHandler(async (req, res, next) => {
             account_id: transaction.account_id,
           });
 
-          // Create new transaction
-          const newTransaction = new Transaction({
+          const duplicateTransaction = await Transaction.findOne({
             transaction_id: transaction.transaction_id,
-            user: user,
-            item: item,
-            account: account,
-            name: transaction.merchant_name
-              ? transaction.merchant_name
-              : transaction.name,
-            // Note that positive amount is $ going OUT of the account and negative is $ going INTO the account
-            amount: transaction.amount,
-            iso_currency_code: transaction.iso_currency_code,
-            // Prefer authorized-date
-            date: transaction.authorized_date
-              ? transaction.authorized_date
-              : transaction.date,
-            // Prefer personal_finance_category
-            category: transaction.personal_finance_category,
-            pending_transaction_id: transaction.pending_transaction_id,
-            is_pending: transaction.pending,
-            is_deleted: false,
           });
 
-          newTransaction.save();
+          if (!duplicateTransaction) {
+            // Create new transaction
+            const newTransaction = new Transaction({
+              transaction_id: transaction.transaction_id,
+              user: user,
+              item: item,
+              account: account,
+              name: transaction.merchant_name
+                ? transaction.merchant_name
+                : transaction.name,
+              // Note that positive amount is $ going OUT of the account and negative is $ going INTO the account
+              amount: transaction.amount,
+              iso_currency_code: transaction.iso_currency_code,
+              // Prefer authorized-date
+              date: transaction.authorized_date
+                ? transaction.authorized_date
+                : transaction.date,
+              // Prefer personal_finance_category
+              category: transaction.personal_finance_category,
+              pending_transaction_id: transaction.pending_transaction_id,
+              is_pending: transaction.pending,
+              is_deleted: false,
+            });
+
+            newTransaction.save();
+          }
         })
       );
 
@@ -279,6 +285,8 @@ exports.transactions_sync = asyncHandler(async (req, res, next) => {
       // Update cursor in Item
       item.cursor = allData.nextCursor;
       await item.save();
+
+      return allData;
     })
   );
 
