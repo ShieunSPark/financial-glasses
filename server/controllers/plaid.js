@@ -169,7 +169,7 @@ exports.transactions_sync = asyncHandler(async (req, res, next) => {
   const items = await Item.find({ user: user });
   // On my desktop PC, this sync function runs too quickly and duplicates transactions,
   // but on my laptop, it runs fine... maybe adding the line below will help?
-  // const numOfTransactions = await Transaction.countDocuments();
+  // UPDATE: I'm dumb... I disabled cache in the developers tools on my PC... T_T
 
   const result = await Promise.all(
     items.map(async (item) => {

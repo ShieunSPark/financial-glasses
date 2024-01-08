@@ -1,5 +1,7 @@
 # Financial Glasses
 
+**_(details are still a work in progress...)_**
+
 I used Intuit Mint for my budgeting needs since 2019. But since Mint has been migrated over to Credit Karma and doesn't have budgeting capabilities (and I need a web dev project to work on for my portfolio), Financial Glasses was born.
 
 <!-- ![Financial Glasses home page](client\src\assets\financial-glasses-home-screenshot.png) -->
@@ -59,5 +61,3 @@ In two separate terminals, start the server and the client with the following:
 ```
 npm run dev
 ```
-
-**(wip)**
