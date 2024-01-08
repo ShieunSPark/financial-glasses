@@ -167,6 +167,9 @@ exports.set_access_token = asyncHandler(async (req, res, next) => {
 exports.transactions_sync = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
   const items = await Item.find({ user: user });
+  // On my desktop PC, this sync function runs too quickly and duplicates transactions,
+  // but on my laptop, it runs fine... maybe adding the line below will help?
+  // const numOfTransactions = await Transaction.countDocuments();
 
   const result = await Promise.all(
     items.map(async (item) => {

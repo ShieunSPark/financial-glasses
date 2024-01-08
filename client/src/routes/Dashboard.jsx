@@ -26,31 +26,6 @@ export default function Dashboard() {
 
   const navigate = useNavigate();
 
-  // Verify user is logged in
-  useEffect(() => {
-    const verifyLoggedIn = async () => {
-      dashboardRequest().then((data) => {
-        if (data.error) {
-          navigate("/");
-          // Perhaps display a message saying the user is not logged in
-        } else {
-          setUser(data.user);
-          setNumOfItems(data.numOfItems);
-          // setIsLoading(false);
-
-          // Generate Plaid link token
-          const generateLinkToken = async () => {
-            const response = await plaidCreateLinkTokenRequest(data.user);
-            const { link_token } = await response;
-            setLinkToken(link_token);
-          };
-          generateLinkToken();
-        }
-      });
-    };
-    verifyLoggedIn();
-  }, []);
-
   // Convert Plaid link token -> public token -> access token
   const { open, ready } = usePlaidLink(
     {
@@ -67,6 +42,30 @@ export default function Dashboard() {
     },
     []
   );
+
+  // Verify user is logged in
+  useEffect(() => {
+    const verifyLoggedIn = async () => {
+      dashboardRequest().then((data) => {
+        if (data.error) {
+          navigate("/");
+          // Perhaps display a message saying the user is not logged in
+        } else {
+          setUser(data.user);
+          setNumOfItems(data.numOfItems);
+
+          // Generate Plaid link token
+          const generateLinkToken = async () => {
+            const response = await plaidCreateLinkTokenRequest(data.user);
+            const { link_token } = await response;
+            setLinkToken(link_token);
+          };
+          generateLinkToken();
+        }
+      });
+    };
+    verifyLoggedIn();
+  }, []);
 
   useEffect(() => {
     const getAccounts = async () => {
@@ -106,23 +105,13 @@ export default function Dashboard() {
           </div>
         )}
         <div className="flex justify-center items-center m-2 p-2">
-          {numOfItems === 0 ? (
-            <button
-              className=" p-2 transition ease-in-out delay-50 bg-blue-500 text-white rounded-md hover:bg-indigo-500"
-              type="submit"
-              onClick={() => open()}
-            >
-              Connect a Bank
-            </button>
-          ) : (
-            <button
-              className=" p-2 transition ease-in-out delay-50 bg-blue-500 text-white rounded-md hover:bg-indigo-500"
-              type="submit"
-              onClick={() => open()}
-            >
-              Connect Another Bank
-            </button>
-          )}
+          <button
+            className=" p-2 transition ease-in-out delay-50 bg-blue-500 text-white rounded-md hover:bg-indigo-500"
+            type="submit"
+            onClick={() => open()}
+          >
+            {numOfItems === 0 ? "Connect a Bank" : "Connect Another Bank"}
+          </button>
         </div>
 
         <div className="flex-col">
