@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { usePlaidLink } from "react-plaid-link";
 import { HiX } from "react-icons/hi";
+import { Transition } from "@headlessui/react";
 
 import { TokenContext, UserContext } from "../App";
 import plaidCreateLinkTokenRequest from "../api/plaidCreateLinkTokenRequest";
@@ -88,7 +89,20 @@ export default function Dashboard() {
 
   if (isLoading) {
     // Show spinner
-    return <LoadingSpinner />;
+    return (
+      <Transition
+        appear={true}
+        show={true}
+        enter="transition duration-100 ease-in-out delay-100"
+        enterFrom="opacity-0"
+        enterTo="opacity-100"
+        leave="transition duration-100 ease-in-out"
+        leaveFrom="opacity-100"
+        leaveTo="opacity-0"
+      >
+        <LoadingSpinner />
+      </Transition>
+    );
   } else {
     return (
       <div>
