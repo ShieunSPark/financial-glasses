@@ -13,7 +13,7 @@ export default function Transactions() {
   const { user, setUser } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(true);
   const [itemsAndAccounts, setItemsAndAccounts] = useState([]);
-  const [accounts, setAccounts] = useState([{ name: "all", selected: true }]);
+  const [accounts, setAccounts] = useState(["all"]);
   const [transactions, setTransactions] = useState([]);
   const [selectedAccountID, setSelectedAccountID] = useState("all");
 
@@ -32,19 +32,11 @@ export default function Transactions() {
     verifyLoggedIn();
   }, []);
 
-  // Fetch all items, accounts, and transactions for the user
+  // Fetch all items and accounts for the user
   useEffect(() => {
     const getAccounts = async () => {
       const response = await accountsRequest();
       setItemsAndAccounts(response.itemsAndAccounts);
-      response.itemsAndAccounts.forEach((item) => {
-        item.accounts.forEach((account) => {
-          setAccounts((prevAccounts) => [
-            ...prevAccounts,
-            { name: account.name, selected: false },
-          ]);
-        });
-      });
     };
 
     const getTransactions = async () => {
@@ -56,6 +48,16 @@ export default function Transactions() {
     getAccounts();
     getTransactions();
   }, []);
+
+  // Initialize array of accounts
+  useEffect(() => {
+    itemsAndAccounts.forEach((item) => {
+      item.accounts.forEach((account) => {
+        if (!accounts.includes(account.account_id))
+          setAccounts((prevAccounts) => [...prevAccounts, account.account_id]);
+      });
+    });
+  }, [itemsAndAccounts, accounts]);
 
   // Keep track of which account has been selected to view
   const selectAccount = (accountID) => {
@@ -72,7 +74,7 @@ export default function Transactions() {
   } else {
     return (
       <div className="grid grid-cols-5 grid-rows-1 border-2 border-green-500 h-majority m-4">
-        {console.log(accounts)}
+        {/* Tab for all accounts */}
         <div className="col-span-1 flex flex-col space-y-1">
           <div
             className={`flex justify-center items-center h-12 ${
@@ -84,7 +86,7 @@ export default function Transactions() {
           >
             All Accounts
           </div>
-
+          {/* Logic for tabs of individual accounts */}
           {itemsAndAccounts
             ? itemsAndAccounts.map((entry) =>
                 entry.accounts.map((account) => (
@@ -104,75 +106,79 @@ export default function Transactions() {
               )
             : null}
         </div>
-        <Transition
-          show={false}
-          className="origin-top"
-          enter="transition duration-150 ease-in"
-          enterFrom="transform scale-y-50 opacity-0"
-          enterTo="transform scale-y-100 opacity-100"
-          leave="transition duration-150 ease-in"
-          leaveFrom="transform scale-y-100 opacity-100"
-          leaveTo="transform scale-y-50 opacity-0"
-        >
-          <div className="col-span-4 text-center h-full overflow-y-auto">
-            <table className="table-auto w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 ">
-              <thead className="h-12 text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 sticky top-0">
-                <tr>
-                  <th scope="col" className="px-6 py-3">
-                    Name
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Amount
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Category
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Date
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactions
-                  ? transactions
-                      .filter((transaction) =>
-                        selectedAccountID !== "all"
-                          ? transaction.account.account_id === selectedAccountID
-                          : true
-                      )
-                      .map((transaction) => (
-                        <tr
-                          key={transaction.transaction_id}
-                          className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
-                        >
-                          <th
-                            scope="row"
-                            className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+        {/* For each account, create a Transition as well as a table */}
+        <div className="col-span-4 text-center h-full overflow-y-auto">
+          {accounts.map((accountID) => (
+            <Transition
+              key={accountID}
+              appear={true}
+              show={accountID === selectedAccountID}
+              enter="transition duration-200 ease-in-out delay-200"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="transition duration-200 ease-in-out"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <table className="table-auto w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 ">
+                <thead className="h-12 text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 sticky top-0">
+                  <tr>
+                    <th scope="col" className="px-6 py-3">
+                      Name
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Amount
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Category
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Date
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {transactions
+                    ? transactions
+                        .filter((transaction) =>
+                          accountID !== "all"
+                            ? transaction.account.account_id === accountID
+                            : true
+                        )
+                        .map((transaction) => (
+                          <tr
+                            key={transaction.transaction_id}
+                            className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
                           >
-                            {transaction.name}
-                          </th>
-                          {transaction.amount > 0 ? (
+                            <th
+                              scope="row"
+                              className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                            >
+                              {transaction.name}
+                            </th>
+                            {transaction.amount > 0 ? (
+                              <td className="px-6 py-4">
+                                ${transaction.amount.toFixed(2)}
+                              </td>
+                            ) : (
+                              <td className="px-6 py-4">
+                                -${transaction.amount.toFixed(2) * -1}
+                              </td>
+                            )}
                             <td className="px-6 py-4">
-                              ${transaction.amount.toFixed(2)}
+                              {transaction.category.primary}
                             </td>
-                          ) : (
                             <td className="px-6 py-4">
-                              -${transaction.amount.toFixed(2) * -1}
+                              {transaction.date.substring(0, 10)}
                             </td>
-                          )}
-                          <td className="px-6 py-4">
-                            {transaction.category.primary}
-                          </td>
-                          <td className="px-6 py-4">
-                            {transaction.date.substring(0, 10)}
-                          </td>
-                        </tr>
-                      ))
-                  : null}
-              </tbody>
-            </table>
-          </div>
-        </Transition>
+                          </tr>
+                        ))
+                    : null}
+                </tbody>
+              </table>
+            </Transition>
+          ))}
+        </div>
       </div>
       /*<>
         {itemsAndAccounts
