@@ -91,7 +91,7 @@ export default function Transactions() {
   } else {
     return (
       <Transition appear={true} show={true}>
-        <div className="grid grid-cols-5 grid-rows-1 border-2 border-green-500 h-majority m-4">
+        <div className="grid grid-cols-5 grid-rows-1 border-2 border-green-800 dark:border-green-600 h-majority m-4">
           {/* Tab for all accounts */}
           <div className="col-span-1 flex flex-col space-y-1">
             <Transition.Child
@@ -150,20 +150,20 @@ export default function Transactions() {
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
               >
-                <table className="table-auto w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 ">
+                <table className="table-fixed w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 ">
                   <thead className="h-12 text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 sticky top-0">
                     <tr>
-                      <th scope="col" className="px-6 py-3">
+                      <th scope="col" className="w-1/6 px-6 py-3">
+                        Date
+                      </th>
+                      <th scope="col" className="w-1/2 px-6 py-3">
                         Name
                       </th>
-                      <th scope="col" className="px-6 py-3">
-                        Amount
-                      </th>
-                      <th scope="col" className="px-6 py-3">
+                      <th scope="col" className="w-1/3 px-6 py-3">
                         Category
                       </th>
-                      <th scope="col" className="px-6 py-3">
-                        Date
+                      <th scope="col" className="w-1/6 text-right px-6 py-3">
+                        Amount
                       </th>
                     </tr>
                   </thead>
@@ -178,26 +178,27 @@ export default function Transactions() {
                           .map((transaction) => (
                             <tr
                               key={transaction.transaction_id}
-                              className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                              className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-600"
                             >
-                              <th
-                                scope="row"
-                                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                              >
+                              <td className="px-6 py-4">
+                                {transaction.date.substring(0, 10)}
+                              </td>
+                              <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                 {transaction.name}
-                              </th>
-                              <td className="text-center px-6 py-4 w-4">
-                                <div className="text-right">
-                                  {transaction.amount > 0
-                                    ? `$${transaction.amount.toFixed(2)}`
-                                    : `-$${transaction.amount.toFixed(2) * -1}`}
-                                </div>
                               </td>
                               <td className="px-6 py-4">
                                 {transaction.category.primary}
                               </td>
-                              <td className="px-6 py-4">
-                                {transaction.date.substring(0, 10)}
+                              <td className="text-center px-6 py-4">
+                                {transaction.amount > 0 ? (
+                                  <div className="text-right">
+                                    ${transaction.amount.toFixed(2)}
+                                  </div>
+                                ) : (
+                                  <div className="text-right text-green-200">
+                                    -${transaction.amount.toFixed(2) * -1}
+                                  </div>
+                                )}
                               </td>
                             </tr>
                           ))

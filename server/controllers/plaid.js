@@ -198,9 +198,9 @@ exports.transactions_sync = asyncHandler(async (req, res, next) => {
           allData.removed = allData.removed.concat(newData.removed);
           allData.nextCursor = newData.next_cursor;
           keepGoing = newData.has_more;
-          console.log(
-            `Added: ${newData.added.length} Modified: ${newData.modified.length} Removed: ${newData.removed.length} `
-          );
+          // console.log(
+          //   `Added: ${newData.added.length} Modified: ${newData.modified.length} Removed: ${newData.removed.length} `
+          // );
         } while (keepGoing === true);
       } catch (err) {
         res.status(401).json({

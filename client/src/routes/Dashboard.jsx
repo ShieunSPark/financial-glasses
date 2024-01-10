@@ -152,6 +152,7 @@ export default function Dashboard() {
                         >
                           <HiX className="w-6 h-6 text-red-400 hover:text-red-600" />
                         </button>
+
                         {showConfirm &&
                           selectedAccount === account.account_id &&
                           createPortal(
