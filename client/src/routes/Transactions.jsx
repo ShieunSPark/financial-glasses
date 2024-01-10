@@ -115,7 +115,7 @@ export default function Transactions() {
               ? itemsAndAccounts.map((entry) =>
                   entry.accounts.map((account) => (
                     <Transition.Child
-                      key={account.account_id}
+                      key={account.account_id + "/tab"}
                       enter="transition duration-200 ease-in-out delay-200"
                       enterFrom="opacity-0"
                       enterTo="opacity-100"
@@ -181,25 +181,31 @@ export default function Transactions() {
                               className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-600"
                             >
                               <td className="px-6 py-4">
-                                {transaction.date.substring(0, 10)}
+                                {`${
+                                  new Date(transaction.date).getMonth() + 1
+                                }/${new Date(
+                                  transaction.date
+                                ).getDate()}/${new Date(
+                                  transaction.date
+                                ).getFullYear()}`}
                               </td>
                               <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                 {transaction.name}
                               </td>
                               <td className="px-6 py-4">
-                                {transaction.category.primary}
+                                {!transaction.budget
+                                  ? transaction.plaidCategory.detailed
+                                  : transaction.budget.detailed}
                               </td>
-                              <td className="text-center px-6 py-4">
-                                {transaction.amount > 0 ? (
-                                  <div className="text-right">
-                                    ${transaction.amount.toFixed(2)}
-                                  </div>
-                                ) : (
-                                  <div className="text-right text-green-200">
-                                    -${transaction.amount.toFixed(2) * -1}
-                                  </div>
-                                )}
-                              </td>
+                              {transaction.amount > 0 ? (
+                                <td className="text-right px-6 py-4">
+                                  ${transaction.amount.toFixed(2)}
+                                </td>
+                              ) : (
+                                <td className="text-green-200 text-right px-6 py-4">
+                                  -${transaction.amount.toFixed(2) * -1}
+                                </td>
+                              )}
                             </tr>
                           ))
                       : null}

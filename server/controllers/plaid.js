@@ -72,7 +72,7 @@ exports.create_link_token = asyncHandler(async (req, res, next) => {
     .catch(next);
 });
 
-// Convert Plaid public token to access token, then add item, account(s), and transactions to the database
+// Convert Plaid public token to access token, then add item and account(s) to the database
 exports.set_access_token = asyncHandler(async (req, res, next) => {
   // Promise.resolve()
   //   .then(async function () {
@@ -122,9 +122,17 @@ exports.set_access_token = asyncHandler(async (req, res, next) => {
       newItem = checkItem;
     }
 
+    // Date logic for Capital One CC/loans (requires min_last_updated_datetime field)
+    const date = new Date();
+    date.setFullYear(date.getFullYear() - 2);
+    console.log(date.toISOString);
+
     // Create accounts (but first, use access token to get accounts from Plaid)
     const resAccounts = await plaidClient.accountsBalanceGet({
       access_token: ACCESS_TOKEN,
+      options: {
+        min_last_updated_datetime: date.toISOString(),
+      },
     });
 
     resAccounts.data.accounts.forEach(async (account) => {
@@ -163,6 +171,15 @@ exports.set_access_token = asyncHandler(async (req, res, next) => {
   // })
   // .catch(next);
 });
+
+// Use RegEx to get rid of underscores, uppercase the first letter of each word,
+// and make all other letters lowercase. (Used in transaction_sync function below)
+const simplifyText = (string) =>
+  string
+    .replace(/_/g, " ")
+    .toLowerCase()
+    .replace(/\b\w/g, (s) => s.toUpperCase())
+    .replace(/\b(And|Or)\b/, (s) => s.toLowerCase());
 
 exports.transactions_sync = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
@@ -237,8 +254,20 @@ exports.transactions_sync = asyncHandler(async (req, res, next) => {
               date: transaction.authorized_date
                 ? transaction.authorized_date
                 : transaction.date,
-              // Prefer personal_finance_category
-              category: transaction.personal_finance_category,
+              // Break down personal_finance_category and simplify the text
+              plaidCategory: {
+                primary: simplifyText(
+                  transaction.personal_finance_category.primary
+                ),
+                detailed: simplifyText(
+                  transaction.personal_finance_category.detailed
+                ).substring(
+                  transaction.personal_finance_category.primary.length + 1
+                ),
+                confidence_level: simplifyText(
+                  transaction.personal_finance_category.confidence_level
+                ),
+              },
               pending_transaction_id: transaction.pending_transaction_id,
               is_pending: transaction.pending,
               is_deleted: false,
@@ -265,7 +294,7 @@ exports.transactions_sync = asyncHandler(async (req, res, next) => {
           dbTransaction.date = transaction.authorized_date
             ? transaction.authorized_date
             : transaction.date;
-          dbTransaction.category = transaction.personal_finance_category;
+          dbTransaction.plaidCategory = transaction.personal_finance_category;
           dbTransaction.pending_transaction_id =
             transaction.pending_transaction_id;
           dbTransaction.is_pending = transaction.pending;

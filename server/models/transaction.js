@@ -16,7 +16,9 @@ const TransactionSchema = new Schema({
   // Prefer authorized-date
   date: { type: Date, required: true },
   // Prefer personal_finance_category
-  category: { type: Object, required: true },
+  plaidCategory: { type: Object, required: true },
+  // User's defined categories (if specified)
+  userCategory: { type: Object },
   // Can be either String or null
   pending_transaction_id: { type: Schema.Types.Mixed },
   is_pending: { type: Boolean, required: true },
