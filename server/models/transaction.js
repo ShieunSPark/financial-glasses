@@ -8,17 +8,15 @@ const TransactionSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   item: { type: Schema.Types.ObjectId, ref: "Item", required: true },
   account: { type: Schema.Types.ObjectId, ref: "Account", required: true },
-  // Prefer merchant_name, then name
   name: { type: String, required: true },
-  // Note that positive amount is $ going OUT of the account and negative is $ going INTO the account
+  // User's defined name (if specified)
+  modifiedName: { type: String },
   amount: { type: Number, required: true },
   iso_currency_code: { type: String, required: true },
-  // Prefer authorized-date
   date: { type: Date, required: true },
-  // Prefer personal_finance_category
   plaidCategory: { type: Object, required: true },
   // User's defined categories (if specified)
-  userCategory: { type: Object },
+  modifiedCategory: { type: Object },
   // Can be either String or null
   pending_transaction_id: { type: Schema.Types.Mixed },
   is_pending: { type: Boolean, required: true },
