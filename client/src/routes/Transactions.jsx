@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Disclosure, Transition } from "@headlessui/react";
 
@@ -16,6 +16,8 @@ export default function Transactions() {
   const [accounts, setAccounts] = useState(["all"]);
   const [transactions, setTransactions] = useState([]);
   const [selectedAccountID, setSelectedAccountID] = useState("all");
+  const [selectedTransactionID, setSelectedTransactionID] = useState("");
+  const [selectedButton, setSelectedButton] = useState("");
 
   const navigate = useNavigate();
 
@@ -71,6 +73,34 @@ export default function Transactions() {
       setSelectedAccountID(accountID);
     }
   };
+
+  const handleClickOutside = () => {
+    setSelectedButton("");
+  };
+
+  // Shout out to Robin Wieruch for this resource
+  // (https://www.robinwieruch.de/react-hook-detect-click-outside-component/)
+  const useOutsideClick = (callback) => {
+    const ref = useRef();
+
+    useEffect(() => {
+      const handleClick = (event) => {
+        if (ref.current && !ref.current.contains(event.target)) {
+          callback();
+        }
+      };
+
+      document.addEventListener("click", handleClick);
+
+      return () => {
+        document.removeEventListener("click", handleClick);
+      };
+    }, [ref]);
+
+    return ref;
+  };
+
+  const selectedRef = useOutsideClick(handleClickOutside);
 
   if (isLoading) {
     // Show spinner
@@ -153,18 +183,22 @@ export default function Transactions() {
                 <table className="table-fixed w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 ">
                   <thead className="h-12 text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 sticky top-0">
                     <tr>
-                      <th scope="col" className="w-1/6 px-6 py-3">
+                      <th scope="col" className="w-2/12 px-6 py-3">
                         Date
                       </th>
-                      <th scope="col" className="w-1/2 px-6 py-3">
+                      <th scope="col" className="w-4/12 px-6 py-3">
                         Name
                       </th>
-                      <th scope="col" className="w-1/3 px-6 py-3">
+                      <th scope="col" className="w-3/12 px-6 py-3">
                         Category
                       </th>
-                      <th scope="col" className="w-1/6 text-right px-6 py-3">
+                      <th scope="col" className="w-2/12 text-right px-6 py-3">
                         Amount
                       </th>
+                      <th
+                        scope="col"
+                        className="w-1/12 text-right px-6 py-3"
+                      ></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -175,39 +209,100 @@ export default function Transactions() {
                               ? transaction.account.account_id === accountID
                               : true
                           )
-                          .map((transaction) => (
-                            <tr
-                              key={transaction.transaction_id}
-                              className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-600"
-                            >
-                              <td className="px-6 py-4">
-                                {`${
-                                  new Date(transaction.date).getMonth() + 1
-                                }/${new Date(
-                                  transaction.date
-                                ).getDate()}/${new Date(
-                                  transaction.date
-                                ).getFullYear()}`}
-                              </td>
-                              <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                {transaction.name}
-                              </td>
-                              <td className="px-6 py-4">
-                                {!transaction.budget
-                                  ? transaction.plaidCategory.detailed
-                                  : transaction.budget.detailed}
-                              </td>
-                              {transaction.amount > 0 ? (
-                                <td className="text-right px-6 py-4">
-                                  ${transaction.amount.toFixed(2)}
+                          .map((transaction) => {
+                            // Attach ref to the row I CLICKED on, not the row I'm HOVERING over
+                            const refProp =
+                              selectedButton === transaction.transaction_id
+                                ? { ref: selectedRef }
+                                : {};
+                            return (
+                              <tr
+                                key={transaction.transaction_id}
+                                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-600"
+                                onClick={
+                                  selectedButton === transaction.transaction_id
+                                    ? (e) => e.stopPropagation()
+                                    : undefined
+                                }
+                                // ref={selectedRef}
+                                onMouseEnter={() =>
+                                  setSelectedTransactionID(
+                                    transaction.transaction_id
+                                  )
+                                }
+                                onMouseLeave={() =>
+                                  setSelectedTransactionID("")
+                                }
+                                {...refProp}
+                              >
+                                <td className="px-6 py-4">
+                                  {`${
+                                    new Date(transaction.date).getMonth() + 1
+                                  }/${new Date(
+                                    transaction.date
+                                  ).getDate()}/${new Date(
+                                    transaction.date
+                                  ).getFullYear()}`}
                                 </td>
-                              ) : (
-                                <td className="text-green-200 text-right px-6 py-4">
-                                  -${transaction.amount.toFixed(2) * -1}
+                                {selectedButton ===
+                                transaction.transaction_id ? (
+                                  <td>
+                                    <input
+                                      type="text"
+                                      defaultValue={transaction.name}
+                                      className="w-full bg-green-900 px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                    />
+                                  </td>
+                                ) : (
+                                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    {transaction.name}
+                                  </td>
+                                )}
+
+                                <td className="px-6 py-4">
+                                  {!transaction.budget
+                                    ? transaction.plaidCategory.detailed
+                                    : transaction.budget.detailed}
                                 </td>
-                              )}
-                            </tr>
-                          ))
+                                {transaction.amount > 0 ? (
+                                  <td className="text-right px-6 py-4">
+                                    ${transaction.amount.toFixed(2)}
+                                  </td>
+                                ) : (
+                                  <td className="text-green-200 text-right px-6 py-4">
+                                    -${transaction.amount.toFixed(2) * -1}
+                                  </td>
+                                )}
+                                <td className="px-6 py-4">
+                                  {selectedButton ===
+                                  transaction.transaction_id ? (
+                                    <button
+                                      className="text-green-400"
+                                      onClick={() => setSelectedButton("")}
+                                    >
+                                      Save
+                                    </button>
+                                  ) : (
+                                    <button
+                                      className={`${
+                                        selectedTransactionID ===
+                                        transaction.transaction_id
+                                          ? " "
+                                          : "hidden "
+                                      } text-blue-400`}
+                                      onClick={() =>
+                                        setSelectedButton(
+                                          transaction.transaction_id
+                                        )
+                                      }
+                                    >
+                                      Edit
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })
                       : null}
                   </tbody>
                 </table>
@@ -215,92 +310,6 @@ export default function Transactions() {
             ))}
           </div>
         </div>
-        {/*
-        <>
-          {itemsAndAccounts
-            ? itemsAndAccounts.map((entry) => (
-                <div key={entry.item.item_id} className="text-center pt-4 mx-6">
-                  {entry.accounts.map((account) => (
-                    <div key={account.account_id} className="py-2">
-                      <Disclosure>
-                        <Disclosure.Button className="w-full bg-green-100 dark:bg-green-800">
-                          {account.name}
-                        </Disclosure.Button>
-
-                        <Transition
-                          className="origin-top"
-                          enter="transition duration-150 ease-in"
-                          enterFrom="transform scale-y-50 opacity-0"
-                          enterTo="transform scale-y-100 opacity-100"
-                          leave="transition duration-150 ease-in"
-                          leaveFrom="transform scale-y-100 opacity-100"
-                          leaveTo="transform scale-y-50 opacity-0"
-                        >
-                          <Disclosure.Panel className="h-96 overflow-y-scroll">
-                            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                                <tr>
-                                  <th scope="col" className="px-6 py-3">
-                                    Name
-                                  </th>
-                                  <th scope="col" className="px-6 py-3">
-                                    Amount
-                                  </th>
-                                  <th scope="col" className="px-6 py-3">
-                                    Category
-                                  </th>
-                                  <th scope="col" className="px-6 py-3">
-                                    Date
-                                  </th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {transactions
-                                  ? transactions.map((transaction) => (
-                                      <>
-                                        <tr
-                                          key={transaction.transaction_id}
-                                          className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
-                                        >
-                                          <th
-                                            scope="row"
-                                            className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                                          >
-                                            {transaction.name}
-                                          </th>
-                                          {transaction.amount > 0 ? (
-                                            <td className="px-6 py-4">
-                                              ${transaction.amount.toFixed(2)}
-                                            </td>
-                                          ) : (
-                                            <td className="px-6 py-4">
-                                              -$
-                                              {transaction.amount.toFixed(2) *
-                                                -1}
-                                            </td>
-                                          )}
-                                          <td className="px-6 py-4">
-                                            {transaction.category.primary}
-                                          </td>
-                                          <td className="px-6 py-4">
-                                            {transaction.date.substring(0, 10)}
-                                          </td>
-                                        </tr>
-                                      </>
-                                    ))
-                                  : null}
-                              </tbody>
-                            </table>
-                          </Disclosure.Panel>
-                        </Transition>
-                      </Disclosure>
-                    </div>
-                  ))}
-                </div>
-              ))
-            : null}
-        </>
-        */}
       </Transition>
     );
   }

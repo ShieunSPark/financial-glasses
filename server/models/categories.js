@@ -1,52 +1,4 @@
-// // The logic used to get all primary and detailed categories without manually copying/pasting
-// const { open } = require("node:fs/promises");
-
-// const simplifyText = (string) =>
-//   string
-//     .replace(/_/g, " ")
-//     .toLowerCase()
-//     .replace(/\b\w/g, (s) => s.toUpperCase())
-//     .replace(/\b(And|Or)\b/, (s) => s.toLowerCase());
-
-// (async () => {
-//   const file = await open(
-//     "Z:/Shieun Folder/Code/financial-glasses/server/csv/transactions-personal-finance-category-taxonomy.csv"
-//   );
-
-//   const categories = [];
-//   let prevCategory = "Income";
-//   let row = {
-//     primary: "Income",
-//     detailed: [],
-//   };
-//   let rowNum = 0;
-
-//   for await (const line of file.readLines()) {
-//     if (rowNum > 0) {
-//       const rowItems = line.split(",");
-//       const main = simplifyText(rowItems[0].toString());
-//       const subMain = simplifyText(
-//         rowItems[1].toString().substring(rowItems[0].length + 1)
-//       );
-
-//       if (main !== prevCategory) {
-//         categories.push(row);
-//         row = {};
-//         row.primary = main;
-//         row.detailed = [];
-//       }
-//       row.detailed.push(subMain);
-
-//       if (rowNum === 104) categories.push(row);
-//       prevCategory = main;
-//     }
-//     rowNum++;
-//   }
-
-//   console.log(categories);
-// })();
-
-const allCategories = [
+export const allCategories = [
   {
     primary: "Income",
     detailed: [
@@ -227,3 +179,51 @@ const allCategories = [
     ],
   },
 ];
+
+// // The logic used to get all primary and detailed categories without manually copying/pasting
+// const { open } = require("node:fs/promises");
+
+// const simplifyText = (string) =>
+//   string
+//     .replace(/_/g, " ")
+//     .toLowerCase()
+//     .replace(/\b\w/g, (s) => s.toUpperCase())
+//     .replace(/\b(And|Or)\b/, (s) => s.toLowerCase());
+
+// (async () => {
+//   const file = await open(
+//     "Z:/Shieun Folder/Code/financial-glasses/server/csv/transactions-personal-finance-category-taxonomy.csv"
+//   );
+
+//   const categories = [];
+//   let prevCategory = "Income";
+//   let row = {
+//     primary: "Income",
+//     detailed: [],
+//   };
+//   let rowNum = 0;
+
+//   for await (const line of file.readLines()) {
+//     if (rowNum > 0) {
+//       const rowItems = line.split(",");
+//       const main = simplifyText(rowItems[0].toString());
+//       const subMain = simplifyText(
+//         rowItems[1].toString().substring(rowItems[0].length + 1)
+//       );
+
+//       if (main !== prevCategory) {
+//         categories.push(row);
+//         row = {};
+//         row.primary = main;
+//         row.detailed = [];
+//       }
+//       row.detailed.push(subMain);
+
+//       if (rowNum === 104) categories.push(row);
+//       prevCategory = main;
+//     }
+//     rowNum++;
+//   }
+
+//   console.log(categories);
+// })();
