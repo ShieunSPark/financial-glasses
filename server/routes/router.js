@@ -90,4 +90,11 @@ router.get(
   dashboard_controller.transactions_get
 );
 
+// UPDATE a transaction
+router.put(
+  "/transaction/:transaction_id/put",
+  checkLoggedIn,
+  dashboard_controller.transaction_put
+);
+
 module.exports = router;

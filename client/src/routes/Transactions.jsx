@@ -8,6 +8,7 @@ import accountsRequest from "../api/accountsRequest";
 import transactionsRequest from "../api/transactionsRequest";
 
 import LoadingSpinner from "../components/LoadingSpinner";
+import transactionPutRequest from "../api/transactionPutRequest";
 
 export default function Transactions() {
   const { user, setUser } = useContext(UserContext);
@@ -18,6 +19,7 @@ export default function Transactions() {
   const [selectedAccountID, setSelectedAccountID] = useState("all");
   const [selectedTransactionID, setSelectedTransactionID] = useState("");
   const [selectedButton, setSelectedButton] = useState("");
+  const [modifiedName, setModifiedName] = useState("");
 
   const navigate = useNavigate();
 
@@ -98,6 +100,25 @@ export default function Transactions() {
     }, [ref]);
 
     return ref;
+  };
+
+  const updateModifiedName = (e) => {
+    setModifiedName(e.target.value);
+  };
+
+  // Update modifiedName for the transaction
+  const save = (transactionID) => {
+    transactionPutRequest(modifiedName, transactionID).then(async () => {
+      setModifiedName("");
+      const getTransactions = async () => {
+        const response = await transactionsRequest();
+        setTransactions(response.transactions);
+        setIsLoading(false);
+      };
+
+      getTransactions();
+    });
+    setSelectedButton("");
   };
 
   const selectedRef = useOutsideClick(handleClickOutside);
@@ -248,14 +269,21 @@ export default function Transactions() {
                                 transaction.transaction_id ? (
                                   <td>
                                     <input
-                                      type="text"
-                                      defaultValue={transaction.name}
                                       className="w-full bg-green-900 px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                      type="text"
+                                      defaultValue={
+                                        transaction.modifiedName
+                                          ? transaction.modifiedName
+                                          : transaction.name
+                                      }
+                                      onChange={updateModifiedName}
                                     />
                                   </td>
                                 ) : (
                                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                    {transaction.name}
+                                    {transaction.modifiedName
+                                      ? transaction.modifiedName
+                                      : transaction.name}
                                   </td>
                                 )}
 
@@ -278,7 +306,9 @@ export default function Transactions() {
                                   transaction.transaction_id ? (
                                     <button
                                       className="text-green-400"
-                                      onClick={() => setSelectedButton("")}
+                                      onClick={() =>
+                                        save(transaction.transaction_id)
+                                      }
                                     >
                                       Save
                                     </button>

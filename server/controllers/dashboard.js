@@ -108,3 +108,28 @@ exports.transactions_get = asyncHandler(async (req, res, next) => {
     });
   }
 });
+
+exports.transaction_put = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.session.passport.user);
+
+  try {
+    // Update the modified name of the transaction
+    const transaction = await Transaction.findOne({
+      transaction_id: req.params.transaction_id,
+    });
+    transaction.modifiedName = req.body.modifiedName;
+    // transaction.markModified("modifiedName");
+    await transaction.save();
+    console.log(transaction);
+  } catch (err) {
+    console.log(err);
+    res.status(401).json({
+      err: err,
+    });
+    return;
+  }
+
+  res.json({
+    message: "Transaction updated",
+  });
+});
