@@ -201,8 +201,8 @@ export default function Transactions() {
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
               >
-                <table className="table-fixed w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 ">
-                  <thead className="h-12 text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 sticky top-0">
+                <table className="table-fixed w-full text-sm text-left rtl:text-right text-gray-600 dark:text-gray-400 ">
+                  <thead className="h-12 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-400 uppercase sticky top-0">
                     <tr>
                       <th scope="col" className="w-2/12 px-6 py-3">
                         Date
@@ -239,7 +239,7 @@ export default function Transactions() {
                             return (
                               <tr
                                 key={transaction.transaction_id}
-                                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-600"
+                                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-200 hover:dark:bg-gray-600"
                                 onClick={
                                   selectedButton === transaction.transaction_id
                                     ? (e) => e.stopPropagation()
@@ -269,7 +269,7 @@ export default function Transactions() {
                                 transaction.transaction_id ? (
                                   <td>
                                     <input
-                                      className="w-full bg-green-900 px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                      className="w-full bg-green-100 dark:bg-green-900 px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                                       type="text"
                                       defaultValue={
                                         transaction.modifiedName
@@ -297,7 +297,7 @@ export default function Transactions() {
                                     ${transaction.amount.toFixed(2)}
                                   </td>
                                 ) : (
-                                  <td className="text-green-200 text-right px-6 py-4">
+                                  <td className="text-green-500 dark:text-green-200 text-right px-6 py-4">
                                     -${transaction.amount.toFixed(2) * -1}
                                   </td>
                                 )}
@@ -305,7 +305,7 @@ export default function Transactions() {
                                   {selectedButton ===
                                   transaction.transaction_id ? (
                                     <button
-                                      className="text-green-400"
+                                      className="text-green-700 dark:text-green-400"
                                       onClick={() =>
                                         save(transaction.transaction_id)
                                       }
@@ -319,7 +319,7 @@ export default function Transactions() {
                                         transaction.transaction_id
                                           ? " "
                                           : "hidden "
-                                      } text-blue-400`}
+                                      } text-blue-700 dark:text-blue-400`}
                                       onClick={() =>
                                         setSelectedButton(
                                           transaction.transaction_id

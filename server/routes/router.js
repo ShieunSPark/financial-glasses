@@ -97,4 +97,7 @@ router.put(
   dashboard_controller.transaction_put
 );
 
+// GET profile
+router.get("/profile", checkLoggedIn, dashboard_controller.profile_get);
+
 module.exports = router;

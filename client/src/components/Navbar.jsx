@@ -31,7 +31,7 @@ export default function Navbar() {
 
   return (
     <div>
-      <nav className="flex justify-between items-center p-5 bg-slate-100 dark:bg-slate-600 ">
+      <nav className="flex justify-between items-center p-5 bg-slate-200 dark:bg-slate-500 ">
         <Link to={`/dashboard`}>
           <img className="w-16" src={logo} alt="Financial Glasses logo" />
         </Link>
@@ -82,17 +82,17 @@ export default function Navbar() {
                 <div className="py-1">
                   <Menu.Item>
                     {({ active }) => (
-                      <a
-                        // href="#"
+                      <button
+                        onClick={() => navigate("/profile")}
                         className={classNames(
                           active
                             ? "bg-gray-100 text-gray-900"
                             : "text-gray-700",
-                          "block px-4 py-2 text-sm"
+                          "block w-full px-4 py-2 text-left text-sm"
                         )}
                       >
                         Profile
-                      </a>
+                      </button>
                     )}
                   </Menu.Item>
                   <Menu.Item>

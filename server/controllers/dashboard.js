@@ -133,3 +133,10 @@ exports.transaction_put = asyncHandler(async (req, res, next) => {
     message: "Transaction updated",
   });
 });
+
+exports.profile_get = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.session.passport.user);
+  res.json({
+    user: user,
+  });
+});
