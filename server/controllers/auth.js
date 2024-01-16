@@ -5,8 +5,7 @@ const passport = require("passport");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
-// const Post = require("../models/post");
-// const Comment = require("../models/comment");
+const Budget = require("../models/budget");
 
 exports.signup_post = [
   // Sanitize and validate all fields
@@ -73,8 +72,16 @@ exports.signup_post = [
             errors: errors.array(),
           });
         } else {
-          // Data from form is valid. Save user.
+          // Data from form is valid. Save user, and generate a new budget.
           await user.save();
+          const budgets = await Budget.find({ user: user });
+          if (budgets.length === 0) {
+            const budget = new Budget({
+              user: user,
+            });
+            await budget.save();
+          }
+
           res.status(200).json({
             message: "Sign up successful!",
           });

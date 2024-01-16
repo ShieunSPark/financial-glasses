@@ -1,4 +1,10 @@
-export const allCategories = [
+const mongoose = require("mongoose");
+
+const Schema = mongoose.Schema;
+
+// This is to set up the base categories per user - and thus,
+// used in the User model
+const allCategories = [
   {
     primary: "Income",
     detailed: [
@@ -227,3 +233,15 @@ export const allCategories = [
 
 //   console.log(categories);
 // })();
+
+const BudgetSchema = new Schema({
+  user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  categories: { type: Array, required: true, default: allCategories },
+});
+
+// Virtual for user's URL
+BudgetSchema.virtual("url").get(function () {
+  return `/budget/${this._id}`;
+});
+
+module.exports = mongoose.model("Budget", BudgetSchema);
