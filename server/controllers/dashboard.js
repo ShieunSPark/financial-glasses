@@ -7,6 +7,7 @@ const User = require("../models/user");
 const Item = require("../models/item");
 const Account = require("../models/account");
 const Transaction = require("../models/transaction");
+const Budget = require("../models/budget");
 
 exports.dashboard_get = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
@@ -138,5 +139,14 @@ exports.profile_get = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
   res.json({
     user: user,
+  });
+});
+
+exports.categories_get = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.session.passport.user);
+  const budget = await Budget.findOne({ user: user });
+
+  res.json({
+    budget: budget,
   });
 });

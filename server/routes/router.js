@@ -100,4 +100,11 @@ router.put(
 // GET profile
 router.get("/profile", checkLoggedIn, dashboard_controller.profile_get);
 
+// GET categories (for budget)
+router.get(
+  "/categories/:user_id",
+  checkLoggedIn,
+  dashboard_controller.categories_get
+);
+
 module.exports = router;

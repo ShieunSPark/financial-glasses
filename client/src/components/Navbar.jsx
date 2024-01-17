@@ -38,19 +38,19 @@ export default function Navbar() {
         <div className="flex gap-x-10">
           <Link
             to={`/dashboard`}
-            className="text-xl hover:text-blue-600 duration-150"
+            className="text-xl hover:text-blue-600 dark:hover:text-blue-300 duration-150"
           >
             Overview
           </Link>
           <Link
             to={`/transactions`}
-            className="text-xl hover:text-blue-600 duration-150"
+            className="text-xl hover:text-blue-600 dark:hover:text-blue-300 duration-150"
           >
             Transactions
           </Link>
           <Link
             to={`/budgets`}
-            className="text-xl hover:text-blue-600 duration-150"
+            className="text-xl hover:text-blue-600 dark:hover:text-blue-300 duration-150"
           >
             Budgets
           </Link>

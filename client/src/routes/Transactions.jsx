@@ -1,11 +1,13 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useCombobox } from "downshift";
 import { Disclosure, Transition } from "@headlessui/react";
 
 import { UserContext } from "../App";
 import dashboardRequest from "../api/dashboardRequest";
 import accountsRequest from "../api/accountsRequest";
 import transactionsRequest from "../api/transactionsRequest";
+import categoriesRequest from "../api/categoriesRequest";
 
 import LoadingSpinner from "../components/LoadingSpinner";
 import transactionPutRequest from "../api/transactionPutRequest";
@@ -20,7 +22,7 @@ export default function Transactions() {
   const [selectedTransactionID, setSelectedTransactionID] = useState("");
   const [selectedButton, setSelectedButton] = useState("");
   const [modifiedName, setModifiedName] = useState("");
-  const [categories, setCategoriese] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   const navigate = useNavigate();
 
@@ -68,6 +70,23 @@ export default function Transactions() {
       });
   }, [itemsAndAccounts, accounts]);
 
+  // Set up categories
+  useEffect(() => {
+    const getCategories = async () => {
+      const response = await categoriesRequest();
+      const fullList = [];
+      response.budget.categories.map((category) => {
+        fullList.push(category.primary);
+        category.detailed.map((detailed) => {
+          fullList.push(detailed);
+        });
+      });
+      setCategories(fullList);
+    };
+
+    getCategories();
+  }, []);
+
   // Keep track of which account has been selected to view
   const selectAccount = (accountID) => {
     if (accountID === "all") {
@@ -103,6 +122,8 @@ export default function Transactions() {
     return ref;
   };
 
+  const selectedRef = useOutsideClick(handleClickOutside);
+
   const updateModifiedName = (e) => {
     setModifiedName(e.target.value);
   };
@@ -122,7 +143,37 @@ export default function Transactions() {
     setSelectedButton("");
   };
 
-  const selectedRef = useOutsideClick(handleClickOutside);
+  function getCategoriesFilter(inputValue) {
+    const lowerCasedInputValue = inputValue.toLowerCase();
+
+    return function categoriesFilter(category) {
+      return (
+        !inputValue ||
+        category.title.toLowerCase().includes(lowerCasedInputValue)
+      );
+    };
+  }
+
+  const {
+    isOpen,
+    getMenuProps,
+    getInputProps,
+    highlightedIndex,
+    getItemProps,
+    selectedItem,
+  } = useCombobox({
+    onInputValueChange: ({ inputValue }) => {
+      setCategories(
+        categories.filter((category) => {
+          category.toLowerCase().includes(inputValue.toLowerCase());
+        })
+      );
+    },
+    items: categories,
+    // itemToString(category) {
+    //   return category ? category.primary : "";
+    // },
+  });
 
   if (isLoading) {
     // Show spinner
@@ -257,7 +308,7 @@ export default function Transactions() {
                                 }
                                 {...refProp}
                               >
-                                <td className="px-6 py-4">
+                                <td className="px-6 py-4 truncate">
                                   {`${
                                     new Date(transaction.date).getMonth() + 1
                                   }/${new Date(
@@ -290,8 +341,9 @@ export default function Transactions() {
                                 {selectedButton ===
                                 transaction.transaction_id ? (
                                   <td className="px-3 py-2">
-                                    <div>
+                                    <div className="w-48 flex flex-col gap-1">
                                       <input
+                                        className="w-full px-3 py-2 bg-green-50 dark:bg-green-900 whitespace-nowrap border rounded focus:outline-none focus:ring focus:border-blue-300"
                                         type="text"
                                         id="dropdown-input"
                                         defaultValue={
@@ -300,19 +352,39 @@ export default function Transactions() {
                                                 .detailed
                                             : transaction.plaidCategory.detailed
                                         }
-                                        className="w-full px-3 py-2 bg-green-50 dark:bg-green-900 whitespace-nowrap border rounded focus:outline-none focus:ring focus:border-blue-300"
+                                        {...getInputProps()}
                                       />
-                                      {/* <div className="absolute mt-2 overflow-y-auto max-h-40 border rounded w-full bg-white">
-                                        <datalist id="options">
-                                          {options.map((option, index) => (
-                                            <option
-                                              key={index}
-                                              value={option}
-                                            />
-                                          ))}
-                                        </datalist>
-                                      </div> */}
                                     </div>
+                                    <ul
+                                      className={`absolute w-72 bg-white mt-1 shadow-md max-h-80 overflow-scroll p-0 z-10 ${
+                                        !(isOpen && categories.length) &&
+                                        "hidden"
+                                      }`}
+                                      {...getMenuProps()}
+                                    >
+                                      {isOpen &&
+                                        categories.map((category, index) => (
+                                          <li
+                                            className={`${
+                                              highlightedIndex === index
+                                                ? "bg-blue-300"
+                                                : ""
+                                            }
+                                              ${
+                                                selectedItem === category
+                                                  ? "font-bold"
+                                                  : ""
+                                              } py-2 px-3 shadow-sm flex flex-col`}
+                                            key={category}
+                                            {...getItemProps({
+                                              category,
+                                              index,
+                                            })}
+                                          >
+                                            <span>{category}</span>
+                                          </li>
+                                        ))}
+                                    </ul>
                                   </td>
                                 ) : (
                                   <td className="px-6 py-4 truncate">
