@@ -22,6 +22,7 @@ export default function Transactions() {
   const [modifiedName, setModifiedName] = useState("");
 
   const navigate = useNavigate();
+  const options = ["Option 1", "Option 2", "Option 3", "Option 4"];
 
   // Verify user is logged in
   useEffect(() => {
@@ -267,9 +268,9 @@ export default function Transactions() {
                                 </td>
                                 {selectedButton ===
                                 transaction.transaction_id ? (
-                                  <td>
+                                  <td className="px-3 py-2">
                                     <input
-                                      className="w-full bg-green-100 dark:bg-green-900 px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                      className="w-full px-3 py-2 bg-green-100 dark:bg-green-900 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                                       type="text"
                                       defaultValue={
                                         transaction.modifiedName
@@ -286,12 +287,38 @@ export default function Transactions() {
                                       : transaction.name}
                                   </td>
                                 )}
-
-                                <td className="px-6 py-4">
-                                  {!transaction.budget
-                                    ? transaction.plaidCategory.detailed
-                                    : transaction.budget.detailed}
-                                </td>
+                                {selectedButton ===
+                                transaction.transaction_id ? (
+                                  <td className="px-3 py-2">
+                                    <div>
+                                      <input
+                                        type="text"
+                                        id="dropdown-input"
+                                        list="options"
+                                        placeholder={
+                                          transaction.plaidCategory.detailed
+                                        }
+                                        className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+                                      />
+                                      <div className="absolute mt-2 overflow-y-auto max-h-40 border rounded w-full bg-white">
+                                        <datalist id="options">
+                                          {options.map((option, index) => (
+                                            <option
+                                              key={index}
+                                              value={option}
+                                            />
+                                          ))}
+                                        </datalist>
+                                      </div>
+                                    </div>
+                                  </td>
+                                ) : (
+                                  <td className="px-6 py-4">
+                                    {!transaction.modifiedCategory
+                                      ? transaction.plaidCategory.detailed
+                                      : transaction.modifiedCategory.detailed}
+                                  </td>
+                                )}
                                 {transaction.amount > 0 ? (
                                   <td className="text-right px-6 py-4">
                                     ${transaction.amount.toFixed(2)}
