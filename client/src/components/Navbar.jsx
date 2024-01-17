@@ -31,26 +31,26 @@ export default function Navbar() {
 
   return (
     <div>
-      <nav className="flex justify-between items-center p-5 bg-slate-200 dark:bg-slate-500 ">
+      <nav className="flex justify-between items-center p-5 bg-emerald-100 dark:bg-emerald-900 ">
         <Link to={`/dashboard`}>
           <img className="w-16" src={logo} alt="Financial Glasses logo" />
         </Link>
         <div className="flex gap-x-10">
           <Link
             to={`/dashboard`}
-            className="text-xl hover:text-blue-300 duration-200"
+            className="text-xl hover:text-blue-600 duration-150"
           >
             Overview
           </Link>
           <Link
             to={`/transactions`}
-            className="text-xl hover:text-blue-300 duration-200"
+            className="text-xl hover:text-blue-600 duration-150"
           >
             Transactions
           </Link>
           <Link
             to={`/budgets`}
-            className="text-xl hover:text-blue-300 duration-200"
+            className="text-xl hover:text-blue-600 duration-150"
           >
             Budgets
           </Link>

@@ -20,9 +20,9 @@ export default function Transactions() {
   const [selectedTransactionID, setSelectedTransactionID] = useState("");
   const [selectedButton, setSelectedButton] = useState("");
   const [modifiedName, setModifiedName] = useState("");
+  const [categories, setCategoriese] = useState([]);
 
   const navigate = useNavigate();
-  const options = ["Option 1", "Option 2", "Option 3", "Option 4"];
 
   // Verify user is logged in
   useEffect(() => {
@@ -154,8 +154,8 @@ export default function Transactions() {
               <div
                 className={`flex justify-center items-center h-12 ${
                   selectedAccountID === "all"
-                    ? "bg-yellow-600 dark:bg-yellow-900"
-                    : "bg-yellow-400 dark:bg-yellow-700 hover:bg-yellow-600  dark:hover:bg-yellow-900"
+                    ? "bg-yellow-500 dark:bg-yellow-900"
+                    : "bg-yellow-300 dark:bg-yellow-700 hover:bg-yellow-500  dark:hover:bg-yellow-900"
                 } text-center cursor-pointer`}
                 onClick={() => selectAccount("all")}
               >
@@ -175,8 +175,8 @@ export default function Transactions() {
                       <div
                         className={`flex flex-col justify-center items-center h-12 ${
                           selectedAccountID === account.account_id
-                            ? "bg-yellow-600 dark:bg-yellow-900"
-                            : "bg-yellow-400 dark:bg-yellow-700 hover:bg-yellow-600 dark:hover:bg-yellow-900"
+                            ? "bg-yellow-500 dark:bg-yellow-900"
+                            : "bg-yellow-300 dark:bg-yellow-700 hover:bg-yellow-500 dark:hover:bg-yellow-900"
                         } text-center cursor-pointer`}
                         onClick={() => selectAccount(account.account_id)}
                       >
@@ -270,7 +270,7 @@ export default function Transactions() {
                                 transaction.transaction_id ? (
                                   <td className="px-3 py-2">
                                     <input
-                                      className="w-full px-3 py-2 bg-green-100 dark:bg-green-900 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                      className="w-full px-3 py-2 bg-green-50 dark:bg-green-900 font-medium text-gray-900 dark:text-white whitespace-nowrap border rounded focus:outline-none focus:ring focus:border-blue-300"
                                       type="text"
                                       defaultValue={
                                         transaction.modifiedName
@@ -281,7 +281,7 @@ export default function Transactions() {
                                     />
                                   </td>
                                 ) : (
-                                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                  <td className="px-6 py-4 font-medium text-gray-900 dark:text-white truncate">
                                     {transaction.modifiedName
                                       ? transaction.modifiedName
                                       : transaction.name}
@@ -294,13 +294,15 @@ export default function Transactions() {
                                       <input
                                         type="text"
                                         id="dropdown-input"
-                                        list="options"
-                                        placeholder={
-                                          transaction.plaidCategory.detailed
+                                        defaultValue={
+                                          "modifiedCategory" in transaction
+                                            ? transaction.modifiedCategory
+                                                .detailed
+                                            : transaction.plaidCategory.detailed
                                         }
-                                        className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+                                        className="w-full px-3 py-2 bg-green-50 dark:bg-green-900 whitespace-nowrap border rounded focus:outline-none focus:ring focus:border-blue-300"
                                       />
-                                      <div className="absolute mt-2 overflow-y-auto max-h-40 border rounded w-full bg-white">
+                                      {/* <div className="absolute mt-2 overflow-y-auto max-h-40 border rounded w-full bg-white">
                                         <datalist id="options">
                                           {options.map((option, index) => (
                                             <option
@@ -309,11 +311,11 @@ export default function Transactions() {
                                             />
                                           ))}
                                         </datalist>
-                                      </div>
+                                      </div> */}
                                     </div>
                                   </td>
                                 ) : (
-                                  <td className="px-6 py-4">
+                                  <td className="px-6 py-4 truncate">
                                     {!transaction.modifiedCategory
                                       ? transaction.plaidCategory.detailed
                                       : transaction.modifiedCategory.detailed}

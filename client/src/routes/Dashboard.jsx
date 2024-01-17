@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { usePlaidLink } from "react-plaid-link";
-import { HiX } from "react-icons/hi";
+import { HiTrash } from "react-icons/hi";
 import { Transition } from "@headlessui/react";
 
 import { TokenContext, UserContext } from "../App";
@@ -150,7 +150,7 @@ export default function Dashboard() {
                             setSelectedAccount(account.account_id);
                           }}
                         >
-                          <HiX className="w-6 h-6 text-red-400 hover:text-red-600" />
+                          <HiTrash className="w-6 h-6 text-gray-400 hover:text-gray-600" />
                         </button>
 
                         {showConfirm &&
