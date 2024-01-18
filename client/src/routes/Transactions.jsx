@@ -1,6 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useCombobox } from "downshift";
 import { Disclosure, Transition } from "@headlessui/react";
 
 import { UserContext } from "../App";
@@ -8,9 +6,10 @@ import dashboardRequest from "../api/dashboardRequest";
 import accountsRequest from "../api/accountsRequest";
 import transactionsRequest from "../api/transactionsRequest";
 import categoriesRequest from "../api/categoriesRequest";
+import transactionPutRequest from "../api/transactionPutRequest";
 
 import LoadingSpinner from "../components/LoadingSpinner";
-import transactionPutRequest from "../api/transactionPutRequest";
+import CategoryDropdown from "../components/CategoryDropdown";
 
 export default function Transactions() {
   const { user, setUser } = useContext(UserContext);
@@ -76,7 +75,7 @@ export default function Transactions() {
       const response = await categoriesRequest();
       const fullList = [];
       response.budget.categories.map((category) => {
-        fullList.push(category.primary);
+        fullList.push(category.primary.toUpperCase());
         category.detailed.map((detailed) => {
           fullList.push(detailed);
         });
@@ -142,38 +141,6 @@ export default function Transactions() {
     });
     setSelectedButton("");
   };
-
-  function getCategoriesFilter(inputValue) {
-    const lowerCasedInputValue = inputValue.toLowerCase();
-
-    return function categoriesFilter(category) {
-      return (
-        !inputValue ||
-        category.title.toLowerCase().includes(lowerCasedInputValue)
-      );
-    };
-  }
-
-  const {
-    isOpen,
-    getMenuProps,
-    getInputProps,
-    highlightedIndex,
-    getItemProps,
-    selectedItem,
-  } = useCombobox({
-    onInputValueChange: ({ inputValue }) => {
-      setCategories(
-        categories.filter((category) => {
-          category.toLowerCase().includes(inputValue.toLowerCase());
-        })
-      );
-    },
-    items: categories,
-    // itemToString(category) {
-    //   return category ? category.primary : "";
-    // },
-  });
 
   if (isLoading) {
     // Show spinner
@@ -341,50 +308,11 @@ export default function Transactions() {
                                 {selectedButton ===
                                 transaction.transaction_id ? (
                                   <td className="px-3 py-2">
-                                    <div className="w-48 flex flex-col gap-1">
-                                      <input
-                                        className="w-full px-3 py-2 bg-green-50 dark:bg-green-900 whitespace-nowrap border rounded focus:outline-none focus:ring focus:border-blue-300"
-                                        type="text"
-                                        id="dropdown-input"
-                                        defaultValue={
-                                          "modifiedCategory" in transaction
-                                            ? transaction.modifiedCategory
-                                                .detailed
-                                            : transaction.plaidCategory.detailed
-                                        }
-                                        {...getInputProps()}
-                                      />
-                                    </div>
-                                    <ul
-                                      className={`absolute w-72 bg-white mt-1 shadow-md max-h-80 overflow-scroll p-0 z-10 ${
-                                        !(isOpen && categories.length) &&
-                                        "hidden"
-                                      }`}
-                                      {...getMenuProps()}
-                                    >
-                                      {isOpen &&
-                                        categories.map((category, index) => (
-                                          <li
-                                            className={`${
-                                              highlightedIndex === index
-                                                ? "bg-blue-300"
-                                                : ""
-                                            }
-                                              ${
-                                                selectedItem === category
-                                                  ? "font-bold"
-                                                  : ""
-                                              } py-2 px-3 shadow-sm flex flex-col`}
-                                            key={category}
-                                            {...getItemProps({
-                                              category,
-                                              index,
-                                            })}
-                                          >
-                                            <span>{category}</span>
-                                          </li>
-                                        ))}
-                                    </ul>
+                                    <CategoryDropdown
+                                      categories={categories}
+                                      setCategories={setCategories}
+                                      transaction={transaction}
+                                    />
                                   </td>
                                 ) : (
                                   <td className="px-6 py-4 truncate">
