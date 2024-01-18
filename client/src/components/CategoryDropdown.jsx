@@ -19,6 +19,22 @@ export default function CategoryDropdown({
   // }
   const [filteredCategories, setFilteredCategories] = useState(categories);
 
+  function stateReducer(state, actionAndChanges) {
+    const { type, changes } = actionAndChanges;
+    // this prevents the menu from being closed when the user selects an item with 'Enter' or mouse
+    switch (type) {
+      case useCombobox.stateChangeTypes.InputKeyDownEnter:
+      case useCombobox.stateChangeTypes.ItemClick:
+        return {
+          ...changes, // default Downshift new state changes on item selection.
+          isOpen: state.isOpen, // but keep menu open.
+          highlightedIndex: state.highlightedIndex, // with the item highlighted.
+        };
+      default:
+        return changes; // otherwise business as usual.
+    }
+  }
+
   const {
     isOpen,
     getMenuProps,
@@ -28,6 +44,15 @@ export default function CategoryDropdown({
     selectedItem,
   } = useCombobox({
     items: filteredCategories,
+    initialInputValue:
+      "modifiedCategory" in transaction
+        ? transaction.modifiedCategory.detailed
+        : transaction.plaidCategory.detailed,
+    initialHighlightedIndex: categories.indexOf(
+      "modifiedCategory" in transaction
+        ? transaction.modifiedCategory.detailed
+        : transaction.plaidCategory.detailed
+    ),
     onInputValueChange: ({ inputValue }) => {
       setFilteredCategories(
         categories.filter((category) =>
@@ -36,6 +61,7 @@ export default function CategoryDropdown({
         )
       );
     },
+    stateReducer,
   });
 
   return (
@@ -45,12 +71,7 @@ export default function CategoryDropdown({
           className="px-3 py-2 bg-green-50 dark:bg-green-900 whitespace-nowrap border rounded focus:outline-none focus:ring focus:border-blue-300"
           type="text"
           id="dropdown-input"
-          value={
-            "modifiedCategory" in transaction
-              ? transaction.modifiedCategory.detailed
-              : transaction.plaidCategory.detailed
-          }
-          {...getInputProps()}
+          {...getInputProps({})}
         />
       </div>
       <ul

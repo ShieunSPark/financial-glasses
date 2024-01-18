@@ -1,3 +1,4 @@
+import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Disclosure, Transition } from "@headlessui/react";
 
@@ -264,7 +265,6 @@ export default function Transactions() {
                                     ? (e) => e.stopPropagation()
                                     : undefined
                                 }
-                                // ref={selectedRef}
                                 onMouseEnter={() =>
                                   setSelectedTransactionID(
                                     transaction.transaction_id
