@@ -1,15 +1,16 @@
 import { createContext, useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import Error from "./routes/Error";
-import Home from "./routes/Home";
-import SignUp from "./routes/SignUp";
-import Login from "./routes/Login";
+import Error from "./components/Error";
+
+import Home from "./pages/Home";
+import SignUp from "./pages/SignUp";
+import Login from "./pages/Login";
 import Navbar from "./components/Navbar";
-import Dashboard from "./routes/Dashboard";
-import Transactions from "./routes/Transactions";
-import Budgets from "./routes/Budgets";
-import Profile from "./routes/Profile";
+import Dashboard from "./pages/Dashboard";
+import Transactions from "./pages/Transactions";
+import Budgets from "./pages/Budgets";
+import Profile from "./pages/Profile";
 
 export const TokenContext = createContext(null);
 export const UserContext = createContext(null);
