@@ -18,6 +18,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 export default function Dashboard() {
   // const { JWTtoken, setJWTtoken } = useContext(TokenContext);
   const { user, setUser } = useContext(UserContext);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [linkToken, setLinkToken] = useState(null);
   const [numOfItems, setNumOfItems] = useState(0);
@@ -52,6 +53,7 @@ export default function Dashboard() {
           navigate("/");
           // Perhaps display a message saying the user is not logged in
         } else {
+          setIsLoggedIn(true);
           setUser(data.user);
           setNumOfItems(data.numOfItems);
 
@@ -74,8 +76,8 @@ export default function Dashboard() {
       setItemsAndAccounts(response.itemsAndAccounts);
     };
 
-    getAccounts();
-  }, []);
+    if (isLoggedIn) getAccounts();
+  }, [isLoggedIn]);
 
   useEffect(() => {
     const syncTransactions = async () => {
@@ -84,8 +86,8 @@ export default function Dashboard() {
       });
     };
 
-    syncTransactions();
-  }, []);
+    if (isLoggedIn) syncTransactions();
+  }, [isLoggedIn]);
 
   if (isLoading) {
     // Show spinner

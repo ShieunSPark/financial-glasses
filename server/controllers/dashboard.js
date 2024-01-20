@@ -121,7 +121,6 @@ exports.transaction_put = asyncHandler(async (req, res, next) => {
     transaction.modifiedName = req.body.modifiedName;
     // transaction.markModified("modifiedName");
     await transaction.save();
-    console.log(transaction);
   } catch (err) {
     console.log(err);
     res.status(401).json({

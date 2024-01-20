@@ -23,6 +23,7 @@ export default function Transactions() {
   const [selectedButton, setSelectedButton] = useState("");
   const [modifiedName, setModifiedName] = useState("");
   const [categories, setCategories] = useState([]);
+  const [modifiedCategory, setModifiedCategory] = useState("");
 
   const navigate = useNavigate();
 
@@ -128,7 +129,7 @@ export default function Transactions() {
     setModifiedName(e.target.value);
   };
 
-  // Update modifiedName for the transaction
+  // Update modifiedName and modifiedCategory for the transaction
   const save = (transactionID) => {
     transactionPutRequest(modifiedName, transactionID).then(async () => {
       setModifiedName("");
@@ -142,6 +143,8 @@ export default function Transactions() {
     });
     setSelectedButton("");
   };
+
+  // console.log(modifiedCategory);
 
   if (isLoading) {
     // Show spinner
@@ -310,8 +313,9 @@ export default function Transactions() {
                                   <td className="px-3 py-2">
                                     <CategoryDropdown
                                       categories={categories}
-                                      setCategories={setCategories}
+                                      // setCategories={setCategories}
                                       transaction={transaction}
+                                      setModifiedCategory={setModifiedCategory}
                                     />
                                   </td>
                                 ) : (

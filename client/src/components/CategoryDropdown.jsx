@@ -6,6 +6,7 @@ export default function CategoryDropdown({
   categories,
   // setCategories,
   transaction,
+  setModifiedCategory,
 }) {
   // function getCategoriesFilter(inputValue) {
   //   const lowerCasedInputValue = inputValue.toLowerCase();
@@ -21,15 +22,24 @@ export default function CategoryDropdown({
 
   function stateReducer(state, actionAndChanges) {
     const { type, changes } = actionAndChanges;
-    // this prevents the menu from being closed when the user selects an item with 'Enter' or mouse
+    // if (changes.hasOwnProperty("isOpen")) {
+    //   return {
+    //     ...changes,
+    //     highlightedIndex: changes.isOpen
+    //       ? categories.indexOf(state.selectedItem)
+    //       : null,
+    //   };
+    // }
     switch (type) {
-      case useCombobox.stateChangeTypes.InputKeyDownEnter:
-      case useCombobox.stateChangeTypes.ItemClick:
+      case useCombobox.stateChangeTypes.InputChange:
         return {
           ...changes, // default Downshift new state changes on item selection.
           isOpen: state.isOpen, // but keep menu open.
           highlightedIndex: state.highlightedIndex, // with the item highlighted.
         };
+      // also on selection.
+      case useCombobox.stateChangeTypes.ItemClick:
+      case useCombobox.stateChangeTypes.InputKeyDownEnter:
       default:
         return changes; // otherwise business as usual.
     }
@@ -88,6 +98,7 @@ export default function CategoryDropdown({
                 ${selectedItem === category ? "font-bold" : ""} 
                 text-black py-2 px-3 shadow-sm flex flex-col`}
               key={category + index}
+              onClick={() => console.log("selected")}
               {...getItemProps({
                 category,
                 index,
