@@ -31,15 +31,14 @@ export default function CategoryDropdown({
     //   };
     // }
     switch (type) {
-      case useCombobox.stateChangeTypes.InputChange:
+      case useCombobox.stateChangeTypes.InputKeyDownEnter:
+      case useCombobox.stateChangeTypes.ItemClick:
         return {
           ...changes, // default Downshift new state changes on item selection.
           isOpen: state.isOpen, // but keep menu open.
           highlightedIndex: state.highlightedIndex, // with the item highlighted.
         };
-      // also on selection.
-      case useCombobox.stateChangeTypes.ItemClick:
-      case useCombobox.stateChangeTypes.InputKeyDownEnter:
+      // case useCombobox.stateChangeTypes.InputChange:
       default:
         return changes; // otherwise business as usual.
     }
