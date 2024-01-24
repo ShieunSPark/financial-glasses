@@ -114,11 +114,14 @@ exports.transaction_put = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
 
   try {
-    // Update the modified name of the transaction
+    // Update the modified name or modified category of the transaction
     const transaction = await Transaction.findOne({
       transaction_id: req.params.transaction_id,
     });
-    transaction.modifiedName = req.body.modifiedName;
+    if (req.body.modifiedName !== "")
+      transaction.modifiedName = req.body.modifiedName;
+    if (req.body.modifiedCategory !== "")
+      transaction.modifiedCategory = req.body.modifiedCategory;
     // transaction.markModified("modifiedName");
     await transaction.save();
   } catch (err) {

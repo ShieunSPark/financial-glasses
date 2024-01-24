@@ -1,44 +1,29 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCombobox } from "downshift";
 import PropTypes from "prop-types";
 
 export default function CategoryDropdown({
   categories,
-  // setCategories,
   transaction,
   setModifiedCategory,
 }) {
-  // function getCategoriesFilter(inputValue) {
-  //   const lowerCasedInputValue = inputValue.toLowerCase();
-
-  //   return function categoriesFilter(category) {
-  //     return (
-  //       !inputValue ||
-  //       category.title.toLowerCase().includes(lowerCasedInputValue)
-  //     );
-  //   };
-  // }
   const [filteredCategories, setFilteredCategories] = useState(categories);
 
+  // Right now, this does a weird thing where the first time you click the input,
+  // it doesn't scroll to where the text is. But when you click off and then on the input again,
+  // it jumps to the highlighted text... I'm so confused
   function stateReducer(state, actionAndChanges) {
     const { type, changes } = actionAndChanges;
-    // if (changes.hasOwnProperty("isOpen")) {
-    //   return {
-    //     ...changes,
-    //     highlightedIndex: changes.isOpen
-    //       ? categories.indexOf(state.selectedItem)
-    //       : null,
-    //   };
-    // }
     switch (type) {
       case useCombobox.stateChangeTypes.InputKeyDownEnter:
       case useCombobox.stateChangeTypes.ItemClick:
         return {
           ...changes, // default Downshift new state changes on item selection.
           isOpen: state.isOpen, // but keep menu open.
-          highlightedIndex: state.highlightedIndex, // with the item highlighted.
+          highlightedIndex: state.isOpen
+            ? categories.indexOf(state.selectedItem)
+            : null, // with the item highlighted.
         };
-      // case useCombobox.stateChangeTypes.InputChange:
       default:
         return changes; // otherwise business as usual.
     }
@@ -55,11 +40,15 @@ export default function CategoryDropdown({
     items: filteredCategories,
     initialInputValue:
       "modifiedCategory" in transaction
-        ? transaction.modifiedCategory.detailed
+        ? transaction.modifiedCategory
+        : transaction.plaidCategory.detailed,
+    initialSelectedItem:
+      "modifiedCategory" in transaction
+        ? transaction.modifiedCategory
         : transaction.plaidCategory.detailed,
     initialHighlightedIndex: categories.indexOf(
       "modifiedCategory" in transaction
-        ? transaction.modifiedCategory.detailed
+        ? transaction.modifiedCategory
         : transaction.plaidCategory.detailed
     ),
     onInputValueChange: ({ inputValue }) => {
@@ -69,6 +58,7 @@ export default function CategoryDropdown({
           category.toLowerCase().includes(inputValue.toLowerCase())
         )
       );
+      if (categories.includes(inputValue)) setModifiedCategory(inputValue);
     },
     stateReducer,
   });
@@ -97,7 +87,6 @@ export default function CategoryDropdown({
                 ${selectedItem === category ? "font-bold" : ""} 
                 text-black py-2 px-3 shadow-sm flex flex-col`}
               key={category + index}
-              onClick={() => console.log("selected")}
               {...getItemProps({
                 category,
                 index,
@@ -111,7 +100,7 @@ export default function CategoryDropdown({
             </li>
           ))
         ) : (
-          <li className={"text-black py-2 px-3 shadow-sm flex flex-col"}>
+          <li className={"text-black italic py-2 px-3 shadow-sm flex flex-col"}>
             <span>No option</span>
           </li>
         )}
@@ -122,6 +111,6 @@ export default function CategoryDropdown({
 
 CategoryDropdown.propTypes = {
   categories: PropTypes.array,
-  setCategories: PropTypes.func,
   transaction: PropTypes.object,
+  setModifiedCategory: PropTypes.func,
 };

@@ -99,7 +99,6 @@ export default function TransactionTable({
                         <td className="px-3 py-2">
                           <CategoryDropdown
                             categories={categories}
-                            // setCategories={setCategories}
                             transaction={transaction}
                             setModifiedCategory={setModifiedCategory}
                           />
@@ -108,7 +107,7 @@ export default function TransactionTable({
                         <td className="px-6 py-4 truncate">
                           {!transaction.modifiedCategory
                             ? transaction.plaidCategory.detailed
-                            : transaction.modifiedCategory.detailed}
+                            : transaction.modifiedCategory}
                         </td>
                       )}
                       {transaction.amount > 0 ? (

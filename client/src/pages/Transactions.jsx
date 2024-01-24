@@ -128,16 +128,19 @@ export default function Transactions() {
 
   // Update modifiedName and modifiedCategory for the transaction
   const save = (transactionID) => {
-    transactionPutRequest(modifiedName, transactionID).then(async () => {
-      setModifiedName("");
-      const getTransactions = async () => {
-        const response = await transactionsRequest();
-        setTransactions(response.transactions);
-        setIsLoading(false);
-      };
+    transactionPutRequest(modifiedName, modifiedCategory, transactionID).then(
+      async () => {
+        setModifiedName("");
+        setModifiedCategory("");
+        const getTransactions = async () => {
+          const response = await transactionsRequest();
+          setTransactions(response.transactions);
+          setIsLoading(false);
+        };
 
-      getTransactions();
-    });
+        getTransactions();
+      }
+    );
     setSelectedButton("");
   };
 
