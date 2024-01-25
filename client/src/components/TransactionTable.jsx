@@ -1,11 +1,16 @@
-import { useContext } from "react";
+import { useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getPaginationRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 
-import { UserContext } from "../App";
 import CategoryDropdown from "../components/CategoryDropdown";
 
 export default function TransactionTable({
-  accountID,
   transactions,
   selectedButton,
   setSelectedButton,
@@ -17,11 +22,290 @@ export default function TransactionTable({
   setModifiedCategory,
   save,
 }) {
-  const { user, setUser } = useContext(UserContext);
+  const [data, setData] = useState(() => [...transactions]);
+
+  // This updates data when editing a transaction object
+  useEffect(() => {
+    setData([...transactions]);
+  }, [transactions]);
+
+  const columnHelper = createColumnHelper();
+
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor((row) => row.date, {
+        id: "date",
+        header: () => "Date",
+        cell: (info) => (
+          <div className="px-6 py-4 truncate">
+            {`${new Date(info.renderValue()).getMonth() + 1}/${new Date(
+              info.renderValue()
+            ).getDate()}/${new Date(info.renderValue()).getFullYear()}`}
+          </div>
+        ),
+        footer: (info) => info.column.id,
+      }),
+      columnHelper.accessor(
+        (row) => (row.modifiedName ? row.modifiedName : row.name),
+        {
+          id: "name",
+          header: () => "Name",
+          cell: (info) => info.getValue(),
+          footer: (info) => info.column.id,
+        }
+      ),
+      columnHelper.accessor((row) => row.plaidCategory.detailed, {
+        id: "category",
+        header: () => "Category",
+        // Might need to double check it's info or info.detailed
+        cell: (info) => info.getValue(),
+        footer: (info) => info.column.id,
+      }),
+      columnHelper.accessor((row) => row.amount, {
+        id: "amount",
+        header: () => "Amount",
+        cell: (info) =>
+          info.renderValue() > 0 ? (
+            <div className="text-right px-6 py-4">
+              ${info.renderValue().toFixed(2)}
+            </div>
+          ) : (
+            <div className="text-green-500 dark:text-green-200 text-right px-6 py-4">
+              -${info.renderValue().toFixed(2) * -1}
+            </div>
+          ),
+        footer: (info) => info.column.id,
+      }),
+      columnHelper.accessor("", {
+        id: "edit-save",
+        cell: () => "",
+        footer: (info) => info.column.id,
+      }),
+    ],
+    [data]
+  );
+
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  });
 
   return (
     <div>
       <table className="table-fixed w-full text-sm text-left rtl:text-right text-gray-600 dark:text-gray-400 ">
+        <thead className="h-12 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-400 uppercase sticky top-0">
+          {table.getHeaderGroups().map((headerGroup) => (
+            <tr key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <th
+                  key={header.id}
+                  scope="col"
+                  className={`px-6 py-3 ${
+                    header.id === "date"
+                      ? "w-2/12"
+                      : header.id === "name"
+                      ? "w-4/12"
+                      : header.id === "category"
+                      ? "w-3/12"
+                      : header.id === "amount"
+                      ? "w-2/12 text-right"
+                      : "w-1/12 text-right"
+                  }`}
+                >
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                </th>
+              ))}
+            </tr>
+          ))}
+        </thead>
+        <tbody>
+          {table.getRowModel().rows.map((row) => {
+            const refProp =
+              selectedButton === row.original.transaction_id
+                ? { ref: selectedRef }
+                : {};
+            return (
+              <tr
+                key={row.id}
+                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-200 hover:dark:bg-gray-600"
+                onClick={
+                  selectedButton === row.original.transaction_id
+                    ? (e) => e.stopPropagation()
+                    : undefined
+                }
+                onMouseEnter={() =>
+                  setSelectedTransactionID(row.original.transaction_id)
+                }
+                onMouseLeave={() => setSelectedTransactionID("")}
+                {...refProp}
+              >
+                {row.getVisibleCells().map((cell) => {
+                  if (cell.column.id === "name") {
+                    if (selectedButton === row.original.transaction_id) {
+                      return (
+                        <td key={cell.id} className="px-3 py-2">
+                          <input
+                            className="w-full px-3 py-2 bg-green-50 dark:bg-green-900 font-medium text-gray-900 dark:text-white whitespace-nowrap border rounded focus:outline-none focus:ring focus:border-blue-300"
+                            type="text"
+                            defaultValue={
+                              row.original.modifiedName
+                                ? row.original.modifiedName
+                                : row.original.name
+                            }
+                            onChange={(e) => setModifiedName(e.target.value)}
+                          />
+                        </td>
+                      );
+                    } else {
+                      return (
+                        <td
+                          key={cell.id}
+                          className="px-6 py-4 font-medium text-gray-900 dark:text-white truncate"
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </td>
+                      );
+                    }
+                  } else if (cell.column.id === "category") {
+                    if (selectedButton === row.original.transaction_id) {
+                      return (
+                        <td key={cell.id} className="px-3 py-2">
+                          <CategoryDropdown
+                            categories={categories}
+                            transaction={row.original}
+                            setModifiedCategory={setModifiedCategory}
+                          />
+                        </td>
+                      );
+                    } else {
+                      return (
+                        <td key={cell.id} className="px-6 py-4 truncate">
+                          {!row.original.modifiedCategory
+                            ? row.original.plaidCategory.detailed
+                            : row.original.modifiedCategory}
+                        </td>
+                      );
+                    }
+                  } else if (cell.column.id === "edit-save") {
+                    if (selectedButton === row.original.transaction_id) {
+                      return (
+                        <td key={cell.id} className="px-6 py-4">
+                          <button
+                            className="text-green-700 dark:text-green-400"
+                            onClick={() => save(row.original.transaction_id)}
+                          >
+                            Save
+                          </button>
+                        </td>
+                      );
+                    } else {
+                      return (
+                        <td key={cell.id} className="px-6 py-4">
+                          <button
+                            className={`${
+                              selectedTransactionID ===
+                              row.original.transaction_id
+                                ? " "
+                                : "hidden "
+                            } text-blue-700 dark:text-blue-400`}
+                            onClick={() =>
+                              setSelectedButton(row.original.transaction_id)
+                            }
+                          >
+                            Edit
+                          </button>
+                        </td>
+                      );
+                    }
+                  } else {
+                    return (
+                      <td key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>
+                    );
+                  }
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      {/* Pagination */}
+      <div className="flex justify-center items-center gap-2 p-2">
+        <button
+          className="border rounded p-1"
+          onClick={() => table.setPageIndex(0)}
+          disabled={!table.getCanPreviousPage()}
+        >
+          {"<<"}
+        </button>
+        <button
+          className="border rounded p-1"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          {"<"}
+        </button>
+        <button
+          className="border rounded p-1"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          {">"}
+        </button>
+        <button
+          className="border rounded p-1"
+          onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+          disabled={!table.getCanNextPage()}
+        >
+          {">>"}
+        </button>
+        <span className="flex items-center gap-1">
+          <div>Page</div>
+          <strong>
+            {table.getState().pagination.pageIndex + 1} of{" "}
+            {table.getPageCount()}
+          </strong>
+        </span>
+        <span className="flex items-center gap-1">
+          | Go to page:
+          <input
+            type="number"
+            defaultValue={table.getState().pagination.pageIndex + 1}
+            onChange={(e) => {
+              const page = e.target.value ? Number(e.target.value) - 1 : 0;
+              table.setPageIndex(page);
+            }}
+            className="border p-1 rounded w-16"
+          />
+        </span>
+        <select
+          value={table.getState().pagination.pageSize}
+          onChange={(e) => {
+            table.setPageSize(Number(e.target.value));
+          }}
+        >
+          {[10, 20, 30, 40, 50].map((pageSize) => (
+            <option key={pageSize} value={pageSize}>
+              Show {pageSize}
+            </option>
+          ))}
+        </select>
+      </div>
+      {/* <table className="table-fixed w-full text-sm text-left rtl:text-right text-gray-600 dark:text-gray-400 ">
         <thead className="h-12 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-400 uppercase sticky top-0">
           <tr>
             <th scope="col" className="w-2/12 px-6 py-3">
@@ -148,7 +432,7 @@ export default function TransactionTable({
                 })
             : null}
         </tbody>
-      </table>
+      </table> */}
     </div>
   );
 }

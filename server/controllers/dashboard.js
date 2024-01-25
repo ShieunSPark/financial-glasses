@@ -118,9 +118,15 @@ exports.transaction_put = asyncHandler(async (req, res, next) => {
     const transaction = await Transaction.findOne({
       transaction_id: req.params.transaction_id,
     });
-    if (req.body.modifiedName !== "")
+    if (
+      req.body.modifiedName !== "" &&
+      transaction.modifiedName !== req.body.modifiedName
+    )
       transaction.modifiedName = req.body.modifiedName;
-    if (req.body.modifiedCategory !== "")
+    if (
+      req.body.modifiedCategory !== "" &&
+      transaction.modifiedCategory !== req.body.modifiedCategory
+    )
       transaction.modifiedCategory = req.body.modifiedCategory;
     // transaction.markModified("modifiedName");
     await transaction.save();
