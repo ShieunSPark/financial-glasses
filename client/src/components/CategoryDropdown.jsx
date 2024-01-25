@@ -3,8 +3,8 @@ import { useCombobox } from "downshift";
 import PropTypes from "prop-types";
 
 export default function CategoryDropdown({
-  categories,
   transaction,
+  categories,
   setModifiedCategory,
 }) {
   const [filteredCategories, setFilteredCategories] = useState(categories);

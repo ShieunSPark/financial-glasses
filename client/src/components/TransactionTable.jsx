@@ -1,8 +1,43 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import PropTypes from "prop-types";
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 
 import { UserContext } from "../App";
 import CategoryDropdown from "../components/CategoryDropdown";
+
+const columnHelper = createColumnHelper();
+
+const columns = [
+  columnHelper.accessor("date", {
+    header: () => "Date",
+    cell: (info) => info.renderValue(),
+    footer: (info) => info.column.id,
+  }),
+  columnHelper.accessor((row) => row.name, {
+    id: "name",
+    header: () => "Name",
+    cell: (info) => info.getValue(),
+    footer: (info) => info.column.id,
+  }),
+  columnHelper.accessor("category", {
+    id: "category",
+    header: () => "Category",
+    // Might need to double check it's info or info.detailed
+    cell: (info) => info.getValue(),
+    footer: (info) => info.column.id,
+  }),
+  columnHelper.accessor("Amount", {
+    id: "amount",
+    header: () => "Amount",
+    cell: (info) => info.getValue(),
+    footer: (info) => info.column.id,
+  }),
+];
 
 export default function TransactionTable({
   accountID,
@@ -17,11 +52,46 @@ export default function TransactionTable({
   setModifiedCategory,
   save,
 }) {
+  const [data, setData] = useState(() => [...transactions]);
   const { user, setUser } = useContext(UserContext);
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
 
   return (
     <div>
       <table className="table-fixed w-full text-sm text-left rtl:text-right text-gray-600 dark:text-gray-400 ">
+        <thead className="h-12 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-400 uppercase sticky top-0">
+          {table.getHeaderGroups().map((headerGroup) => (
+            <tr key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <th key={header.id}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                </th>
+              ))}
+            </tr>
+          ))}
+        </thead>
+        <tbody>
+          {table.getRowModel().rows.map((row) => (
+            <tr key={row.id}>
+              {row.getVisibleCells().map((cell) => (
+                <td key={cell.id}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {/* <table className="table-fixed w-full text-sm text-left rtl:text-right text-gray-600 dark:text-gray-400 ">
         <thead className="h-12 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-400 uppercase sticky top-0">
           <tr>
             <th scope="col" className="w-2/12 px-6 py-3">
@@ -148,7 +218,7 @@ export default function TransactionTable({
                 })
             : null}
         </tbody>
-      </table>
+      </table> */}
     </div>
   );
 }
