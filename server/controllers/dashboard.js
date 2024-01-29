@@ -125,7 +125,7 @@ exports.transaction_put = asyncHandler(async (req, res, next) => {
       transaction.modifiedName = req.body.modifiedName;
     if (
       req.body.modifiedCategory !== "" &&
-      transaction.modidifiedCategory !== req.body.modidifiedCategory
+      transaction.modifiedCategory !== req.body.modifiedCategory
     )
       transaction.modifiedCategory = req.body.modifiedCategory;
     // transaction.markModified("modifiedName");

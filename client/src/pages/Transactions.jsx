@@ -144,8 +144,6 @@ export default function Transactions() {
     setSelectedButton("");
   };
 
-  // console.log(modifiedCategory);
-
   if (isLoading) {
     // Show spinner
     return (
@@ -225,7 +223,6 @@ export default function Transactions() {
                 leaveTo="opacity-0"
               >
                 <TransactionTable
-                  accountID={accountID}
                   transactions={transactions.filter((transaction) =>
                     accountID !== "all"
                       ? transaction.account.account_id === accountID
