@@ -226,7 +226,11 @@ export default function Transactions() {
               >
                 <TransactionTable
                   accountID={accountID}
-                  transactions={transactions}
+                  transactions={transactions.filter((transaction) =>
+                    accountID !== "all"
+                      ? transaction.account.account_id === accountID
+                      : true
+                  )}
                   selectedButton={selectedButton}
                   setSelectedButton={setSelectedButton}
                   selectedRef={selectedRef}
