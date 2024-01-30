@@ -143,6 +143,40 @@ exports.transaction_put = asyncHandler(async (req, res, next) => {
   });
 });
 
+exports.dashboard_chart = asyncHandler(async (req, res, next) => {
+  const monthTransactions = await Transaction.find({
+    date: {
+      $gte:
+        new Date().getMonth() < 10
+          ? // Be sure to do getMonth() + 1 to correctly track the current month
+            `0${new Date().getMonth()}/01/${new Date().getFullYear()}`
+          : `${new Date().getMonth()}/01/${new Date().getFullYear()}`,
+    },
+  });
+
+  const categoriesSum = [];
+  monthTransactions.forEach((transaction) => {
+    if (
+      categoriesSum.find(
+        (item) => item.category === transaction.plaidCategory.detailed
+      ) === undefined
+    )
+      categoriesSum.push({
+        category: transaction.plaidCategory.detailed,
+        total: transaction.amount,
+      });
+    else {
+      categoriesSum.find(
+        (item) => item.category === transaction.plaidCategory.detailed
+      ).total += transaction.amount;
+    }
+  });
+
+  res.json({
+    categoriesSum: categoriesSum,
+  });
+});
+
 exports.profile_get = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
   res.json({

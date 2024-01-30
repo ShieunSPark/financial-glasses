@@ -20,7 +20,7 @@ export default function Transactions() {
   const [accounts, setAccounts] = useState(["all"]);
   const [transactions, setTransactions] = useState([]);
   const [selectedAccountID, setSelectedAccountID] = useState("all");
-  const [selectedTransactionID, setSelectedTransactionID] = useState("");
+  const [highlightedTransaction, setHighlightedTransaction] = useState("");
   const [selectedButton, setSelectedButton] = useState("");
   const [modifiedName, setModifiedName] = useState("");
   const [categories, setCategories] = useState([]);
@@ -162,10 +162,10 @@ export default function Transactions() {
     );
   } else {
     return (
-      <Transition appear={true} show={true}>
-        <div className="grid grid-cols-5 grid-rows-1 border-2 border-green-800 dark:border-green-600 h-majority m-4">
+      <Transition appear={true} show={true} className={""}>
+        <div className="grid grid-cols-5 border-2 border-green-800 dark:border-green-600 h-[80vh] m-4">
           {/* Tab for all accounts */}
-          <div className="col-span-1 flex flex-col space-y-1">
+          <div className="col-span-1 flex flex-col space-y-1 h-full">
             <Transition.Child
               enter="transition duration-200 ease-in-out delay-200"
               enterFrom="opacity-0"
@@ -209,7 +209,7 @@ export default function Transactions() {
               : null}
           </div>
           {/* For each account, create a Transition as well as a table */}
-          <div className="col-span-4 text-center h-full overflow-y-auto">
+          <div className="col-span-4 text-center h-full">
             {accounts.map((accountID) => (
               <Transition
                 key={accountID}
@@ -221,6 +221,7 @@ export default function Transactions() {
                 leave="transition duration-200 ease-in-out"
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
+                className={"h-full"}
               >
                 <TransactionTable
                   transactions={transactions.filter((transaction) =>
@@ -231,8 +232,8 @@ export default function Transactions() {
                   selectedButton={selectedButton}
                   setSelectedButton={setSelectedButton}
                   selectedRef={selectedRef}
-                  selectedTransactionID={selectedTransactionID}
-                  setSelectedTransactionID={setSelectedTransactionID}
+                  highlightedTransaction={highlightedTransaction}
+                  setHighlightedTransaction={setHighlightedTransaction}
                   setModifiedName={setModifiedName}
                   categories={categories}
                   setModifiedCategory={setModifiedCategory}

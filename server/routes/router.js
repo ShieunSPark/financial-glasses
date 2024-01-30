@@ -97,6 +97,12 @@ router.put(
   dashboard_controller.transaction_put
 );
 
+router.get(
+  "/dashboard/chart",
+  checkLoggedIn,
+  dashboard_controller.dashboard_chart
+);
+
 // GET profile
 router.get("/profile", checkLoggedIn, dashboard_controller.profile_get);
 
