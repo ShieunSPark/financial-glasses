@@ -18,7 +18,6 @@ export default function TransactionTable({
   highlightedTransaction,
   setHighlightedTransaction,
   setModifiedName,
-  categories,
   setModifiedCategory,
   save,
 }) {
@@ -190,7 +189,6 @@ export default function TransactionTable({
                         return (
                           <td key={cell.id} className="px-3 py-2">
                             <CategoryDropdown
-                              categories={categories}
                               transaction={row.original}
                               setModifiedCategory={setModifiedCategory}
                             />

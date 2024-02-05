@@ -1,7 +1,6 @@
 import { useContext, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { HiXCircle } from "react-icons/hi";
-import { Transition } from "@headlessui/react";
 
 import { UserContext } from "../App";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -41,11 +40,8 @@ export default function Confirm({ accountID, onClose }) {
           <div className="text-center">
             Are you sure you want to delete this account?
           </div>
-          <div className="flex justify-center">
-            <button
-              className="bg-gray-400 rounded-md p-2 mx-6"
-              onClick={onClose}
-            >
+          <div className="flex justify-center gap-4">
+            <button className="bg-gray-400 rounded-md p-2" onClick={onClose}>
               Cancel
             </button>
             <button
