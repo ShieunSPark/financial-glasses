@@ -168,13 +168,23 @@ export default function Dashboard() {
                             <HiTrash className="w-6 h-6 text-gray-400 hover:text-gray-600" />
                           </button>
 
-                          {showConfirm &&
-                            selectedAccount === account.account_id &&
+                          {selectedAccount === account.account_id &&
                             createPortal(
-                              <Confirm
-                                accountID={account.account_id}
-                                onClose={() => setShowConfirm(false)}
-                              />,
+                              <Transition
+                                appear={true}
+                                show={showConfirm}
+                                enter="transition duration-300 ease-in-out"
+                                enterFrom="opacity-0"
+                                enterTo="opacity-100"
+                                leave="transition duration-300 ease-in-out"
+                                leaveFrom="opacity-100"
+                                leaveTo="opacity-0"
+                              >
+                                <Confirm
+                                  accountID={account.account_id}
+                                  onClose={() => setShowConfirm(false)}
+                                />
+                              </Transition>,
                               document.body
                             )}
                         </div>
