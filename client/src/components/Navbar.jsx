@@ -1,5 +1,5 @@
-import { Fragment, useContext } from "react";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Fragment, useContext, useState } from "react";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Menu, Transition } from "@headlessui/react";
 import { HiDotsVertical } from "react-icons/hi";
 
@@ -9,6 +9,8 @@ import logo from "../assets/fgLogo.svg";
 export default function Navbar() {
   // const { JWTtoken, setJWTtoken } = useContext(TokenContext);
   const { user, setUser } = useContext(UserContext);
+  const { hash, pathname, search } = useLocation();
+  const [selectedRoute, setSelectedRoute] = useState(pathname.substring(1));
 
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
@@ -32,27 +34,36 @@ export default function Navbar() {
   return (
     <div>
       <nav className="flex justify-between items-center p-5 bg-emerald-100 dark:bg-emerald-900 ">
-        <Link to={`/dashboard`}>
+        <Link to={`/dashboard`} onClick={() => setSelectedRoute("dashboard")}>
           <img className="w-16" src={logo} alt="Financial Glasses logo" />
         </Link>
         <div className="flex gap-x-10">
           <Link
             to={`/dashboard`}
-            className="text-xl hover:text-blue-600 dark:hover:text-blue-300 duration-150"
+            className={`text-xl hover:text-blue-600 dark:hover:text-blue-300 duration-15 ${
+              selectedRoute === "dashboard" ? "underline" : null
+            }`}
+            onClick={() => setSelectedRoute("dashboard")}
           >
             Overview
           </Link>
           <Link
             to={`/transactions`}
-            className="text-xl hover:text-blue-600 dark:hover:text-blue-300 duration-150"
+            className={`text-xl hover:text-blue-600 dark:hover:text-blue-300 duration-15 ${
+              selectedRoute === "transactions" ? "underline" : null
+            }`}
+            onClick={() => setSelectedRoute("transactions")}
           >
             Transactions
           </Link>
           <Link
-            to={`/budgets`}
-            className="text-xl hover:text-blue-600 dark:hover:text-blue-300 duration-150"
+            to={`/budget`}
+            className={`text-xl hover:text-blue-600 dark:hover:text-blue-300 duration-15 ${
+              selectedRoute === "budgets" ? "underline" : null
+            }`}
+            onClick={() => setSelectedRoute("budgets")}
           >
-            Budgets
+            Budget
           </Link>
         </div>
         <div className="flex w-[64px]">

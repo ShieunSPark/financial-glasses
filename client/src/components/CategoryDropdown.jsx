@@ -2,12 +2,29 @@ import { useEffect, useState } from "react";
 import { useCombobox } from "downshift";
 import PropTypes from "prop-types";
 
-export default function CategoryDropdown({
-  transaction,
-  categories,
-  setModifiedCategory,
-}) {
+import categoriesRequest from "../api/categoriesRequest";
+
+export default function CategoryDropdown({ transaction, setModified }) {
+  const [categories, setCategories] = useState([]);
   const [filteredCategories, setFilteredCategories] = useState(categories);
+
+  // Set up categories
+  useEffect(() => {
+    const getCategories = async () => {
+      const response = await categoriesRequest();
+      const fullList = [];
+      response.budget.categories.map((category) => {
+        fullList.push(category.primary.toUpperCase());
+        category.detailed.map((detailed) => {
+          fullList.push(detailed);
+        });
+      });
+      setCategories(fullList);
+      setFilteredCategories(fullList);
+    };
+
+    getCategories();
+  }, []);
 
   // Right now, this does a weird thing where the first time you click the input,
   // it doesn't scroll to where the text is. But when you click off and then on the input again,
@@ -41,14 +58,20 @@ export default function CategoryDropdown({
     initialInputValue:
       "modifiedCategory" in transaction
         ? transaction.modifiedCategory
+        : !transaction.plaidCategory
+        ? ""
         : transaction.plaidCategory.detailed,
     initialSelectedItem:
       "modifiedCategory" in transaction
         ? transaction.modifiedCategory
+        : !transaction.plaidCategory
+        ? ""
         : transaction.plaidCategory.detailed,
     initialHighlightedIndex: categories.indexOf(
       "modifiedCategory" in transaction
         ? transaction.modifiedCategory
+        : !transaction.plaidCategory
+        ? ""
         : transaction.plaidCategory.detailed
     ),
     onInputValueChange: ({ inputValue }) => {
@@ -58,7 +81,7 @@ export default function CategoryDropdown({
           category.toLowerCase().includes(inputValue.toLowerCase())
         )
       );
-      if (categories.includes(inputValue)) setModifiedCategory(inputValue);
+      if (categories.includes(inputValue)) setModified(inputValue);
     },
     stateReducer,
   });
@@ -112,5 +135,5 @@ export default function CategoryDropdown({
 CategoryDropdown.propTypes = {
   categories: PropTypes.array,
   transaction: PropTypes.object,
-  setModifiedCategory: PropTypes.func,
+  setModified: PropTypes.func,
 };

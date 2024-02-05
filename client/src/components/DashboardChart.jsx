@@ -79,7 +79,7 @@ export default function DashboardChart({ data }) {
           data={chartData}
           cx="50%"
           cy="45%"
-          outerRadius={"75%"}
+          outerRadius={"70%"}
           fill="#8884d8"
           label={renderCustomizedLabel}
           legendType="square"

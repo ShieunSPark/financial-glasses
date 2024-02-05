@@ -149,8 +149,8 @@ exports.dashboard_chart = asyncHandler(async (req, res, next) => {
       $gte:
         new Date().getMonth() < 10
           ? // Be sure to do getMonth() + 1 to correctly track the current month
-            `0${new Date().getMonth()}/01/${new Date().getFullYear()}`
-          : `${new Date().getMonth()}/01/${new Date().getFullYear()}`,
+            `${new Date().getFullYear()}-0${new Date().getMonth() + 1}-01`
+          : `${new Date().getFullYear()}-${new Date().getMonth() + 1}-01`,
     },
   });
 
@@ -177,18 +177,98 @@ exports.dashboard_chart = asyncHandler(async (req, res, next) => {
   });
 });
 
-exports.profile_get = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.session.passport.user);
-  res.json({
-    user: user,
-  });
-});
-
 exports.categories_get = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
   const budget = await Budget.findOne({ user: user });
 
+  budget.trackedCategories.sort((a, b) => {
+    const nameA = a.trackedCategory.toUpperCase(); // ignore upper and lowercase
+    const nameB = b.trackedCategory.toUpperCase(); // ignore upper and lowercase
+    if (nameA < nameB) {
+      return -1;
+    }
+    if (nameA > nameB) {
+      return 1;
+    }
+
+    // names must be equal
+    return 0;
+  });
+
   res.json({
     budget: budget,
+  });
+});
+
+exports.budget_put = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.session.passport.user);
+  const budget = await Budget.findOne({ user: user });
+
+  const requestedCategory = budget.trackedCategories.find(
+    (category) => category.trackedCategory === req.body.trackedCategory
+  );
+
+  if (!requestedCategory) {
+    budget.trackedCategories = [
+      ...budget.trackedCategories,
+      {
+        trackedCategory: req.body.trackedCategory,
+        budgetAmount: req.body.budgetAmount,
+      },
+    ];
+
+    await budget.save();
+
+    res.json({
+      budget: budget,
+    });
+    return;
+  } else {
+    await Budget.findOneAndUpdate(
+      {
+        "trackedCategories.trackedCategory": req.body.trackedCategory,
+      },
+      {
+        $set: {
+          "trackedCategories.$.budgetAmount": req.body.budgetAmount,
+        },
+      }
+    );
+
+    res.json({
+      budget: budget,
+    });
+    return;
+  }
+
+  res.json({
+    message: "Category already is being tracked; not added to list",
+  });
+});
+
+exports.budget_delete = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.session.passport.user);
+  const budget = await Budget.findOneAndUpdate(
+    { user: user },
+    {
+      $pull: {
+        trackedCategories: {
+          trackedCategory: req.body.trackedCategory,
+        },
+      },
+    }
+  );
+
+  console.log(budget);
+
+  res.json({
+    budget: budget,
+  });
+});
+
+exports.profile_get = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.session.passport.user);
+  res.json({
+    user: user,
   });
 });

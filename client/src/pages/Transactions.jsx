@@ -6,7 +6,6 @@ import { UserContext } from "../App";
 import dashboardRequest from "../api/dashboardRequest";
 import accountsRequest from "../api/accountsRequest";
 import transactionsRequest from "../api/transactionsRequest";
-import categoriesRequest from "../api/categoriesRequest";
 import transactionPutRequest from "../api/transactionPutRequest";
 
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -23,7 +22,6 @@ export default function Transactions() {
   const [highlightedTransaction, setHighlightedTransaction] = useState("");
   const [selectedButton, setSelectedButton] = useState("");
   const [modifiedName, setModifiedName] = useState("");
-  const [categories, setCategories] = useState([]);
   const [modifiedCategory, setModifiedCategory] = useState("");
 
   const navigate = useNavigate();
@@ -71,23 +69,6 @@ export default function Transactions() {
         });
       });
   }, [itemsAndAccounts, accounts]);
-
-  // Set up categories
-  useEffect(() => {
-    const getCategories = async () => {
-      const response = await categoriesRequest();
-      const fullList = [];
-      response.budget.categories.map((category) => {
-        fullList.push(category.primary.toUpperCase());
-        category.detailed.map((detailed) => {
-          fullList.push(detailed);
-        });
-      });
-      setCategories(fullList);
-    };
-
-    getCategories();
-  }, []);
 
   // Keep track of which account has been selected to view
   const selectAccount = (accountID) => {
@@ -235,7 +216,6 @@ export default function Transactions() {
                   highlightedTransaction={highlightedTransaction}
                   setHighlightedTransaction={setHighlightedTransaction}
                   setModifiedName={setModifiedName}
-                  categories={categories}
                   setModifiedCategory={setModifiedCategory}
                   save={save}
                 />
