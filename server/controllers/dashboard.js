@@ -149,8 +149,8 @@ exports.dashboard_chart = asyncHandler(async (req, res, next) => {
       $gte:
         new Date().getMonth() < 10
           ? // Be sure to do getMonth() + 1 to correctly track the current month
-            `0${new Date().getMonth()}/01/${new Date().getFullYear()}`
-          : `${new Date().getMonth()}/01/${new Date().getFullYear()}`,
+            `${new Date().getFullYear()}-0${new Date().getMonth() + 1}-01`
+          : `${new Date().getFullYear()}-${new Date().getMonth() + 1}-01`,
     },
   });
 
@@ -190,5 +190,27 @@ exports.categories_get = asyncHandler(async (req, res, next) => {
 
   res.json({
     budget: budget,
+  });
+});
+
+exports.budget_put = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.session.passport.user);
+  const budget = await Budget.findOne({ user: user });
+
+  if (!budget.trackedCategories.includes(req.body.trackedCategory)) {
+    budget.trackedCategories = [
+      ...budget.trackedCategories,
+      req.body.trackedCategory,
+    ];
+    await budget.save();
+
+    res.json({
+      budget: budget,
+    });
+    return;
+  }
+
+  res.json({
+    message: "Category already is being tracked; not added to list",
   });
 });

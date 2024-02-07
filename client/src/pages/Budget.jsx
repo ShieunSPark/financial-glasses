@@ -6,7 +6,7 @@ import { Transition } from "@headlessui/react";
 import dashboardRequest from "../api/dashboardRequest";
 import AddTrackedCategory from "../components/AddTrackedCategory";
 
-export default function Budgets() {
+export default function Budget() {
   const [progressPercentage, setProgressPercentage] = useState(0);
   const [buttonClicked, setButtonClicked] = useState(false);
   const navigate = useNavigate();
@@ -52,7 +52,7 @@ export default function Budgets() {
           Add a Category to Track
         </button>
       </div>
-      <div className="m-auto h-1 w-1/2 bg-gray-300 rounded-full">
+      <div className="m-auto h-6 w-1/2 bg-gray-300 rounded-full">
         <div
           style={{ width: `${progressPercentage}%` }}
           className={`h-full ${

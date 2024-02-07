@@ -106,11 +106,14 @@ router.get(
 // GET profile
 router.get("/profile", checkLoggedIn, dashboard_controller.profile_get);
 
-// GET categories (for budget)
+// GET categories in user's budget)
 router.get(
   "/categories/:user_id",
   checkLoggedIn,
   dashboard_controller.categories_get
 );
+
+// UPDATE tracked categories in user's budget
+router.put("/budget/update", checkLoggedIn, dashboard_controller.budget_put);
 
 module.exports = router;

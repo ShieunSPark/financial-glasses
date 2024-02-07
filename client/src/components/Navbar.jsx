@@ -57,13 +57,13 @@ export default function Navbar() {
             Transactions
           </Link>
           <Link
-            to={`/budgets`}
+            to={`/budget`}
             className={`text-xl hover:text-blue-600 dark:hover:text-blue-300 duration-15 ${
               selectedRoute === "budgets" ? "underline" : null
             }`}
             onClick={() => setSelectedRoute("budgets")}
           >
-            Budgets
+            Budget
           </Link>
         </div>
         <div className="flex w-[64px]">

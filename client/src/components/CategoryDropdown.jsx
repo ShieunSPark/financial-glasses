@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 
 import categoriesRequest from "../api/categoriesRequest";
 
-export default function CategoryDropdown({ transaction, setModifiedCategory }) {
+export default function CategoryDropdown({ transaction, setModified }) {
   const [categories, setCategories] = useState([]);
   const [filteredCategories, setFilteredCategories] = useState(categories);
 
@@ -59,19 +59,19 @@ export default function CategoryDropdown({ transaction, setModifiedCategory }) {
       "modifiedCategory" in transaction
         ? transaction.modifiedCategory
         : !transaction.plaidCategory
-        ? null
+        ? ""
         : transaction.plaidCategory.detailed,
     initialSelectedItem:
       "modifiedCategory" in transaction
         ? transaction.modifiedCategory
         : !transaction.plaidCategory
-        ? null
+        ? ""
         : transaction.plaidCategory.detailed,
     initialHighlightedIndex: categories.indexOf(
       "modifiedCategory" in transaction
         ? transaction.modifiedCategory
         : !transaction.plaidCategory
-        ? null
+        ? ""
         : transaction.plaidCategory.detailed
     ),
     onInputValueChange: ({ inputValue }) => {
@@ -81,7 +81,7 @@ export default function CategoryDropdown({ transaction, setModifiedCategory }) {
           category.toLowerCase().includes(inputValue.toLowerCase())
         )
       );
-      if (categories.includes(inputValue)) setModifiedCategory(inputValue);
+      if (categories.includes(inputValue)) setModified(inputValue);
     },
     stateReducer,
   });
@@ -135,5 +135,5 @@ export default function CategoryDropdown({ transaction, setModifiedCategory }) {
 CategoryDropdown.propTypes = {
   categories: PropTypes.array,
   transaction: PropTypes.object,
-  setModifiedCategory: PropTypes.func,
+  setModified: PropTypes.func,
 };

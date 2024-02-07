@@ -190,7 +190,7 @@ export default function TransactionTable({
                           <td key={cell.id} className="px-3 py-2">
                             <CategoryDropdown
                               transaction={row.original}
-                              setModifiedCategory={setModifiedCategory}
+                              setModified={setModifiedCategory}
                             />
                           </td>
                         );

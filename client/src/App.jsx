@@ -9,7 +9,7 @@ import Login from "./pages/Login";
 import Navbar from "./components/Navbar";
 import Dashboard from "./pages/Dashboard";
 import Transactions from "./pages/Transactions";
-import Budgets from "./pages/Budgets";
+import Budget from "./pages/Budget";
 import Profile from "./pages/Profile";
 
 export const TokenContext = createContext(null);
@@ -48,8 +48,8 @@ function App() {
           element: <Transactions />,
         },
         {
-          path: "/budgets",
-          element: <Budgets />,
+          path: "/budget",
+          element: <Budget />,
         },
         {
           path: "/profile",

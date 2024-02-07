@@ -6,28 +6,29 @@ import { UserContext } from "../App";
 import LoadingSpinner from "../components/LoadingSpinner";
 import CategoryDropdown from "./CategoryDropdown";
 
-export default function Confirm({ onClose }) {
+export default function AddTrackedCategory({ onClose }) {
   const { user, setUser } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(false);
+  const [trackedCategory, setTrackedCategory] = useState("");
 
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
 
-  const deleteAccount = () => {
-    fetch(`${API_URL}/dashboard/account`, {
-      method: "DELETE",
+  const addTrackedCategory = () => {
+    fetch(`${API_URL}/budget/update`, {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       credentials: "include",
       body: JSON.stringify({
-        accountID,
+        trackedCategory,
       }),
     }).then(() => {
       onClose();
       // Show loading symbol
-      setIsLoading(true);
-      navigate(0);
+      // setIsLoading(true);
+      // navigate(0);
     });
   };
 
@@ -39,14 +40,14 @@ export default function Confirm({ onClose }) {
       <div className="before:absolute before:bg-gray-400  before:opacity-70 before:top-0 before:w-full before:h-full fixed inset-0 overflow-auto flex ">
         <div className="flex-col justify-center relative bg-gray-50 dark:bg-gray-800 w-full max-w-md m-auto p-8 rounded-lg z-10">
           <div className="text-center m-4">Select a category to track:</div>
-          <CategoryDropdown transaction={{}} setModifiedCategory={() => null} />
+          <CategoryDropdown transaction={{}} setModified={setTrackedCategory} />
           <div className="flex justify-center gap-4 m-4">
             <button className="bg-gray-400 rounded-md p-2" onClick={onClose}>
               Cancel
             </button>
             <button
               className="bg-red-400 rounded-md p-2"
-              //   onClick={deleteAccount}
+              onClick={addTrackedCategory}
             >
               Add
             </button>
