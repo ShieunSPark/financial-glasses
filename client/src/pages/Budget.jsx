@@ -4,11 +4,17 @@ import { useNavigate } from "react-router-dom";
 import { Transition } from "@headlessui/react";
 
 import dashboardRequest from "../api/dashboardRequest";
+import dashboardChartRequest from "../api/dashboardChartRequest";
+import categoriesRequest from "../api/categoriesRequest";
+
 import AddTrackedCategory from "../components/AddTrackedCategory";
 
 export default function Budget() {
-  const [progressPercentage, setProgressPercentage] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const [buttonClicked, setButtonClicked] = useState(false);
+  const [trackedCategories, setTrackedCategories] = useState([]);
+  const [chartData, setChartData] = useState([]);
+
   const navigate = useNavigate();
 
   // Verify user is logged in
@@ -22,8 +28,37 @@ export default function Budget() {
       });
     };
     verifyLoggedIn();
-    setProgressPercentage(25);
   }, []);
+
+  // Get sums of each category from current month's transactions
+  useEffect(() => {
+    const getChartData = async () => {
+      const response = await dashboardChartRequest();
+      setChartData(response.categoriesSum);
+    };
+
+    getChartData();
+  }, []);
+
+  // Get tracked categories
+  useEffect(() => {
+    const getTrackedCategories = async () => {
+      const response = await categoriesRequest();
+      setTrackedCategories(response.budget.trackedCategories);
+    };
+
+    getTrackedCategories();
+  }, []);
+
+  useEffect(() => {
+    const delay = (milliseconds) =>
+      new Promise((resolve) => setTimeout(resolve, milliseconds));
+    const delayBudgetBarAnimation = async () => {
+      await delay(500);
+      setIsLoading(false);
+    };
+    delayBudgetBarAnimation();
+  }, [trackedCategories]);
 
   return (
     <div>
@@ -52,14 +87,31 @@ export default function Budget() {
           Add a Category to Track
         </button>
       </div>
-      <div className="m-auto h-6 w-1/2 bg-gray-300 rounded-full">
-        <div
-          style={{ width: `${progressPercentage}%` }}
-          className={`h-full ${
-            progressPercentage < 70 ? "bg-green-600" : "bg-red-600"
-          } transition-all duration-1000 ease-out rounded-full`}
-        ></div>
-      </div>
+      {trackedCategories.map((trackedCategory) => {
+        console.log(trackedCategory);
+        const percentage =
+          (chartData.find(
+            (category) => category.category === trackedCategory.trackedCategory
+          ).total /
+            trackedCategory.budgetAmount) *
+          100;
+
+        return (
+          <div key={trackedCategory} className="flex flex-col items-center">
+            <h5>{trackedCategory.trackedCategory}</h5>
+            <div className="h-6 w-1/2 bg-gray-300 rounded-full">
+              <div
+                style={{
+                  width: `${isLoading ? 0 : percentage}%`,
+                }}
+                className={`h-full ${
+                  percentage < 90 ? "bg-green-600" : "bg-red-600"
+                } transition-all duration-1000 ease-out rounded-full`}
+              ></div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

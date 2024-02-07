@@ -177,13 +177,6 @@ exports.dashboard_chart = asyncHandler(async (req, res, next) => {
   });
 });
 
-exports.profile_get = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.session.passport.user);
-  res.json({
-    user: user,
-  });
-});
-
 exports.categories_get = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
   const budget = await Budget.findOne({ user: user });
@@ -200,7 +193,10 @@ exports.budget_put = asyncHandler(async (req, res, next) => {
   if (!budget.trackedCategories.includes(req.body.trackedCategory)) {
     budget.trackedCategories = [
       ...budget.trackedCategories,
-      req.body.trackedCategory,
+      {
+        trackedCategory: req.body.trackedCategory,
+        budgetAmount: req.body.budgetAmount,
+      },
     ];
     await budget.save();
 
@@ -212,5 +208,12 @@ exports.budget_put = asyncHandler(async (req, res, next) => {
 
   res.json({
     message: "Category already is being tracked; not added to list",
+  });
+});
+
+exports.profile_get = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.session.passport.user);
+  res.json({
+    user: user,
   });
 });
