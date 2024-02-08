@@ -120,6 +120,24 @@ export default function Dashboard() {
   } else {
     return (
       <div className="grid grid-cols-2">
+        {createPortal(
+          <Transition
+            appear={true}
+            show={showConfirm}
+            enter="transition duration-300 ease-in-out"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="transition duration-300 ease-in-out"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <Confirm
+              accountID={selectedAccount}
+              onClose={() => setShowConfirm(false)}
+            />
+          </Transition>,
+          document.body
+        )}
         {/* {user ? (
         <div className="text-center pt-4">Hello, {user.firstName}</div>
       ) : null} */}
@@ -150,14 +168,14 @@ export default function Dashboard() {
                     {entry.accounts.map((account) => (
                       <div
                         key={account.account_id}
-                        className="relative w-1/2 p-2 mx-auto my-2 border-green-800 border-2"
+                        className="relative w-3/4 p-2 mx-auto my-2 border-green-800 border-2"
                       >
                         <div className="flex justify-between">
                           <div>{account.name}</div>
                           <div>${account.balance}</div>
                         </div>
                         <div className="text-xs italic">{entry.item.name}</div>
-                        <div className="absolute inset-y-4 -right-8">
+                        <div className="absolute inset-y-4 -right-6">
                           <button
                             id={account.account_id}
                             onClick={() => {
@@ -165,28 +183,8 @@ export default function Dashboard() {
                               setSelectedAccount(account.account_id);
                             }}
                           >
-                            <HiTrash className="w-6 h-6 text-gray-400 hover:text-gray-600" />
+                            <HiTrash className="w-5 h-5 text-gray-400 hover:text-gray-600" />
                           </button>
-
-                          {selectedAccount === account.account_id &&
-                            createPortal(
-                              <Transition
-                                appear={true}
-                                show={showConfirm}
-                                enter="transition duration-300 ease-in-out"
-                                enterFrom="opacity-0"
-                                enterTo="opacity-100"
-                                leave="transition duration-300 ease-in-out"
-                                leaveFrom="opacity-100"
-                                leaveTo="opacity-0"
-                              >
-                                <Confirm
-                                  accountID={account.account_id}
-                                  onClose={() => setShowConfirm(false)}
-                                />
-                              </Transition>,
-                              document.body
-                            )}
                         </div>
                       </div>
                     ))}

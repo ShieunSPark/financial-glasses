@@ -190,7 +190,11 @@ exports.budget_put = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
   const budget = await Budget.findOne({ user: user });
 
-  if (!budget.trackedCategories.includes(req.body.trackedCategory)) {
+  const requestedCategory = budget.trackedCategories.find(
+    (category) => category.trackedCategory === req.body.trackedCategory
+  );
+
+  if (!requestedCategory) {
     budget.trackedCategories = [
       ...budget.trackedCategories,
       {
@@ -198,7 +202,24 @@ exports.budget_put = asyncHandler(async (req, res, next) => {
         budgetAmount: req.body.budgetAmount,
       },
     ];
+
     await budget.save();
+
+    res.json({
+      budget: budget,
+    });
+    return;
+  } else {
+    await Budget.findOneAndUpdate(
+      {
+        "trackedCategories.trackedCategory": req.body.trackedCategory,
+      },
+      {
+        $set: {
+          "trackedCategories.$.budgetAmount": req.body.budgetAmount,
+        },
+      }
+    );
 
     res.json({
       budget: budget,

@@ -2,18 +2,22 @@ import { useContext, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { Transition } from "@headlessui/react";
+import { HiPencilAlt } from "react-icons/hi";
 
 import dashboardRequest from "../api/dashboardRequest";
 import dashboardChartRequest from "../api/dashboardChartRequest";
 import categoriesRequest from "../api/categoriesRequest";
 
-import AddTrackedCategory from "../components/AddTrackedCategory";
+import TrackedCategory from "../components/TrackedCategory";
 
 export default function Budget() {
   const [isLoading, setIsLoading] = useState(true);
+  const [chartData, setChartData] = useState([]);
   const [buttonClicked, setButtonClicked] = useState(false);
   const [trackedCategories, setTrackedCategories] = useState([]);
-  const [chartData, setChartData] = useState([]);
+  const [editClicked, setEditClicked] = useState(false);
+  const [prevTrackedCategory, setPrevTrackedCategory] = useState("");
+  const [prevBudgetAmount, setPrevBudgetAmount] = useState(0);
 
   const navigate = useNavigate();
 
@@ -62,6 +66,7 @@ export default function Budget() {
 
   return (
     <div>
+      {/* Transition for adding a tracked category */}
       {createPortal(
         <Transition
           appear={true}
@@ -73,11 +78,37 @@ export default function Budget() {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <AddTrackedCategory onClose={() => setButtonClicked(false)} />
+          <TrackedCategory
+            option="add"
+            prevTrackedCategory={null}
+            prevBudgetAmount={null}
+            onClose={() => setButtonClicked(false)}
+          />
         </Transition>,
         document.body
       )}
-      <div className="flex justify-center m-2">
+      {/* Transition for editing a tracked category */}
+      {createPortal(
+        <Transition
+          appear={true}
+          show={editClicked}
+          enter="transition duration-300 ease-in-out"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="transition duration-300 ease-in-out"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <TrackedCategory
+            option="edit"
+            prevTrackedCategory={prevTrackedCategory}
+            prevBudgetAmount={prevBudgetAmount}
+            onClose={() => setEditClicked(false)}
+          />
+        </Transition>,
+        document.body
+      )}
+      <div className="flex justify-center m-2 pt-2">
         <button
           className=" p-2 transition ease-in-out delay-50 bg-blue-500 text-white rounded-md hover:bg-indigo-500"
           onClick={() => {
@@ -88,26 +119,45 @@ export default function Budget() {
         </button>
       </div>
       {trackedCategories.map((trackedCategory) => {
-        console.log(trackedCategory);
-        const percentage =
-          (chartData.find(
-            (category) => category.category === trackedCategory.trackedCategory
-          ).total /
-            trackedCategory.budgetAmount) *
-          100;
+        const total = chartData.find(
+          (category) => category.category === trackedCategory.trackedCategory
+        ).total;
+        const percentage = (total / trackedCategory.budgetAmount) * 100;
 
         return (
           <div key={trackedCategory} className="flex flex-col items-center">
-            <h5>{trackedCategory.trackedCategory}</h5>
-            <div className="h-6 w-1/2 bg-gray-300 rounded-full">
-              <div
-                style={{
-                  width: `${isLoading ? 0 : percentage}%`,
-                }}
-                className={`h-full ${
-                  percentage < 90 ? "bg-green-600" : "bg-red-600"
-                } transition-all duration-1000 ease-out rounded-full`}
-              ></div>
+            <div className="w-3/4 relative">
+              <div className="flex justify-between items-end pt-2">
+                <div className="pb-1">{trackedCategory.trackedCategory}</div>
+                <div className="pb-1 text-xs">
+                  ${total.toFixed()} of ${trackedCategory.budgetAmount}
+                </div>
+              </div>
+              <div className="h-6 bg-gray-300 rounded-full">
+                <div
+                  style={{
+                    width: `${
+                      isLoading ? 0 : percentage > 100 ? 100 : percentage
+                    }%`,
+                  }}
+                  className={`flex justify-end items-center h-full ${
+                    percentage < 90 ? "bg-green-600" : "bg-red-600"
+                  } transition-all duration-1000 ease-out rounded-full`}
+                >
+                  <div className="text-xs pr-2">{percentage.toFixed()}%</div>
+                </div>
+              </div>
+              <div className="absolute top-3 -right-6">
+                <button
+                  onClick={() => {
+                    setEditClicked(true);
+                    setPrevTrackedCategory(trackedCategory.trackedCategory);
+                    setPrevBudgetAmount(trackedCategory.budgetAmount);
+                  }}
+                >
+                  <HiPencilAlt className="text-gray-400 hover:text-gray-600" />
+                </button>
+              </div>
             </div>
           </div>
         );
