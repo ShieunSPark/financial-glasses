@@ -18,6 +18,7 @@ export default function Budget() {
   const [editClicked, setEditClicked] = useState(false);
   const [prevTrackedCategory, setPrevTrackedCategory] = useState("");
   const [prevBudgetAmount, setPrevBudgetAmount] = useState(0);
+  const [isUpdated, setIsUpdated] = useState(false);
 
   const navigate = useNavigate();
 
@@ -39,10 +40,11 @@ export default function Budget() {
     const getChartData = async () => {
       const response = await dashboardChartRequest();
       setChartData(response.categoriesSum);
+      setIsUpdated(false);
     };
 
     getChartData();
-  }, []);
+  }, [isUpdated]);
 
   // Get tracked categories
   useEffect(() => {
@@ -52,7 +54,7 @@ export default function Budget() {
     };
 
     getTrackedCategories();
-  }, []);
+  }, [isUpdated]);
 
   useEffect(() => {
     const delay = (milliseconds) =>
@@ -81,8 +83,13 @@ export default function Budget() {
           <TrackedCategory
             option="add"
             prevTrackedCategory={null}
+            setPrevTrackedCategory={null}
             prevBudgetAmount={null}
-            onClose={() => setButtonClicked(false)}
+            setPrevBudgetAmount={null}
+            onClose={() => {
+              setButtonClicked(false);
+              setIsUpdated(true);
+            }}
           />
         </Transition>,
         document.body
@@ -102,8 +109,13 @@ export default function Budget() {
           <TrackedCategory
             option="edit"
             prevTrackedCategory={prevTrackedCategory}
+            setPrevTrackedCategory={setPrevTrackedCategory}
             prevBudgetAmount={prevBudgetAmount}
-            onClose={() => setEditClicked(false)}
+            setPrevBudgetAmount={setPrevBudgetAmount}
+            onClose={() => {
+              setEditClicked(false);
+              setIsUpdated(true);
+            }}
           />
         </Transition>,
         document.body
@@ -118,50 +130,87 @@ export default function Budget() {
           Add a Category to Track
         </button>
       </div>
-      {trackedCategories.map((trackedCategory) => {
-        const total = chartData.find(
-          (category) => category.category === trackedCategory.trackedCategory
-        ).total;
-        const percentage = (total / trackedCategory.budgetAmount) * 100;
+      <Transition
+        appear={true}
+        show={true}
+        enter="transition duration-700 ease-in-out"
+        enterFrom="opacity-0"
+        enterTo="opacity-100"
+        leave="transition duration-700 ease-in-out"
+        leaveFrom="opacity-100"
+        leaveTo="opacity-0"
+      >
+        {trackedCategories.map((trackedCategory) => {
+          const total = chartData.find(
+            (category) => category.category === trackedCategory.trackedCategory
+          );
+          if (total) {
+            const percentage =
+              (total.total / trackedCategory.budgetAmount) * 100;
 
-        return (
-          <div key={trackedCategory} className="flex flex-col items-center">
-            <div className="w-3/4 relative">
-              <div className="flex justify-between items-end pt-2">
-                <div className="pb-1">{trackedCategory.trackedCategory}</div>
-                <div className="pb-1 text-xs">
-                  ${total.toFixed()} of ${trackedCategory.budgetAmount}
+            return (
+              <div
+                key={trackedCategory.trackedCategory}
+                className="flex flex-col items-center"
+              >
+                <div className="w-3/4 relative">
+                  <div className="flex justify-between items-end pt-2">
+                    <div className="pb-1">
+                      {trackedCategory.trackedCategory}
+                    </div>
+                    <div className="pb-1 text-sm">
+                      ${total.total.toFixed()} of $
+                      {trackedCategory.budgetAmount}
+                    </div>
+                  </div>
+                  <div className="h-6 bg-gray-300 rounded-full">
+                    <div
+                      style={{
+                        width: `${
+                          isLoading ? 0 : percentage > 100 ? 100 : percentage
+                        }%`,
+                      }}
+                      className={`flex justify-end items-center h-full ${
+                        percentage < 80
+                          ? "bg-green-600"
+                          : percentage < 100
+                          ? "bg-yellow-600"
+                          : "bg-red-600"
+                      } transition-all duration-1000 ease-out rounded-full`}
+                    >
+                      <Transition
+                        appear={true}
+                        show={!isLoading}
+                        enter="transition duration-1000 ease-in-out"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="transition duration-1000 ease-in-out"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                      >
+                        <div className="text-xs pr-2">
+                          {percentage.toFixed()}%
+                        </div>
+                      </Transition>
+                    </div>
+                  </div>
+                  <div className="absolute top-3 -right-6">
+                    <button
+                      onClick={() => {
+                        setEditClicked(true);
+                        setPrevTrackedCategory(trackedCategory.trackedCategory);
+                        setPrevBudgetAmount(trackedCategory.budgetAmount);
+                      }}
+                    >
+                      <HiPencilAlt className="text-gray-400 hover:text-gray-600" />
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div className="h-6 bg-gray-300 rounded-full">
-                <div
-                  style={{
-                    width: `${
-                      isLoading ? 0 : percentage > 100 ? 100 : percentage
-                    }%`,
-                  }}
-                  className={`flex justify-end items-center h-full ${
-                    percentage < 90 ? "bg-green-600" : "bg-red-600"
-                  } transition-all duration-1000 ease-out rounded-full`}
-                >
-                  <div className="text-xs pr-2">{percentage.toFixed()}%</div>
-                </div>
-              </div>
-              <div className="absolute top-3 -right-6">
-                <button
-                  onClick={() => {
-                    setEditClicked(true);
-                    setPrevTrackedCategory(trackedCategory.trackedCategory);
-                    setPrevBudgetAmount(trackedCategory.budgetAmount);
-                  }}
-                >
-                  <HiPencilAlt className="text-gray-400 hover:text-gray-600" />
-                </button>
-              </div>
-            </div>
-          </div>
-        );
-      })}
+            );
+          }
+        })}
+      </Transition>
     </div>
   );
 }

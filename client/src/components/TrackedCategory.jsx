@@ -9,7 +9,9 @@ import CategoryDropdown from "./CategoryDropdown";
 export default function TrackedCategory({
   option,
   prevTrackedCategory,
+  setPrevTrackedCategory,
   prevBudgetAmount,
+  setPrevBudgetAmount,
   onClose,
 }) {
   const { user, setUser } = useContext(UserContext);
@@ -37,7 +39,8 @@ export default function TrackedCategory({
       onClose();
       // Show loading symbol
       setIsLoading(true);
-      navigate(0);
+      setPrevTrackedCategory(trackedCategory);
+      setPrevBudgetAmount(budgetAmount);
     });
   };
 
