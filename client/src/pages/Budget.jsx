@@ -1,14 +1,15 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { Transition } from "@headlessui/react";
-import { HiPencilAlt } from "react-icons/hi";
+import { HiPencilAlt, HiTrash } from "react-icons/hi";
 
 import dashboardRequest from "../api/dashboardRequest";
 import dashboardChartRequest from "../api/dashboardChartRequest";
 import categoriesRequest from "../api/categoriesRequest";
 
 import TrackedCategory from "../components/TrackedCategory";
+import ConfirmDelete from "../components/ConfirmDelete";
 
 export default function Budget() {
   const [isLoading, setIsLoading] = useState(true);
@@ -16,8 +17,9 @@ export default function Budget() {
   const [buttonClicked, setButtonClicked] = useState(false);
   const [trackedCategories, setTrackedCategories] = useState([]);
   const [editClicked, setEditClicked] = useState(false);
-  const [prevTrackedCategory, setPrevTrackedCategory] = useState("");
-  const [prevBudgetAmount, setPrevBudgetAmount] = useState(0);
+  const [deleteClicked, setDeleteClicked] = useState(false);
+  const [currentTrackedCategory, setCurrentTrackedCategory] = useState("");
+  const [currentBudgetAmount, setCurrentBudgetAmount] = useState(0);
   const [isUpdated, setIsUpdated] = useState(false);
 
   const navigate = useNavigate();
@@ -66,6 +68,8 @@ export default function Budget() {
     delayBudgetBarAnimation();
   }, [trackedCategories]);
 
+  console.log(deleteClicked);
+
   return (
     <div>
       {/* Transition for adding a tracked category */}
@@ -82,10 +86,10 @@ export default function Budget() {
         >
           <TrackedCategory
             option="add"
-            prevTrackedCategory={null}
-            setPrevTrackedCategory={null}
-            prevBudgetAmount={null}
-            setPrevBudgetAmount={null}
+            currentTrackedCategory={null}
+            setCurrentTrackedCategory={null}
+            currentBudgetAmount={null}
+            setCurrentBudgetAmount={null}
             onClose={() => {
               setButtonClicked(false);
               setIsUpdated(true);
@@ -108,12 +112,35 @@ export default function Budget() {
         >
           <TrackedCategory
             option="edit"
-            prevTrackedCategory={prevTrackedCategory}
-            setPrevTrackedCategory={setPrevTrackedCategory}
-            prevBudgetAmount={prevBudgetAmount}
-            setPrevBudgetAmount={setPrevBudgetAmount}
+            currentTrackedCategory={currentTrackedCategory}
+            setCurrentTrackedCategory={setCurrentTrackedCategory}
+            currentBudgetAmount={currentBudgetAmount}
+            setCurrentBudgetAmount={setCurrentBudgetAmount}
             onClose={() => {
               setEditClicked(false);
+              setIsUpdated(true);
+            }}
+          />
+        </Transition>,
+        document.body
+      )}
+      {/* Transition for deleting a tracked category */}
+      {createPortal(
+        <Transition
+          appear={true}
+          show={deleteClicked}
+          enter="transition duration-300 ease-in-out"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="transition duration-300 ease-in-out"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <ConfirmDelete
+            accountID={null}
+            trackedCategory={currentTrackedCategory}
+            onClose={() => {
+              setDeleteClicked(false);
               setIsUpdated(true);
             }}
           />
@@ -194,15 +221,27 @@ export default function Budget() {
                       </Transition>
                     </div>
                   </div>
-                  <div className="absolute top-3 -right-6">
+                  <div className="absolute top-9 -right-10">
                     <button
                       onClick={() => {
                         setEditClicked(true);
-                        setPrevTrackedCategory(trackedCategory.trackedCategory);
-                        setPrevBudgetAmount(trackedCategory.budgetAmount);
+                        setCurrentTrackedCategory(
+                          trackedCategory.trackedCategory
+                        );
+                        setCurrentBudgetAmount(trackedCategory.budgetAmount);
                       }}
                     >
                       <HiPencilAlt className="text-gray-400 hover:text-gray-600" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setDeleteClicked(true);
+                        setCurrentTrackedCategory(
+                          trackedCategory.trackedCategory
+                        );
+                      }}
+                    >
+                      <HiTrash className="text-gray-400 hover:text-gray-600" />
                     </button>
                   </div>
                 </div>

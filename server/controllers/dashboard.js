@@ -232,6 +232,26 @@ exports.budget_put = asyncHandler(async (req, res, next) => {
   });
 });
 
+exports.budget_delete = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.session.passport.user);
+  const budget = await Budget.findOneAndUpdate(
+    { user: user },
+    {
+      $pull: {
+        trackedCategories: {
+          trackedCategory: req.body.trackedCategory,
+        },
+      },
+    }
+  );
+
+  console.log(budget);
+
+  res.json({
+    budget: budget,
+  });
+});
+
 exports.profile_get = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
   res.json({

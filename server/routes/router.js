@@ -116,4 +116,11 @@ router.get(
 // UPDATE tracked categories in user's budget
 router.put("/budget/update", checkLoggedIn, dashboard_controller.budget_put);
 
+// DELETE tracked categories in user's budget
+router.delete(
+  "/budget/delete",
+  checkLoggedIn,
+  dashboard_controller.budget_delete
+);
+
 module.exports = router;

@@ -1,5 +1,4 @@
 import { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { HiXCircle } from "react-icons/hi";
 
 import { UserContext } from "../App";
@@ -8,20 +7,19 @@ import CategoryDropdown from "./CategoryDropdown";
 
 export default function TrackedCategory({
   option,
-  prevTrackedCategory,
-  setPrevTrackedCategory,
-  prevBudgetAmount,
-  setPrevBudgetAmount,
+  currentTrackedCategory,
+  setCurrentTrackedCategory,
+  currentBudgetAmount,
+  setCurrentBudgetAmount,
   onClose,
 }) {
   const { user, setUser } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(false);
   const [trackedCategory, setTrackedCategory] = useState(
-    prevTrackedCategory === null ? "" : prevTrackedCategory
+    currentTrackedCategory === null ? "" : currentTrackedCategory
   );
-  const [budgetAmount, setBudgetAmount] = useState(prevBudgetAmount);
+  const [budgetAmount, setBudgetAmount] = useState(currentBudgetAmount);
 
-  const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
 
   const updateTrackedCategory = () => {
@@ -39,8 +37,8 @@ export default function TrackedCategory({
       onClose();
       // Show loading symbol
       setIsLoading(true);
-      setPrevTrackedCategory(trackedCategory);
-      setPrevBudgetAmount(budgetAmount);
+      setCurrentTrackedCategory(trackedCategory);
+      setCurrentBudgetAmount(budgetAmount);
     });
   };
 
@@ -86,7 +84,7 @@ export default function TrackedCategory({
       <div className="before:absolute before:bg-gray-400  before:opacity-70 before:top-0 before:w-full before:h-full fixed inset-0 overflow-auto flex ">
         <div className="flex flex-col justify-center items-center relative bg-gray-50 dark:bg-gray-800 w-full max-w-lg m-auto p-8 rounded-lg z-10">
           <div className="text-center m-3">
-            Tracked Category: {prevTrackedCategory}
+            Tracked Category: {currentTrackedCategory}
           </div>
           <div className="text-center m-3">
             How much money do you want to set for this category?
@@ -95,7 +93,7 @@ export default function TrackedCategory({
             className="px-3 py-2 bg-green-50 dark:bg-green-900 whitespace-nowrap border rounded focus:outline-none focus:ring focus:border-blue-300"
             type="number"
             min={0}
-            defaultValue={prevBudgetAmount}
+            defaultValue={currentBudgetAmount}
             onChange={(e) => setBudgetAmount(e.target.value)}
           />
           <div className="flex justify-center gap-4 m-4">
