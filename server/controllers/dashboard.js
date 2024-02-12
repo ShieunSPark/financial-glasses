@@ -181,6 +181,20 @@ exports.categories_get = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
   const budget = await Budget.findOne({ user: user });
 
+  budget.trackedCategories.sort((a, b) => {
+    const nameA = a.trackedCategory.toUpperCase(); // ignore upper and lowercase
+    const nameB = b.trackedCategory.toUpperCase(); // ignore upper and lowercase
+    if (nameA < nameB) {
+      return -1;
+    }
+    if (nameA > nameB) {
+      return 1;
+    }
+
+    // names must be equal
+    return 0;
+  });
+
   res.json({
     budget: budget,
   });

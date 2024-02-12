@@ -68,8 +68,6 @@ export default function Budget() {
     delayBudgetBarAnimation();
   }, [trackedCategories]);
 
-  console.log(deleteClicked);
-
   return (
     <div>
       {/* Transition for adding a tracked category */}
