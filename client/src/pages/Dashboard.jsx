@@ -14,6 +14,7 @@ import accountsRequest from "../api/accountsRequest";
 import transactionsSyncRequest from "../api/transactionsSyncRequest";
 
 import ConfirmDelete from "../components/ConfirmDelete";
+import DialogDelete from "../components/DialogDelete";
 import LoadingSpinner from "../components/LoadingSpinner";
 import DashboardChart from "../components/DashboardChart";
 
@@ -122,28 +123,14 @@ export default function Dashboard() {
   } else {
     return (
       <div>
-        {createPortal(
-          <Transition
-            appear={true}
-            show={showConfirm}
-            enter="transition duration-300 ease-in-out"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="transition duration-300 ease-in-out"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <ConfirmDelete
-              accountID={selectedAccountID}
-              accountName={selectedAccountName}
-              itemName={selectedItem}
-              trackedCategory={null}
-              onClose={() => setShowConfirm(false)}
-            />
-          </Transition>,
-          document.body
-        )}
-
+        {/* <DialogDelete
+          show={showConfirm}
+          accountID={selectedAccountID}
+          accountName={selectedAccountName}
+          itemName={selectedItem}
+          trackedCategory={null}
+          onClose={() => setShowConfirm(false)}
+        /> */}
         <div className="grid grid-cols-2">
           {/* {user ? (
         <div className="text-center pt-4">Hello, {user.firstName}</div>
@@ -196,6 +183,16 @@ export default function Dashboard() {
                             >
                               <HiTrash className="w-5 h-5 text-gray-400 hover:text-gray-600" />
                             </button>
+                            {selectedAccountID === account.account_id && (
+                              <ConfirmDelete
+                                show={showConfirm}
+                                accountID={selectedAccountID}
+                                accountName={selectedAccountName}
+                                itemName={selectedItem}
+                                trackedCategory={null}
+                                onClose={() => setShowConfirm(false)}
+                              />
+                            )}
                           </div>
                         </div>
                       ))}

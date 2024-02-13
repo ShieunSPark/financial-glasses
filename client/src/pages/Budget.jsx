@@ -122,29 +122,7 @@ export default function Budget() {
         </Transition>,
         document.body
       )}
-      {/* Transition for deleting a tracked category */}
-      {createPortal(
-        <Transition
-          appear={true}
-          show={deleteClicked}
-          enter="transition duration-300 ease-in-out"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="transition duration-300 ease-in-out"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <ConfirmDelete
-            accountID={null}
-            trackedCategory={currentTrackedCategory}
-            onClose={() => {
-              setDeleteClicked(false);
-              setIsUpdated(true);
-            }}
-          />
-        </Transition>,
-        document.body
-      )}
+
       <div className="flex justify-center m-2 pt-2">
         <button
           className=" p-2 transition ease-in-out delay-50 bg-blue-500 text-white rounded-md hover:bg-indigo-500"
@@ -241,6 +219,18 @@ export default function Budget() {
                     >
                       <HiTrash className="text-gray-400 hover:text-gray-600" />
                     </button>
+                    {currentTrackedCategory ===
+                      trackedCategory.trackedCategory && (
+                      <ConfirmDelete
+                        show={deleteClicked}
+                        accountID={null}
+                        trackedCategory={currentTrackedCategory}
+                        onClose={() => {
+                          setDeleteClicked(false);
+                          setIsUpdated(true);
+                        }}
+                      />
+                    )}
                   </div>
                 </div>
               </div>

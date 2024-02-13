@@ -223,6 +223,7 @@ exports.transactions_sync = asyncHandler(async (req, res, next) => {
         res.status(401).json({
           error: err,
         });
+        return;
       }
 
       // Save added transactions to database
