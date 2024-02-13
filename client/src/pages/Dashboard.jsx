@@ -26,7 +26,9 @@ export default function Dashboard() {
   const [numOfItems, setNumOfItems] = useState(0);
   const [itemsAndAccounts, setItemsAndAccounts] = useState([]);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [selectedAccount, setSelectedAccount] = useState("");
+  const [selectedAccountID, setSelectedAccountID] = useState("");
+  const [selectedAccountName, setSelectedAccountName] = useState("");
+  const [selectedItem, setSelectedItem] = useState("");
   const [chartData, setChartData] = useState([]);
 
   const navigate = useNavigate();
@@ -132,7 +134,9 @@ export default function Dashboard() {
             leaveTo="opacity-0"
           >
             <ConfirmDelete
-              accountID={selectedAccount}
+              accountID={selectedAccountID}
+              accountName={selectedAccountName}
+              itemName={selectedItem}
               trackedCategory={null}
               onClose={() => setShowConfirm(false)}
             />
@@ -185,7 +189,9 @@ export default function Dashboard() {
                               id={account.account_id}
                               onClick={() => {
                                 setShowConfirm(true);
-                                setSelectedAccount(account.account_id);
+                                setSelectedAccountID(account.account_id);
+                                setSelectedAccountName(account.name);
+                                setSelectedItem(entry.item.name);
                               }}
                             >
                               <HiTrash className="w-5 h-5 text-gray-400 hover:text-gray-600" />
@@ -199,7 +205,7 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex flex-col items-center h-screen">
-            <h2 className="pt-4">This Month's Budget</h2>
+            <h2 className="pt-4">{`This Month's Budget`}</h2>
             <DashboardChart data={chartData} />
           </div>
         </div>
