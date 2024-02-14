@@ -51,7 +51,7 @@ router.get(
 );
 
 // GET logout
-router.post("/logout", auth_controller.logout_get);
+router.post("/logout", auth_controller.logout_post);
 
 // GET dashboard
 router.get("/dashboard", checkLoggedIn, dashboard_controller.dashboard_get);

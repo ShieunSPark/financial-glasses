@@ -117,7 +117,7 @@ exports.login_post = asyncHandler(async (req, res, next) => {
   });
 });
 
-exports.logout_get = asyncHandler(async (req, res, next) => {
+exports.logout_post = asyncHandler(async (req, res, next) => {
   req.logout((err) => {
     if (err) return next(err);
   });

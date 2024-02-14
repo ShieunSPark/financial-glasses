@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Cell,
   Legend,
@@ -11,26 +11,6 @@ import PropTypes from "prop-types";
 
 export default function DashboardChart({ data }) {
   const [chartData, setChartData] = useState([]);
-  const rechartsRef = useRef(null);
-
-  useEffect(() => {
-    const handleMouseMove = () => {
-      // This function is called when the mouse moves over the Recharts component
-      // You can perform any logic here if needed
-    };
-
-    if (rechartsRef.current) {
-      // Attach event listener to track mouse movement
-      rechartsRef.current.addEventListener("mousemove", handleMouseMove);
-    }
-
-    return () => {
-      // Clean up: remove event listener when component unmounts
-      if (rechartsRef.current) {
-        rechartsRef.current.removeEventListener("mousemove", handleMouseMove);
-      }
-    };
-  }, []);
 
   useEffect(() => {
     if (data.length > 0) setChartData(data.filter((sum) => sum.total > 0));
@@ -91,7 +71,7 @@ export default function DashboardChart({ data }) {
   };
 
   return (
-    <ResponsiveContainer width="90%" height="50%" ref={rechartsRef}>
+    <ResponsiveContainer width="90%" height="50%">
       <PieChart className="bg-slate-700">
         <Pie
           dataKey="total"
