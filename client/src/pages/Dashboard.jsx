@@ -85,23 +85,23 @@ export default function Dashboard() {
     if (isLoggedIn) getAccounts();
   }, [isLoggedIn]);
 
-  useEffect(() => {
-    const syncTransactions = async () => {
-      transactionsSyncRequest().then(() => {
-        setIsLoading(false);
-      });
-    };
-
-    if (isLoggedIn) syncTransactions();
-  }, [isLoggedIn]);
-
+  // Sync transactions, then update chart data
   useEffect(() => {
     const getChartData = async () => {
       const response = await dashboardChartRequest();
       setChartData(response.categoriesSum);
     };
 
-    if (isLoggedIn) getChartData();
+    const syncTransactions = async () => {
+      transactionsSyncRequest().then(() => {
+        getChartData();
+        setIsLoading(false);
+      });
+    };
+
+    if (isLoggedIn) {
+      syncTransactions();
+    }
   }, [isLoggedIn]);
 
   if (isLoading) {
@@ -121,17 +121,20 @@ export default function Dashboard() {
       </Transition>
     );
   } else {
+    // Setting height to 'h-full' caused animation issues when deleting an account..
+    // I hate coding T____T
     return (
       <div>
         {/* <DialogDelete
           show={showConfirm}
+          setIsLoading={setIsLoading}
           accountID={selectedAccountID}
           accountName={selectedAccountName}
           itemName={selectedItem}
           trackedCategory={null}
           onClose={() => setShowConfirm(false)}
         /> */}
-        <div className="grid grid-cols-2">
+        <div className="grid grid-cols-2 h-4/5">
           {/* {user ? (
         <div className="text-center pt-4">Hello, {user.firstName}</div>
       ) : null} */}
@@ -186,6 +189,7 @@ export default function Dashboard() {
                             {selectedAccountID === account.account_id && (
                               <ConfirmDelete
                                 show={showConfirm}
+                                setIsLoading={setIsLoading}
                                 accountID={selectedAccountID}
                                 accountName={selectedAccountName}
                                 itemName={selectedItem}
@@ -201,7 +205,7 @@ export default function Dashboard() {
                 : null}
             </div>
           </div>
-          <div className="flex flex-col items-center h-screen">
+          <div className="flex flex-col items-center">
             <h2 className="pt-4">{`This Month's Budget`}</h2>
             <DashboardChart data={chartData} />
           </div>

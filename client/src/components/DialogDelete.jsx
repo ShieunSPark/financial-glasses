@@ -7,14 +7,13 @@ import LoadingSpinner from "./LoadingSpinner";
 
 export default function DialogDelete({
   show,
+  setIsLoading,
   accountID,
   accountName,
   itemName,
   trackedCategory,
   onClose,
 }) {
-  const [isLoading, setIsLoading] = useState(false);
-
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -54,10 +53,7 @@ export default function DialogDelete({
     });
   };
 
-  if (isLoading) {
-    // Show spinner
-    return <LoadingSpinner />;
-  } else if (accountID) {
+  if (accountID) {
     return (
       <Transition
         appear={true}

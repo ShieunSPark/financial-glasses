@@ -1,24 +1,18 @@
-import { useContext, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { Transition } from "@headlessui/react";
 
 import { HiXCircle } from "react-icons/hi";
 
-import { UserContext } from "../App";
-import LoadingSpinner from "./LoadingSpinner";
-
 export default function ConfirmDelete({
   show,
+  setIsLoading,
   accountID,
   accountName,
   itemName,
   trackedCategory,
   onClose,
 }) {
-  const { user, setUser } = useContext(UserContext);
-  const [isLoading, setIsLoading] = useState(false);
-
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -33,9 +27,10 @@ export default function ConfirmDelete({
         accountID,
       }),
     }).then(() => {
-      onClose();
       // Show loading symbol
       setIsLoading(true);
+      onClose();
+
       navigate(0);
     });
   };
@@ -51,17 +46,14 @@ export default function ConfirmDelete({
         trackedCategory,
       }),
     }).then(() => {
-      onClose();
       // Show loading symbol
       setIsLoading(true);
+      onClose();
       // navigate(0);
     });
   };
 
-  if (isLoading) {
-    // Show spinner
-    return <LoadingSpinner />;
-  } else if (accountID) {
+  if (accountID) {
     return createPortal(
       <Transition
         appear={true}

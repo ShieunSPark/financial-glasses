@@ -24,7 +24,7 @@ exports.dashboard_get = asyncHandler(async (req, res, next) => {
 
 exports.accounts_get = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
-  const items = await Item.find({ user: user });
+  const items = await Item.find({ user: user }).sort({ name: 1 });
   const accounts = await Account.find({ user: user })
     .populate("item")
     .sort({ name: 1 });

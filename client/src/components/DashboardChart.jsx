@@ -71,7 +71,7 @@ export default function DashboardChart({ data }) {
   };
 
   return (
-    <ResponsiveContainer width="90%" height="50%">
+    <ResponsiveContainer width="90%" height={500}>
       <PieChart className="bg-slate-700">
         <Pie
           dataKey="total"
