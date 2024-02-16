@@ -4,7 +4,12 @@ import PropTypes from "prop-types";
 
 import categoriesRequest from "../api/categoriesRequest";
 
-export default function CategoryDropdown({ transaction, setModified }) {
+export default function CategoryDropdown({
+  index,
+  numOfRows,
+  transaction,
+  setModified,
+}) {
   const [categories, setCategories] = useState([]);
   const [filteredCategories, setFilteredCategories] = useState(categories);
 
@@ -34,12 +39,10 @@ export default function CategoryDropdown({ transaction, setModified }) {
     switch (type) {
       case useCombobox.stateChangeTypes.InputKeyDownEnter:
       case useCombobox.stateChangeTypes.ItemClick:
+        // console.log(`state: ${state.selectedItem}`);
+        // console.log(`changes: ${changes.selectedItem}`);
         return {
           ...changes, // default Downshift new state changes on item selection.
-          isOpen: state.isOpen, // but keep menu open.
-          highlightedIndex: state.isOpen
-            ? categories.indexOf(state.selectedItem)
-            : null, // with the item highlighted.
         };
       default:
         return changes; // otherwise business as usual.
@@ -86,8 +89,12 @@ export default function CategoryDropdown({ transaction, setModified }) {
     stateReducer,
   });
 
+  useEffect(() => {
+    setFilteredCategories(categories);
+  }, [isOpen]);
+
   return (
-    <div className="relative">
+    <div className="modal relative">
       <div className="flex flex-col gap-1">
         <input
           className="px-3 py-2 bg-green-50 dark:bg-green-900 whitespace-nowrap border rounded focus:outline-none focus:ring focus:border-blue-300"
@@ -96,8 +103,11 @@ export default function CategoryDropdown({ transaction, setModified }) {
           {...getInputProps({})}
         />
       </div>
+
       <ul
-        className={`absolute w-full bg-white mt-1 shadow-md max-h-80 overflow-auto p-0 z-10 ${
+        className={`absolute w-full bg-white ${
+          index >= numOfRows / 2 ? "bottom-full" : null
+        } mt-1 shadow-md max-h-72 overflow-auto p-0 z-10 ${
           !isOpen && "hidden"
         }`}
         {...getMenuProps()}
@@ -114,6 +124,11 @@ export default function CategoryDropdown({ transaction, setModified }) {
                 category,
                 index,
               })}
+              // onClick={() => {
+              //   setHighlightedIndex(index);
+              //   selectItem(category);
+              //   setFilteredCategories(categories);
+              // }}
             >
               <span>
                 {category === category.toUpperCase()

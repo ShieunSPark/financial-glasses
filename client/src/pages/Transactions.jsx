@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Disclosure, Transition } from "@headlessui/react";
+import { Transition } from "@headlessui/react";
 
 import { UserContext } from "../App";
 import dashboardRequest from "../api/dashboardRequest";
@@ -144,9 +144,9 @@ export default function Transactions() {
   } else {
     return (
       <Transition appear={true} show={true} className={""}>
-        <div className="grid grid-cols-5 border-2 border-green-800 dark:border-green-600 h-[80vh] m-4">
+        <div className="grid grid-cols-5 border-2 border-green-800 dark:border-green-600 m-4">
           {/* Tab for all accounts */}
-          <div className="col-span-1 flex flex-col space-y-1 h-full">
+          <div className="col-span-1 flex flex-col space-y-1">
             <Transition.Child
               enter="transition duration-200 ease-in-out delay-200"
               enterFrom="opacity-0"
@@ -190,36 +190,25 @@ export default function Transactions() {
               : null}
           </div>
           {/* For each account, create a Transition as well as a table */}
-          <div className="col-span-4 text-center h-full">
-            {accounts.map((accountID) => (
-              <Transition
-                key={accountID}
-                appear={true}
-                show={accountID === selectedAccountID}
-                enter="transition duration-200 ease-in-out delay-200"
-                enterFrom="opacity-0"
-                enterTo="opacity-100"
-                leave="transition duration-200 ease-in-out"
-                leaveFrom="opacity-100"
-                leaveTo="opacity-0"
-                className={"h-full"}
-              >
-                <TransactionTable
-                  transactions={transactions.filter((transaction) =>
-                    accountID !== "all"
-                      ? transaction.account.account_id === accountID
-                      : true
-                  )}
-                  selectedButton={selectedButton}
-                  setSelectedButton={setSelectedButton}
-                  selectedRef={selectedRef}
-                  highlightedTransaction={highlightedTransaction}
-                  setHighlightedTransaction={setHighlightedTransaction}
-                  setModifiedName={setModifiedName}
-                  setModifiedCategory={setModifiedCategory}
-                  save={save}
-                />
-              </Transition>
+          <div className="col-span-4 text-center">
+            {accounts.map((account) => (
+              <TransactionTable
+                key={account}
+                show={selectedAccountID === account}
+                transactions={transactions.filter((transaction) =>
+                  selectedAccountID !== "all"
+                    ? transaction.account.account_id === account
+                    : true
+                )}
+                selectedButton={selectedButton}
+                setSelectedButton={setSelectedButton}
+                selectedRef={selectedRef}
+                highlightedTransaction={highlightedTransaction}
+                setHighlightedTransaction={setHighlightedTransaction}
+                setModifiedName={setModifiedName}
+                setModifiedCategory={setModifiedCategory}
+                save={save}
+              />
             ))}
           </div>
         </div>
