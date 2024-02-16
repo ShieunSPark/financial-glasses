@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Disclosure, Transition } from "@headlessui/react";
+import { Transition } from "@headlessui/react";
 
 import { UserContext } from "../App";
 import dashboardRequest from "../api/dashboardRequest";
@@ -191,22 +191,13 @@ export default function Transactions() {
           </div>
           {/* For each account, create a Transition as well as a table */}
           <div className="col-span-4 text-center">
-            {/* {accounts.map((accountID) => ( */}
-            <Transition
-              appear={true}
-              show={true}
-              enter="transition duration-200 ease-in-out delay-200"
-              enterFrom="opacity-0"
-              enterTo="opacity-100"
-              leave="transition duration-200 ease-in-out"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
-              className={"h-full"}
-            >
+            {accounts.map((account) => (
               <TransactionTable
+                key={account}
+                show={selectedAccountID === account}
                 transactions={transactions.filter((transaction) =>
                   selectedAccountID !== "all"
-                    ? transaction.account.account_id === selectedAccountID
+                    ? transaction.account.account_id === account
                     : true
                 )}
                 selectedButton={selectedButton}
@@ -218,8 +209,7 @@ export default function Transactions() {
                 setModifiedCategory={setModifiedCategory}
                 save={save}
               />
-            </Transition>
-            {/* ))} */}
+            ))}
           </div>
         </div>
       </Transition>
