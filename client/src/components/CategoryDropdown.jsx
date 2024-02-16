@@ -36,7 +36,6 @@ export default function CategoryDropdown({ transaction, setModified }) {
       case useCombobox.stateChangeTypes.ItemClick:
         return {
           ...changes, // default Downshift new state changes on item selection.
-          isOpen: state.isOpen, // but keep menu open.
           highlightedIndex: state.isOpen
             ? categories.indexOf(state.selectedItem)
             : null, // with the item highlighted.

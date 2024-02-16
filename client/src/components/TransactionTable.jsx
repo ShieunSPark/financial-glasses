@@ -100,8 +100,8 @@ export default function TransactionTable({
   });
 
   return (
-    <div className="flex flex-col justify-between h-[80vh]">
-      <div className="overflow-y-auto h-4/5">
+    <div className="flex flex-col justify-between h-[650px]">
+      <div className="overflow-y-auto">
         <table className="table-fixed w-full text-sm text-left rtl:text-right text-gray-600 dark:text-gray-400 ">
           <thead className="h-12 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-400 uppercase sticky top-0">
             {table.getHeaderGroups().map((headerGroup) => (

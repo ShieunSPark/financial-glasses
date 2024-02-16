@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { usePlaidLink } from "react-plaid-link";
 import { HiTrash } from "react-icons/hi";
