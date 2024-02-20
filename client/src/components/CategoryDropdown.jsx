@@ -34,11 +34,11 @@ export default function CategoryDropdown({ transaction, setModified }) {
     switch (type) {
       case useCombobox.stateChangeTypes.InputKeyDownEnter:
       case useCombobox.stateChangeTypes.ItemClick:
+        // console.log(`state: ${state.selectedItem}`);
+        // console.log(`changes: ${changes.selectedItem}`);
         return {
           ...changes, // default Downshift new state changes on item selection.
-          highlightedIndex: state.isOpen
-            ? categories.indexOf(state.selectedItem)
-            : null, // with the item highlighted.
+          highlightedIndex: state.highlightedIndex,
         };
       default:
         return changes; // otherwise business as usual.
@@ -73,6 +73,9 @@ export default function CategoryDropdown({ transaction, setModified }) {
         ? ""
         : transaction.plaidCategory.detailed
     ),
+    onIsOpenChange: () => {
+      setFilteredCategories(categories);
+    },
     onInputValueChange: ({ inputValue }) => {
       setFilteredCategories(
         categories.filter((category) =>
@@ -84,6 +87,8 @@ export default function CategoryDropdown({ transaction, setModified }) {
     },
     stateReducer,
   });
+
+  console.log(highlightedIndex);
 
   return (
     <div className="relative">
