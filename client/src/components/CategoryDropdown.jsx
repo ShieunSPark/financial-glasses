@@ -38,7 +38,6 @@ export default function CategoryDropdown({ transaction, setModified }) {
         // console.log(`changes: ${changes.selectedItem}`);
         return {
           ...changes, // default Downshift new state changes on item selection.
-          highlightedIndex: state.highlightedIndex,
         };
       default:
         return changes; // otherwise business as usual.
@@ -73,9 +72,6 @@ export default function CategoryDropdown({ transaction, setModified }) {
         ? ""
         : transaction.plaidCategory.detailed
     ),
-    onIsOpenChange: () => {
-      setFilteredCategories(categories);
-    },
     onInputValueChange: ({ inputValue }) => {
       setFilteredCategories(
         categories.filter((category) =>
@@ -88,7 +84,9 @@ export default function CategoryDropdown({ transaction, setModified }) {
     stateReducer,
   });
 
-  console.log(highlightedIndex);
+  useEffect(() => {
+    setFilteredCategories(categories);
+  }, [isOpen]);
 
   return (
     <div className="relative">
@@ -118,6 +116,11 @@ export default function CategoryDropdown({ transaction, setModified }) {
                 category,
                 index,
               })}
+              // onClick={() => {
+              //   setHighlightedIndex(index);
+              //   selectItem(category);
+              //   setFilteredCategories(categories);
+              // }}
             >
               <span>
                 {category === category.toUpperCase()
