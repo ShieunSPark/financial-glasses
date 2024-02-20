@@ -144,7 +144,7 @@ export default function TransactionTable({
                 ))}
               </thead>
               <tbody>
-                {table.getRowModel().rows.map((row) => {
+                {table.getRowModel().rows.map((row, index) => {
                   const refProp =
                     selectedButton === row.original.transaction_id
                       ? { ref: selectedRef }
@@ -201,6 +201,8 @@ export default function TransactionTable({
                             return (
                               <td key={cell.id} className="px-3 py-2">
                                 <CategoryDropdown
+                                  index={index}
+                                  numOfRows={table.getRowModel().rows.length}
                                   transaction={row.original}
                                   setModified={setModifiedCategory}
                                 />
