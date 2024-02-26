@@ -13,7 +13,7 @@ import accountsRequest from "../api/accountsRequest";
 import transactionsSyncRequest from "../api/transactionsSyncRequest";
 
 import ConfirmDelete from "../components/ConfirmDelete";
-import DialogDelete from "../components/DialogDelete";
+// import DialogDelete from "../components/DialogDelete";
 import LoadingSpinner from "../components/LoadingSpinner";
 import DashboardChart from "../components/DashboardChart";
 

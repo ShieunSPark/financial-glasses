@@ -240,7 +240,7 @@ const BudgetSchema = new Schema({
   trackedCategories: { type: Array, required: true, default: [] },
 });
 
-// Virtual for user's URL
+// Virtual for budget's URL
 BudgetSchema.virtual("url").get(function () {
   return `/budget/${this._id}`;
 });

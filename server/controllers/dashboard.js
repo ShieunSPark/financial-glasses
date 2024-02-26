@@ -158,16 +158,26 @@ exports.dashboard_chart = asyncHandler(async (req, res, next) => {
   monthTransactions.forEach((transaction) => {
     if (
       categoriesSum.find(
-        (item) => item.category === transaction.plaidCategory.detailed
+        (item) =>
+          item.category ===
+          (transaction.modifiedCategory
+            ? transaction.modifiedCategory
+            : transaction.plaidCategory.detailed)
       ) === undefined
     )
       categoriesSum.push({
-        category: transaction.plaidCategory.detailed,
+        category: transaction.modifiedCategory
+          ? transaction.modifiedCategory
+          : transaction.plaidCategory.detailed,
         total: transaction.amount,
       });
     else {
       categoriesSum.find(
-        (item) => item.category === transaction.plaidCategory.detailed
+        (item) =>
+          item.category ===
+          (transaction.modifiedCategory
+            ? transaction.modifiedCategory
+            : transaction.plaidCategory.detailed)
       ).total += transaction.amount;
     }
   });
