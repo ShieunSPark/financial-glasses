@@ -10,6 +10,7 @@ const User = require("../models/user");
 const Item = require("../models/item");
 const Account = require("../models/account");
 const Transaction = require("../models/transaction");
+const Budget = require("../models/budget");
 
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_SECRET = process.env.PLAID_SECRET;
@@ -125,7 +126,6 @@ exports.set_access_token = asyncHandler(async (req, res, next) => {
     // Date logic for Capital One CC/loans (requires min_last_updated_datetime field)
     const date = new Date();
     date.setFullYear(date.getFullYear() - 2);
-    console.log(date.toISOString);
 
     // Create accounts (but first, use access token to get accounts from Plaid)
     const resAccounts = await plaidClient.accountsBalanceGet({
@@ -184,10 +184,11 @@ const simplifyText = (string) =>
 exports.transactions_sync = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
   const items = await Item.find({ user: user });
+  const budget = await Budget.findOne({ user: user });
+
   // On my desktop PC, this sync function runs too quickly and duplicates transactions,
   // but on my laptop, it runs fine... maybe adding the line below will help?
   // UPDATE: I'm dumb... I disabled cache in the developers tools on my PC... T_T
-
   const result = await Promise.all(
     items.map(async (item) => {
       // Get access token and cursor for specified Item
@@ -227,57 +228,103 @@ exports.transactions_sync = asyncHandler(async (req, res, next) => {
       }
 
       // Save added transactions to database
-      await Promise.all(
-        allData.added.map(async (transaction) => {
-          // Get account to add to the transaction
-          const account = await Account.findOne({
-            account_id: transaction.account_id,
-          });
+      const localBudget = JSON.parse(JSON.stringify(budget));
+      for (const transaction of allData.added) {
+        // Get account to add to the transaction
+        const account = await Account.findOne({
+          account_id: transaction.account_id,
+        });
 
-          const duplicateTransaction = await Transaction.findOne({
+        const duplicateTransaction = await Transaction.findOne({
+          transaction_id: transaction.transaction_id,
+        });
+
+        if (!duplicateTransaction) {
+          // Create new transaction
+          const newTransaction = new Transaction({
             transaction_id: transaction.transaction_id,
+            user: user,
+            item: item,
+            account: account,
+            name: transaction.merchant_name
+              ? transaction.merchant_name
+              : transaction.name,
+            // Note that positive amount is $ going OUT of the account and negative is $ going INTO the account
+            amount: transaction.amount,
+            iso_currency_code: transaction.iso_currency_code,
+            // Prefer authorized-date
+            date: transaction.authorized_date
+              ? transaction.authorized_date
+              : transaction.date,
+            // Break down personal_finance_category and simplify the text
+            plaidCategory: {
+              primary: simplifyText(
+                transaction.personal_finance_category.primary
+              ),
+              detailed: simplifyText(
+                transaction.personal_finance_category.detailed
+              ).substring(
+                transaction.personal_finance_category.primary.length + 1
+              ),
+              confidence_level: simplifyText(
+                transaction.personal_finance_category.confidence_level
+              ),
+            },
+            pending_transaction_id: transaction.pending_transaction_id,
+            is_pending: transaction.pending,
+            is_deleted: false,
           });
 
-          if (!duplicateTransaction) {
-            // Create new transaction
-            const newTransaction = new Transaction({
-              transaction_id: transaction.transaction_id,
-              user: user,
-              item: item,
-              account: account,
-              name: transaction.merchant_name
-                ? transaction.merchant_name
-                : transaction.name,
-              // Note that positive amount is $ going OUT of the account and negative is $ going INTO the account
-              amount: transaction.amount,
-              iso_currency_code: transaction.iso_currency_code,
-              // Prefer authorized-date
-              date: transaction.authorized_date
-                ? transaction.authorized_date
-                : transaction.date,
-              // Break down personal_finance_category and simplify the text
-              plaidCategory: {
-                primary: simplifyText(
-                  transaction.personal_finance_category.primary
-                ),
-                detailed: simplifyText(
-                  transaction.personal_finance_category.detailed
-                ).substring(
-                  transaction.personal_finance_category.primary.length + 1
-                ),
-                confidence_level: simplifyText(
-                  transaction.personal_finance_category.confidence_level
-                ),
-              },
-              pending_transaction_id: transaction.pending_transaction_id,
-              is_pending: transaction.pending,
-              is_deleted: false,
-            });
+          await newTransaction.save();
 
-            newTransaction.save();
+          // Add transaction's value to budget
+          const transactionYear = newTransaction.date.getFullYear();
+          const transactionMonth = newTransaction.date.getMonth();
+
+          const databaseMonth = localBudget.monthlySpending.find(
+            (entry) =>
+              entry.year === transactionYear && entry.month === transactionMonth
+          );
+          // Create new entry for specified month and year if it isn't already in the budget
+          if (databaseMonth === undefined) {
+            localBudget.monthlySpending.push({
+              year: transactionYear,
+              month: transactionMonth,
+              categories: [
+                {
+                  name: newTransaction.plaidCategory.detailed
+                    ? newTransaction.plaidCategory.detailed
+                    : newTransaction.plaidCategory.primary,
+                  sum: newTransaction.amount,
+                  isTracked: false,
+                },
+              ],
+            });
+          } else {
+            const databaseCategories = databaseMonth.categories;
+            const databaseCategory = databaseCategories.find(
+              (category) =>
+                category.name === newTransaction.plaidCategory.detailed ||
+                category.name === newTransaction.plaidCategory.primary
+            );
+
+            // Check if the database does not have the category of new transaction we just made
+            if (databaseCategory === undefined) {
+              databaseCategories.push({
+                name: newTransaction.plaidCategory.detailed
+                  ? newTransaction.plaidCategory.detailed
+                  : newTransaction.plaidCategory.primary,
+                sum: newTransaction.amount,
+                isTracked: false,
+              });
+            } else {
+              databaseCategory.sum += newTransaction.amount;
+            }
           }
-        })
-      );
+        }
+      }
+      budget.monthlySpending = localBudget.monthlySpending;
+      await budget.save();
 
       // Update modified transactions in database
       await Promise.all(

@@ -11,6 +11,8 @@ export default function ConfirmDelete({
   accountName,
   itemName,
   trackedCategory,
+  selectedMonthNum,
+  selectedYear,
   onClose,
 }) {
   const navigate = useNavigate();
@@ -44,6 +46,8 @@ export default function ConfirmDelete({
       credentials: "include",
       body: JSON.stringify({
         trackedCategory,
+        selectedMonthNum,
+        selectedYear,
       }),
     }).then(() => {
       // Show loading symbol

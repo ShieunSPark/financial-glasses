@@ -11,6 +11,8 @@ export default function TrackedCategory({
   setCurrentTrackedCategory,
   currentBudgetAmount,
   setCurrentBudgetAmount,
+  selectedMonthNum,
+  selectedYear,
   onClose,
 }) {
   const { user, setUser } = useContext(UserContext);
@@ -32,13 +34,16 @@ export default function TrackedCategory({
       body: JSON.stringify({
         trackedCategory,
         budgetAmount,
+        selectedMonthNum,
+        selectedYear,
       }),
     }).then(() => {
-      onClose();
       // Show loading symbol
       setIsLoading(true);
       setCurrentTrackedCategory(trackedCategory);
       setCurrentBudgetAmount(budgetAmount);
+
+      onClose();
     });
   };
 
