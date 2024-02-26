@@ -186,7 +186,7 @@ const allCategories = [
   },
 ];
 
-// // The logic used to get all primary and detailed categories without manually copying/pasting
+/* // The logic used to get all primary and detailed categories without manually copying/pasting
 // const { open } = require("node:fs/promises");
 
 // const simplifyText = (string) =>
@@ -233,14 +233,28 @@ const allCategories = [
 
 //   console.log(categories);
 // })();
+*/
 
 const BudgetSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   categories: { type: Array, required: true, default: allCategories },
-  trackedCategories: { type: Array, required: true, default: [] },
+  monthlySpending: [
+    {
+      month: Number,
+      year: Number,
+      categories: [
+        {
+          name: String,
+          sum: Number,
+          isTracked: Boolean,
+          budgetAmount: Number,
+        },
+      ],
+    },
+  ],
 });
 
-// Virtual for user's URL
+// Virtual for budget's URL
 BudgetSchema.virtual("url").get(function () {
   return `/budget/${this._id}`;
 });

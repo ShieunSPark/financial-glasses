@@ -8,12 +8,12 @@ import { TokenContext, UserContext } from "../App";
 import plaidCreateLinkTokenRequest from "../api/plaidCreateLinkTokenRequest";
 import plaidSetAccessToken from "../api/plaidSetAccessToken";
 import dashboardRequest from "../api/dashboardRequest";
-import dashboardChartRequest from "../api/dashboardChartRequest";
+import monthlySpendingRequest from "../api/monthlySpendingRequest";
 import accountsRequest from "../api/accountsRequest";
 import transactionsSyncRequest from "../api/transactionsSyncRequest";
 
 import ConfirmDelete from "../components/ConfirmDelete";
-import DialogDelete from "../components/DialogDelete";
+// import DialogDelete from "../components/DialogDelete";
 import LoadingSpinner from "../components/LoadingSpinner";
 import DashboardChart from "../components/DashboardChart";
 
@@ -87,8 +87,24 @@ export default function Dashboard() {
   // Sync transactions, then update chart data
   useEffect(() => {
     const getChartData = async () => {
-      const response = await dashboardChartRequest();
-      setChartData(response.categoriesSum);
+      const response = await monthlySpendingRequest();
+      const currentMonthNum = new Date().getMonth();
+      const currentYear = Number(new Date().getFullYear());
+
+      const currentMonthSpending = response.budget.monthlySpending.filter(
+        (entry) => entry.month === currentMonthNum && entry.year === currentYear
+      );
+
+      setChartData(
+        currentMonthSpending.length !== 0
+          ? currentMonthSpending[0].categories
+              .filter((category) => category.sum > 0)
+              .map(({ name, sum, isTracked, budgetAmount }) => ({
+                name: name,
+                value: sum,
+              }))
+          : []
+      );
     };
 
     const syncTransactions = async () => {
@@ -133,11 +149,8 @@ export default function Dashboard() {
           trackedCategory={null}
           onClose={() => setShowConfirm(false)}
         /> */}
-        <div className="grid grid-cols-2 h-4/5">
-          {/* {user ? (
-        <div className="text-center pt-4">Hello, {user.firstName}</div>
-      ) : null} */}
-          <div id="accounts">
+        <div className="grid grid-cols-3 h-4/5">
+          <div id="accounts col-span-1">
             {numOfItems !== 1 ? (
               <div className="text-center pt-4">
                 You are connected to {numOfItems} banks
@@ -193,6 +206,8 @@ export default function Dashboard() {
                                 accountName={selectedAccountName}
                                 itemName={selectedItem}
                                 trackedCategory={null}
+                                selectedMonthNum={null}
+                                selectedYear={null}
                                 onClose={() => setShowConfirm(false)}
                               />
                             )}
@@ -204,8 +219,8 @@ export default function Dashboard() {
                 : null}
             </div>
           </div>
-          <div className="flex flex-col items-center">
-            <h2 className="pt-4">{`This Month's Budget`}</h2>
+          <div className="col-span-2 flex flex-col items-center">
+            <h2 className="pt-4">{`This Month's Spending`}</h2>
             <DashboardChart data={chartData} />
           </div>
         </div>
