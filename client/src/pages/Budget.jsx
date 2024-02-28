@@ -69,7 +69,7 @@ export default function Budget() {
   }, [trackedCategories]);
 
   return (
-    <div>
+    <div className="w-3/4 mx-auto">
       {/* Transition for adding a tracked category */}
       {createPortal(
         <Transition
@@ -122,7 +122,26 @@ export default function Budget() {
         </Transition>,
         document.body
       )}
-
+      <div className="text-xl mx-auto pt-4">
+        {new Date().toLocaleString("en-US", {
+          year: "numeric",
+          month: "long",
+        })}
+      </div>
+      <div className="grid grid-cols-12 h-16 pt-2">
+        <div className="border-2 w-full text-center">Jan</div>
+        <div className="border-2 w-full text-center">Feb</div>
+        <div className="border-2 w-full text-center">Mar</div>
+        <div className="border-2 w-full text-center">Apr</div>
+        <div className="border-2 w-full text-center">May</div>
+        <div className="border-2 w-full text-center">Jun</div>
+        <div className="border-2 w-full text-center">Jul</div>
+        <div className="border-2 w-full text-center">Aug</div>
+        <div className="border-2 w-full text-center">Sep</div>
+        <div className="border-2 w-full text-center">Oct</div>
+        <div className="border-2 w-full text-center">Nov</div>
+        <div className="border-2 w-full text-center">Dec</div>
+      </div>
       <div className="flex justify-center m-2 pt-2">
         <button
           className=" p-2 transition ease-in-out delay-50 bg-blue-500 text-white rounded-md hover:bg-indigo-500"
@@ -156,7 +175,7 @@ export default function Budget() {
                 key={trackedCategory.trackedCategory}
                 className="flex flex-col items-center"
               >
-                <div className="w-3/4 relative">
+                <div className="w-full relative">
                   <div className="flex justify-between items-end pt-2">
                     <div className="pb-1">
                       {trackedCategory.trackedCategory}
@@ -180,22 +199,10 @@ export default function Budget() {
                           ? "bg-yellow-600"
                           : "bg-red-600"
                       } transition-all duration-1000 ease-out rounded-full`}
-                    >
-                      <Transition
-                        appear={true}
-                        show={!isLoading}
-                        enter="transition duration-1000 ease-in-out"
-                        enterFrom="opacity-0"
-                        enterTo="opacity-100"
-                        leave="transition duration-1000 ease-in-out"
-                        leaveFrom="opacity-100"
-                        leaveTo="opacity-0"
-                      >
-                        <div className="text-xs pr-2">
-                          {percentage.toFixed()}%
-                        </div>
-                      </Transition>
-                    </div>
+                    ></div>
+                  </div>
+                  <div className="absolute top-4 -right-10 text-xs text-left">
+                    ({percentage.toFixed()}%)
                   </div>
                   <div className="absolute top-9 -right-10">
                     <button

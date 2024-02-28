@@ -39,7 +39,7 @@ export default function DashboardChart({ data }) {
   }) => {
     // Logic to place percentages within the pie slices
     // const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-    const radius = outerRadius * 1.25;
+    const radius = outerRadius * 1.15;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 

@@ -184,10 +184,10 @@ const simplifyText = (string) =>
 exports.transactions_sync = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
   const items = await Item.find({ user: user });
+
   // On my desktop PC, this sync function runs too quickly and duplicates transactions,
   // but on my laptop, it runs fine... maybe adding the line below will help?
   // UPDATE: I'm dumb... I disabled cache in the developers tools on my PC... T_T
-
   const result = await Promise.all(
     items.map(async (item) => {
       // Get access token and cursor for specified Item

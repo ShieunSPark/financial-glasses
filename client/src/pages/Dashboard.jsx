@@ -133,11 +133,11 @@ export default function Dashboard() {
           trackedCategory={null}
           onClose={() => setShowConfirm(false)}
         /> */}
-        <div className="grid grid-cols-2 h-4/5">
+        <div className="grid grid-cols-3 h-4/5">
           {/* {user ? (
         <div className="text-center pt-4">Hello, {user.firstName}</div>
       ) : null} */}
-          <div id="accounts">
+          <div id="accounts col-span-1">
             {numOfItems !== 1 ? (
               <div className="text-center pt-4">
                 You are connected to {numOfItems} banks
@@ -204,8 +204,8 @@ export default function Dashboard() {
                 : null}
             </div>
           </div>
-          <div className="flex flex-col items-center">
-            <h2 className="pt-4">{`This Month's Budget`}</h2>
+          <div className="col-span-2 first-letter:flex flex-col items-center">
+            <h2 className="pt-4">{`This Month's Spending`}</h2>
             <DashboardChart data={chartData} />
           </div>
         </div>
