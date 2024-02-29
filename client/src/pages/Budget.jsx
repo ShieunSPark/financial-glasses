@@ -21,6 +21,10 @@ export default function Budget() {
   const [currentTrackedCategory, setCurrentTrackedCategory] = useState("");
   const [currentBudgetAmount, setCurrentBudgetAmount] = useState(0);
   const [isUpdated, setIsUpdated] = useState(false);
+  const [selectedMonthNum, setSelectedMonthNum] = useState(
+    new Date().getMonth() + 1
+  );
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   const navigate = useNavigate();
 
@@ -123,24 +127,26 @@ export default function Budget() {
         document.body
       )}
       <div className="text-xl mx-auto pt-4">
-        {new Date().toLocaleString("en-US", {
-          year: "numeric",
-          month: "long",
-        })}
+        {`${Intl.DateTimeFormat("en", { month: "long" }).format(
+          new Date(selectedMonthNum.toString())
+        )} ${selectedYear}`}
       </div>
-      <div className="grid grid-cols-12 h-16 pt-2">
-        <div className="border-2 w-full text-center">Jan</div>
-        <div className="border-2 w-full text-center">Feb</div>
-        <div className="border-2 w-full text-center">Mar</div>
-        <div className="border-2 w-full text-center">Apr</div>
-        <div className="border-2 w-full text-center">May</div>
-        <div className="border-2 w-full text-center">Jun</div>
-        <div className="border-2 w-full text-center">Jul</div>
-        <div className="border-2 w-full text-center">Aug</div>
-        <div className="border-2 w-full text-center">Sep</div>
-        <div className="border-2 w-full text-center">Oct</div>
-        <div className="border-2 w-full text-center">Nov</div>
-        <div className="border-2 w-full text-center">Dec</div>
+      <div className="grid grid-cols-12 h-12 pt-2">
+        {[...Array(12)].map((value, monthNum) => (
+          <div
+            key={monthNum + 1}
+            className={`flex justify-center items-center w-full border-2 cursor-pointer ${
+              selectedMonthNum === monthNum + 1 ? "bg-slate-600" : null
+            } hover:bg-slate-600`}
+            onClick={() => setSelectedMonthNum(monthNum + 1)}
+          >
+            <div>
+              {Intl.DateTimeFormat("en", { month: "long" })
+                .format(new Date((monthNum + 1).toString()))
+                .substring(0, 3)}
+            </div>
+          </div>
+        ))}
       </div>
       <div className="flex justify-center m-2 pt-2">
         <button
@@ -201,43 +207,51 @@ export default function Budget() {
                       } transition-all duration-1000 ease-out rounded-full`}
                     ></div>
                   </div>
-                  <div className="absolute top-4 -right-10 text-xs text-left">
-                    ({percentage.toFixed()}%)
-                  </div>
-                  <div className="absolute top-9 -right-10">
-                    <button
-                      onClick={() => {
-                        setEditClicked(true);
-                        setCurrentTrackedCategory(
-                          trackedCategory.trackedCategory
-                        );
-                        setCurrentBudgetAmount(trackedCategory.budgetAmount);
-                      }}
-                    >
-                      <HiPencilAlt className="text-gray-400 hover:text-gray-600" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        setDeleteClicked(true);
-                        setCurrentTrackedCategory(
-                          trackedCategory.trackedCategory
-                        );
-                      }}
-                    >
-                      <HiTrash className="text-gray-400 hover:text-gray-600" />
-                    </button>
-                    {currentTrackedCategory ===
-                      trackedCategory.trackedCategory && (
-                      <ConfirmDelete
-                        show={deleteClicked}
-                        accountID={null}
-                        trackedCategory={currentTrackedCategory}
-                        onClose={() => {
-                          setDeleteClicked(false);
-                          setIsUpdated(true);
+                  <div className="absolute top-4 -right-12 flex flex-col">
+                    <div className="text-xs italic text-left pb-1.5">
+                      ({percentage.toFixed()}%)
+                    </div>
+                    <div className="flex">
+                      <button
+                        onClick={() => {
+                          setEditClicked(true);
+                          setCurrentTrackedCategory(
+                            trackedCategory.trackedCategory
+                          );
+                          setCurrentBudgetAmount(trackedCategory.budgetAmount);
                         }}
-                      />
-                    )}
+                      >
+                        <HiPencilAlt
+                          className="text-gray-400 hover:text-gray-600"
+                          size={"20"}
+                        />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setDeleteClicked(true);
+                          setCurrentTrackedCategory(
+                            trackedCategory.trackedCategory
+                          );
+                        }}
+                      >
+                        <HiTrash
+                          className="text-gray-400 hover:text-gray-600"
+                          size={"20"}
+                        />
+                      </button>
+                      {currentTrackedCategory ===
+                        trackedCategory.trackedCategory && (
+                        <ConfirmDelete
+                          show={deleteClicked}
+                          accountID={null}
+                          trackedCategory={currentTrackedCategory}
+                          onClose={() => {
+                            setDeleteClicked(false);
+                            setIsUpdated(true);
+                          }}
+                        />
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
