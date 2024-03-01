@@ -70,6 +70,13 @@ export default function DashboardChart({ data }) {
     return null;
   };
 
+  if (data.length === 0) {
+    return (
+      <div className="h-[500px] w-5/6 bg-blue-100 dark:bg-blue-900 flex justify-center items-center">
+        <div className="italic">No data to show</div>
+      </div>
+    );
+  }
   return (
     <ResponsiveContainer width="90%" height={500}>
       <PieChart className="bg-slate-700">

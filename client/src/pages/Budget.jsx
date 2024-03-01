@@ -135,9 +135,16 @@ export default function Budget() {
         {[...Array(12)].map((value, monthNum) => (
           <div
             key={monthNum + 1}
-            className={`flex justify-center items-center w-full border-2 cursor-pointer ${
-              selectedMonthNum === monthNum + 1 ? "bg-slate-600" : null
-            } hover:bg-slate-600`}
+            className={`flex justify-center items-center w-full border-2 ${
+              selectedMonthNum === monthNum + 1
+                ? "bg-slate-200 dark:bg-slate-600"
+                : null
+            } ${
+              monthNum + 1 <= selectedMonthNum &&
+              new Date().getFullYear() === selectedYear
+                ? "cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-600"
+                : "opacity-50"
+            }`}
             onClick={() => setSelectedMonthNum(monthNum + 1)}
           >
             <div>
