@@ -140,12 +140,17 @@ export default function Budget() {
                 ? "bg-slate-200 dark:bg-slate-600"
                 : null
             } ${
-              monthNum + 1 <= selectedMonthNum &&
+              monthNum <= new Date().getMonth() &&
               new Date().getFullYear() === selectedYear
                 ? "cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-600"
                 : "opacity-50"
             }`}
-            onClick={() => setSelectedMonthNum(monthNum + 1)}
+            onClick={
+              monthNum <= new Date().getMonth() &&
+              new Date().getFullYear() === selectedYear
+                ? () => setSelectedMonthNum(monthNum + 1)
+                : null
+            }
           >
             <div>
               {Intl.DateTimeFormat("en", { month: "long" })
