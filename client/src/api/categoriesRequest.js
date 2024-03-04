@@ -1,7 +1,7 @@
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default (userID) => {
-  return fetch(`${API_URL}/categories/${userID}`, {
+export default () => {
+  return fetch(`${API_URL}/categories`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

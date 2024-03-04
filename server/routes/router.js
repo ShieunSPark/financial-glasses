@@ -108,9 +108,9 @@ router.get("/profile", checkLoggedIn, dashboard_controller.profile_get);
 
 // GET categories in user's budget)
 router.get(
-  "/categories/:user_id",
+  "/categoriesTotals",
   checkLoggedIn,
-  dashboard_controller.categories_get
+  dashboard_controller.categoriesTotals_get
 );
 
 // UPDATE tracked categories in user's budget

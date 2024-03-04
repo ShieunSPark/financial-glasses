@@ -10,6 +10,7 @@ const User = require("../models/user");
 const Item = require("../models/item");
 const Account = require("../models/account");
 const Transaction = require("../models/transaction");
+const Budget = require("../models/budget");
 
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_SECRET = process.env.PLAID_SECRET;
@@ -125,7 +126,6 @@ exports.set_access_token = asyncHandler(async (req, res, next) => {
     // Date logic for Capital One CC/loans (requires min_last_updated_datetime field)
     const date = new Date();
     date.setFullYear(date.getFullYear() - 2);
-    console.log(date.toISOString);
 
     // Create accounts (but first, use access token to get accounts from Plaid)
     const resAccounts = await plaidClient.accountsBalanceGet({
@@ -275,6 +275,51 @@ exports.transactions_sync = asyncHandler(async (req, res, next) => {
             });
 
             newTransaction.save();
+
+            const budget = await Budget.findOne({ user: user });
+
+            // Add transaction's value to budget
+            const transactionYear = newTransaction.date.getFullYear();
+            const transactionMonth = newTransaction.date.getMonth();
+
+            const databaseMonth = budget.monthlySpending.filter(
+              (entry) =>
+                entry.year === transactionYear &&
+                entry.month === transactionMonth
+            );
+            // Create new entry for specified month and year if it isn't already in the budget
+            if (databaseMonth.length === 0) {
+              budget.monthlySpending.push({
+                year: transactionYear,
+                month: transactionMonth,
+                categories: [
+                  {
+                    name: newTransaction.plaidCategory.detailed,
+                    sum: newTransaction.amount,
+                    isTracked: false,
+                  },
+                ],
+              });
+            } else {
+              const databaseCategories = databaseMonth[0].categories;
+              const databaseCategory = databaseCategories.find(
+                (category) =>
+                  (category.name = newTransaction.plaidCategory.detailed)
+              );
+
+              // Check if the database does not have the category of new transaction we just made
+              if (databaseCategory === undefined) {
+                databaseCategories.push({
+                  name: newTransaction.plaidCategory.detailed,
+                  sum: newTransaction.amount,
+                  isTracked: false,
+                });
+              } else {
+                databaseCategory.sum += newTransaction.amount;
+              }
+            }
+
+            budget.save();
           }
         })
       );

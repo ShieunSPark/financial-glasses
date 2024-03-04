@@ -13,6 +13,16 @@ exports.dashboard_get = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
   const items = await Item.find({ user: user });
   const numOfItems = items.length;
+  const budget = await Budget.findOne({ user: user });
+
+  // For development; probably can remove in production as a budget is made
+  // at the /signup route
+  if (!budget) {
+    const newBudget = new Budget({
+      user: user,
+    });
+    await newBudget.save();
+  }
 
   res.json({
     title: "Dashboard",
@@ -187,21 +197,25 @@ exports.dashboard_chart = asyncHandler(async (req, res, next) => {
   });
 });
 
-exports.categories_get = asyncHandler(async (req, res, next) => {
+exports.categoriesTotals_get = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
   const budget = await Budget.findOne({ user: user });
 
-  budget.trackedCategories.sort((a, b) => {
-    const nameA = a.trackedCategory.toUpperCase(); // ignore upper and lowercase
-    const nameB = b.trackedCategory.toUpperCase(); // ignore upper and lowercase
-    if (nameA < nameB) {
+  budget.monthlySpending.sort((a, b) => {
+    // Sort by year first
+    if (a.year < b.year) {
       return -1;
     }
-    if (nameA > nameB) {
+    if (a.year > b.year) {
       return 1;
     }
-
-    // names must be equal
+    // Sort by month second
+    if (a.month < b.month) {
+      return -1;
+    }
+    if (a.month > b.month) {
+      return 1;
+    }
     return 0;
   });
 
