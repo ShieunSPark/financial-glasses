@@ -227,27 +227,64 @@ exports.monthlySpending_get = asyncHandler(async (req, res, next) => {
 exports.budget_put = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
   const budget = await Budget.findOne({ user: user });
+  // const localBudget = JSON.parse(JSON.stringify(budget));
 
-  const requestedMonth = budget.monthlySpending.find(
-    (entry) =>
-      entry.month === req.body.selectedMonthNum &&
-      entry.year === req.body.selectedYear
+  const { selectedMonthNum, selectedYear, trackedCategory, budgetAmount } =
+    req.body;
+
+  const updatedBudget = await Budget.findOneAndUpdate(
+    { user: user },
+    {
+      $set: {
+        "monthlySpending.$[entry].categories.$[trackedCategory].isTracked": true,
+        "monthlySpending.$[entry].categories.$[trackedCategory].budgetAmount":
+          budgetAmount,
+      },
+    },
+    {
+      arrayFilters: [
+        {
+          $and: [
+            { "entry.month": selectedMonthNum },
+            { "entry.year": selectedYear },
+          ],
+        },
+        { "trackedCategory.name": trackedCategory },
+      ],
+      new: true,
+    }
   );
-  console.log(requestedMonth);
 
-  const requestedCategory = requestedMonth.categories.find(
-    (category) => category.name === req.body.trackedCategory
-  );
-  console.log(requestedCategory);
+  // const requestedMonthIndex = localBudget.monthlySpending.findIndex(
+  //   (entry) =>
+  //     entry.month === selectedMonthNum &&
+  //     entry.year === selectedYear
+  // );
 
-  // Update isTracked and budgetAmount in database
-  requestedCategory.isTracked = true;
-  requestedCategory.budgetAmount = req.body.budgetAmount;
+  // const requestedCategoryIndex = localBudget.monthlySpending[
+  //   requestedMonthIndex
+  // ].categories.findIndex(
+  //   (category) => category.name === trackedCategory
+  // );
 
-  await budget.save();
+  // // Update isTracked and budgetAmount in database
+  // localBudget.monthlySpending[requestedMonthIndex].categories[
+  //   requestedCategoryIndex
+  // ].isTracked = true;
+  // console.log(
+  //   localBudget.monthlySpending[requestedMonthIndex].categories[
+  //     requestedCategoryIndex
+  //   ].isTracked
+  // );
+  // localBudget.monthlySpending[requestedMonthIndex].categories[
+  //   requestedCategoryIndex
+  // ].budgetAmount = budgetAmount;
+
+  // budget.monthlySpending = localBudget.monthlySpending;
+  // await budget.save();
 
   res.json({
-    budget: budget,
+    budget: updatedBudget,
   });
 });
 

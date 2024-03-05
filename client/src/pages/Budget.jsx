@@ -219,7 +219,7 @@ export default function Budget() {
                 <div className="flex justify-between items-end pt-2">
                   <div className="pb-1">{trackedCategory.name}</div>
                   <div className="pb-1 text-sm">
-                    ${total.total.toFixed()} of ${trackedCategory.budgetAmount}
+                    ${total.toFixed()} of ${trackedCategory.budgetAmount}
                   </div>
                 </div>
                 <div className="h-6 bg-gray-300 rounded-full">

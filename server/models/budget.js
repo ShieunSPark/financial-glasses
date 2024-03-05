@@ -238,7 +238,20 @@ const allCategories = [
 const BudgetSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   categories: { type: Array, required: true, default: allCategories },
-  monthlySpending: { type: Array, required: true, default: [] },
+  monthlySpending: [
+    {
+      month: Number,
+      year: Number,
+      categories: [
+        {
+          name: String,
+          sum: Number,
+          isTracked: Boolean,
+          budgetAmount: Number,
+        },
+      ],
+    },
+  ],
 });
 
 // Virtual for budget's URL
