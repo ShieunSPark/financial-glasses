@@ -6,23 +6,25 @@ import { HiPencilAlt, HiTrash } from "react-icons/hi";
 
 import dashboardRequest from "../api/dashboardRequest";
 import dashboardChartRequest from "../api/dashboardChartRequest";
-import categoriesRequest from "../api/categoriesRequest";
+import monthlySpendingRequest from "../api/monthlySpendingRequest";
 
 import TrackedCategory from "../components/TrackedCategory";
 import ConfirmDelete from "../components/ConfirmDelete";
 
 export default function Budget() {
   const [isLoading, setIsLoading] = useState(true);
-  const [chartData, setChartData] = useState([]);
-  const [buttonClicked, setButtonClicked] = useState(false);
+  const [monthlySpending, setMonthlySpending] = useState([]);
   const [trackedCategories, setTrackedCategories] = useState([]);
+  // const [chartData, setChartData] = useState([]);
+  const [buttonClicked, setButtonClicked] = useState(false);
   const [editClicked, setEditClicked] = useState(false);
   const [deleteClicked, setDeleteClicked] = useState(false);
   const [currentTrackedCategory, setCurrentTrackedCategory] = useState("");
   const [currentBudgetAmount, setCurrentBudgetAmount] = useState(0);
   const [isUpdated, setIsUpdated] = useState(false);
+  // '0' = Jan, '1' = Feb, etc. Add 1 to it when displaying info to the user
   const [selectedMonthNum, setSelectedMonthNum] = useState(
-    new Date().getMonth() + 1
+    new Date().getMonth()
   );
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
@@ -41,26 +43,45 @@ export default function Budget() {
     verifyLoggedIn();
   }, []);
 
-  // Get sums of each category from current month's transactions
+  // // Get sums of each category from current month's transactions
+  // useEffect(() => {
+  //   const getChartData = async () => {
+  //     const response = await dashboardChartRequest();
+  //     setChartData(response.categoriesSum);
+  //     setIsUpdated(false);
+  //   };
+
+  //   getChartData();
+  // }, [isUpdated]);
+
+  // Get all monthly spending
   useEffect(() => {
-    const getChartData = async () => {
-      const response = await dashboardChartRequest();
-      setChartData(response.categoriesSum);
-      setIsUpdated(false);
+    const getMonthlySpending = async () => {
+      const response = await monthlySpendingRequest();
+      setMonthlySpending(response.budget.monthlySpending);
     };
 
-    getChartData();
+    getMonthlySpending();
   }, [isUpdated]);
 
-  // Get tracked categories
+  // Get currently tracked month's spending
   useEffect(() => {
-    const getTrackedCategories = async () => {
-      const response = await categoriesRequest();
-      setTrackedCategories(response.budget.trackedCategories);
+    const getSelectedMonthSpending = async () => {
+      const selected = monthlySpending.filter(
+        (entry) =>
+          entry.month === selectedMonthNum && entry.year === selectedYear
+      );
+      if (selected.length === 1) {
+        setTrackedCategories(
+          selected[0].categories.filter(
+            (category) => category.isTracked === true
+          )
+        );
+      }
     };
 
-    getTrackedCategories();
-  }, [isUpdated]);
+    getSelectedMonthSpending();
+  }, [isUpdated, monthlySpending, selectedMonthNum, selectedYear]);
 
   useEffect(() => {
     const delay = (milliseconds) =>
@@ -89,9 +110,11 @@ export default function Budget() {
           <TrackedCategory
             option="add"
             currentTrackedCategory={null}
-            setCurrentTrackedCategory={null}
+            setCurrentTrackedCategory={setCurrentTrackedCategory}
             currentBudgetAmount={null}
-            setCurrentBudgetAmount={null}
+            setCurrentBudgetAmount={setCurrentBudgetAmount}
+            selectedMonthNum={selectedMonthNum}
+            selectedYear={selectedYear}
             onClose={() => {
               setButtonClicked(false);
               setIsUpdated(true);
@@ -118,6 +141,8 @@ export default function Budget() {
             setCurrentTrackedCategory={setCurrentTrackedCategory}
             currentBudgetAmount={currentBudgetAmount}
             setCurrentBudgetAmount={setCurrentBudgetAmount}
+            selectedMonthNum={selectedMonthNum}
+            selectedYear={selectedYear}
             onClose={() => {
               setEditClicked(false);
               setIsUpdated(true);
@@ -128,7 +153,7 @@ export default function Budget() {
       )}
       <div className="text-xl mx-auto pt-4">
         {`${Intl.DateTimeFormat("en", { month: "long" }).format(
-          new Date(selectedMonthNum.toString())
+          new Date((selectedMonthNum + 1).toString())
         )} ${selectedYear}`}
       </div>
       <div className="grid grid-cols-12 h-12 pt-2">
@@ -136,7 +161,7 @@ export default function Budget() {
           <div
             key={monthNum + 1}
             className={`flex justify-center items-center w-full border-2 ${
-              selectedMonthNum === monthNum + 1
+              selectedMonthNum === monthNum
                 ? "bg-slate-200 dark:bg-slate-600"
                 : null
             } ${
@@ -148,7 +173,7 @@ export default function Budget() {
             onClick={
               monthNum <= new Date().getMonth() &&
               new Date().getFullYear() === selectedYear
-                ? () => setSelectedMonthNum(monthNum + 1)
+                ? () => setSelectedMonthNum(monthNum)
                 : null
             }
           >
@@ -181,94 +206,82 @@ export default function Budget() {
         leaveTo="opacity-0"
       >
         {trackedCategories.map((trackedCategory) => {
-          const total = chartData.find(
-            (category) => category.category === trackedCategory.trackedCategory
-          );
-          if (total) {
-            const percentage =
-              (total.total / trackedCategory.budgetAmount) * 100;
+          const total = trackedCategory.sum;
 
-            return (
-              <div
-                key={trackedCategory.trackedCategory}
-                className="flex flex-col items-center"
-              >
-                <div className="w-full relative">
-                  <div className="flex justify-between items-end pt-2">
-                    <div className="pb-1">
-                      {trackedCategory.trackedCategory}
-                    </div>
-                    <div className="pb-1 text-sm">
-                      ${total.total.toFixed()} of $
-                      {trackedCategory.budgetAmount}
-                    </div>
+          const percentage = (total / trackedCategory.budgetAmount) * 100;
+
+          return (
+            <div
+              key={trackedCategory.name}
+              className="flex flex-col items-center"
+            >
+              <div className="w-full relative">
+                <div className="flex justify-between items-end pt-2">
+                  <div className="pb-1">{trackedCategory.name}</div>
+                  <div className="pb-1 text-sm">
+                    ${total.total.toFixed()} of ${trackedCategory.budgetAmount}
                   </div>
-                  <div className="h-6 bg-gray-300 rounded-full">
-                    <div
-                      style={{
-                        width: `${
-                          isLoading ? 0 : percentage > 100 ? 100 : percentage
-                        }%`,
+                </div>
+                <div className="h-6 bg-gray-300 rounded-full">
+                  <div
+                    style={{
+                      width: `${
+                        isLoading ? 0 : percentage > 100 ? 100 : percentage
+                      }%`,
+                    }}
+                    className={`flex justify-end items-center h-full ${
+                      percentage < 80
+                        ? "bg-green-600"
+                        : percentage < 100
+                        ? "bg-yellow-600"
+                        : "bg-red-600"
+                    } transition-all duration-1000 ease-out rounded-full`}
+                  ></div>
+                </div>
+                <div className="absolute top-4 -right-12 flex flex-col">
+                  <div className="text-xs italic text-left pb-1.5">
+                    ({percentage.toFixed()}%)
+                  </div>
+                  <div className="flex">
+                    <button
+                      onClick={() => {
+                        setEditClicked(true);
+                        setCurrentTrackedCategory(trackedCategory.name);
+                        setCurrentBudgetAmount(trackedCategory.budgetAmount);
                       }}
-                      className={`flex justify-end items-center h-full ${
-                        percentage < 80
-                          ? "bg-green-600"
-                          : percentage < 100
-                          ? "bg-yellow-600"
-                          : "bg-red-600"
-                      } transition-all duration-1000 ease-out rounded-full`}
-                    ></div>
-                  </div>
-                  <div className="absolute top-4 -right-12 flex flex-col">
-                    <div className="text-xs italic text-left pb-1.5">
-                      ({percentage.toFixed()}%)
-                    </div>
-                    <div className="flex">
-                      <button
-                        onClick={() => {
-                          setEditClicked(true);
-                          setCurrentTrackedCategory(
-                            trackedCategory.trackedCategory
-                          );
-                          setCurrentBudgetAmount(trackedCategory.budgetAmount);
+                    >
+                      <HiPencilAlt
+                        className="text-gray-400 hover:text-gray-600"
+                        size={"20"}
+                      />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setDeleteClicked(true);
+                        setCurrentTrackedCategory(trackedCategory.name);
+                      }}
+                    >
+                      <HiTrash
+                        className="text-gray-400 hover:text-gray-600"
+                        size={"20"}
+                      />
+                    </button>
+                    {currentTrackedCategory === trackedCategory.name && (
+                      <ConfirmDelete
+                        show={deleteClicked}
+                        accountID={null}
+                        trackedCategory={currentTrackedCategory}
+                        onClose={() => {
+                          setDeleteClicked(false);
+                          setIsUpdated(true);
                         }}
-                      >
-                        <HiPencilAlt
-                          className="text-gray-400 hover:text-gray-600"
-                          size={"20"}
-                        />
-                      </button>
-                      <button
-                        onClick={() => {
-                          setDeleteClicked(true);
-                          setCurrentTrackedCategory(
-                            trackedCategory.trackedCategory
-                          );
-                        }}
-                      >
-                        <HiTrash
-                          className="text-gray-400 hover:text-gray-600"
-                          size={"20"}
-                        />
-                      </button>
-                      {currentTrackedCategory ===
-                        trackedCategory.trackedCategory && (
-                        <ConfirmDelete
-                          show={deleteClicked}
-                          accountID={null}
-                          trackedCategory={currentTrackedCategory}
-                          onClose={() => {
-                            setDeleteClicked(false);
-                            setIsUpdated(true);
-                          }}
-                        />
-                      )}
-                    </div>
+                      />
+                    )}
                   </div>
                 </div>
               </div>
-            );
-          }
+            </div>
+          );
         })}
       </Transition>
     </div>

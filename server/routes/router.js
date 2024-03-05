@@ -106,11 +106,11 @@ router.get(
 // GET profile
 router.get("/profile", checkLoggedIn, dashboard_controller.profile_get);
 
-// GET categories in user's budget)
+// GET all monthly spending in user's budget)
 router.get(
-  "/categoriesTotals",
+  "/monthlySpending",
   checkLoggedIn,
-  dashboard_controller.categoriesTotals_get
+  dashboard_controller.monthlySpending_get
 );
 
 // UPDATE tracked categories in user's budget

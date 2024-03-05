@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useCombobox } from "downshift";
 import PropTypes from "prop-types";
 
-import categoriesRequest from "../api/categoriesRequest";
+import categoriesRequest from "../api/monthlySpendingRequest";
 
 export default function CategoryDropdown({
   index,
