@@ -190,6 +190,8 @@ export default function Dashboard() {
                                 accountName={selectedAccountName}
                                 itemName={selectedItem}
                                 trackedCategory={null}
+                                selectedMonthNum={null}
+                                selectedYear={null}
                                 onClose={() => setShowConfirm(false)}
                               />
                             )}

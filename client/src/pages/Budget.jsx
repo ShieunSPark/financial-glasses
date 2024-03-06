@@ -21,7 +21,7 @@ export default function Budget() {
   const [deleteClicked, setDeleteClicked] = useState(false);
   const [currentTrackedCategory, setCurrentTrackedCategory] = useState("");
   const [currentBudgetAmount, setCurrentBudgetAmount] = useState(0);
-  const [isUpdated, setIsUpdated] = useState(false);
+  const [isUpdated, setIsUpdated] = useState(true);
   // '0' = Jan, '1' = Feb, etc. Add 1 to it when displaying info to the user
   const [selectedMonthNum, setSelectedMonthNum] = useState(
     new Date().getMonth()
@@ -59,9 +59,10 @@ export default function Budget() {
     const getMonthlySpending = async () => {
       const response = await monthlySpendingRequest();
       setMonthlySpending(response.budget.monthlySpending);
+      setIsUpdated(false);
     };
 
-    getMonthlySpending();
+    if (isUpdated) getMonthlySpending();
   }, [isUpdated]);
 
   // Get currently tracked month's spending
@@ -77,6 +78,8 @@ export default function Budget() {
             (category) => category.isTracked === true
           )
         );
+      } else {
+        setTrackedCategories([]);
       }
     };
 
@@ -195,26 +198,25 @@ export default function Budget() {
           Add a Category to Track
         </button>
       </div>
-      <Transition
-        appear={true}
-        show={true}
-        enter="transition duration-700 ease-in-out"
-        enterFrom="opacity-0"
-        enterTo="opacity-100"
-        leave="transition duration-700 ease-in-out"
-        leaveFrom="opacity-100"
-        leaveTo="opacity-0"
-      >
-        {trackedCategories.map((trackedCategory) => {
-          const total = trackedCategory.sum;
 
-          const percentage = (total / trackedCategory.budgetAmount) * 100;
+      {trackedCategories.map((trackedCategory) => {
+        const total = trackedCategory.sum;
 
-          return (
-            <div
-              key={trackedCategory.name}
-              className="flex flex-col items-center"
-            >
+        const percentage = (total / trackedCategory.budgetAmount) * 100;
+
+        return (
+          <Transition
+            key={trackedCategory.name}
+            appear={true}
+            show={true}
+            enter="transition duration-700 ease-in-out"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="transition duration-700 ease-in-out"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="flex flex-col items-center">
               <div className="w-full relative">
                 <div className="flex justify-between items-end pt-2">
                   <div className="pb-1">{trackedCategory.name}</div>
@@ -269,8 +271,13 @@ export default function Budget() {
                     {currentTrackedCategory === trackedCategory.name && (
                       <ConfirmDelete
                         show={deleteClicked}
+                        setIsLoading={setIsLoading}
                         accountID={null}
+                        accountName={null}
+                        itemName={null}
                         trackedCategory={currentTrackedCategory}
+                        selectedMonthNum={selectedMonthNum}
+                        selectedYear={selectedYear}
                         onClose={() => {
                           setDeleteClicked(false);
                           setIsUpdated(true);
@@ -281,9 +288,9 @@ export default function Budget() {
                 </div>
               </div>
             </div>
-          );
-        })}
-      </Transition>
+          </Transition>
+        );
+      })}
     </div>
   );
 }

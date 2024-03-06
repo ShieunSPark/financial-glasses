@@ -189,7 +189,7 @@ export default function Transactions() {
                 )
               : null}
           </div>
-          {/* For each account, create a Transition as well as a table */}
+          {/* For each account, create a table */}
           <div className="col-span-4 text-center">
             {accounts.map((account) => (
               <TransactionTable

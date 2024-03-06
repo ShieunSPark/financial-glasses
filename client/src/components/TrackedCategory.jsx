@@ -38,11 +38,12 @@ export default function TrackedCategory({
         selectedYear,
       }),
     }).then(() => {
-      onClose();
       // Show loading symbol
       setIsLoading(true);
       setCurrentTrackedCategory(trackedCategory);
       setCurrentBudgetAmount(budgetAmount);
+
+      onClose();
     });
   };
 
