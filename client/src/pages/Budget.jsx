@@ -10,6 +10,7 @@ import monthlySpendingRequest from "../api/monthlySpendingRequest";
 
 import TrackedCategory from "../components/TrackedCategory";
 import ConfirmDelete from "../components/ConfirmDelete";
+import YearDropdown from "../components/YearDropdown";
 
 export default function Budget() {
   const [isLoading, setIsLoading] = useState(true);
@@ -24,9 +25,17 @@ export default function Budget() {
   const [isUpdated, setIsUpdated] = useState(true);
   // '0' = Jan, '1' = Feb, etc. Add 1 to it when displaying info to the user
   const [selectedMonthNum, setSelectedMonthNum] = useState(
-    new Date().getMonth()
+    window.localStorage.getItem("monthNum")
+      ? Number(window.localStorage.getItem("monthNum"))
+      : new Date().getMonth()
   );
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedYear, setSelectedYear] = useState(
+    window.localStorage.getItem("year")
+      ? Number(window.localStorage.getItem("year"))
+      : Number(new Date().getFullYear())
+  );
+  const [earliestMonthNum, setEarliestMonthNum] = useState(0);
+  const [earliestYear, setEarliestYear] = useState(0);
 
   const navigate = useNavigate();
 
@@ -59,6 +68,8 @@ export default function Budget() {
     const getMonthlySpending = async () => {
       const response = await monthlySpendingRequest();
       setMonthlySpending(response.budget.monthlySpending);
+      setEarliestMonthNum(response.budget.monthlySpending[0].month);
+      setEarliestYear(response.budget.monthlySpending[0].year);
       setIsUpdated(false);
     };
 
@@ -81,11 +92,16 @@ export default function Budget() {
       } else {
         setTrackedCategories([]);
       }
+
+      setIsLoading(true);
     };
 
     getSelectedMonthSpending();
   }, [isUpdated, monthlySpending, selectedMonthNum, selectedYear]);
 
+  // Find earliest month and year within transactions
+
+  // Delay to see bars fill up
   useEffect(() => {
     const delay = (milliseconds) =>
       new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -154,10 +170,20 @@ export default function Budget() {
         </Transition>,
         document.body
       )}
-      <div className="text-xl mx-auto pt-4">
-        {`${Intl.DateTimeFormat("en", { month: "long" }).format(
-          new Date((selectedMonthNum + 1).toString())
-        )} ${selectedYear}`}
+      <div className="flex justify-between items-center pt-4">
+        <div className="text-xl">
+          {`${Intl.DateTimeFormat("en", { month: "long" }).format(
+            new Date((selectedMonthNum + 1).toString())
+          )} ${selectedYear}`}
+        </div>
+        <YearDropdown
+          earliestYear={earliestYear}
+          selectedYear={Number(selectedYear)}
+          setSelectedYear={setSelectedYear}
+          earliestMonthNum={earliestMonthNum}
+          selectedMonthNum={selectedMonthNum}
+          setSelectedMonthNum={setSelectedMonthNum}
+        />
       </div>
       <div className="grid grid-cols-12 h-12 pt-2">
         {[...Array(12)].map((value, monthNum) => (
@@ -168,15 +194,24 @@ export default function Budget() {
                 ? "bg-slate-200 dark:bg-slate-600"
                 : null
             } ${
-              monthNum <= new Date().getMonth() &&
-              new Date().getFullYear() === selectedYear
+              (selectedYear < new Date().getFullYear() &&
+                selectedYear > earliestYear) ||
+              (selectedYear === new Date().getFullYear() &&
+                monthNum <= new Date().getMonth()) ||
+              (selectedYear === earliestYear && monthNum >= earliestMonthNum)
                 ? "cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-600"
                 : "opacity-50"
             }`}
             onClick={
-              monthNum <= new Date().getMonth() &&
-              new Date().getFullYear() === selectedYear
-                ? () => setSelectedMonthNum(monthNum)
+              (selectedYear < new Date().getFullYear() &&
+                selectedYear > earliestYear) ||
+              (selectedYear === new Date().getFullYear() &&
+                monthNum <= new Date().getMonth()) ||
+              (selectedYear === earliestYear && monthNum >= earliestMonthNum)
+                ? () => {
+                    setSelectedMonthNum(monthNum);
+                    window.localStorage.setItem("monthNum", monthNum);
+                  }
                 : null
             }
           >
