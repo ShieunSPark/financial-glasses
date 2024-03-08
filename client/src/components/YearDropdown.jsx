@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import Select from "react-select";
+import { Transition } from "@headlessui/react";
 
 export default function YearDropdown({
   earliestYear,
@@ -56,20 +57,29 @@ export default function YearDropdown({
     },
   };
 
-  if (arrayOfYears.length > 0)
-    return (
-      // <select
-      //   name="year"
-      //   value={selectedYear}
-      //   className="p-2 dark:bg-slate-600 "
-      //   onChange={handleChange}
-      // >
-      //   {arrayOfYears.map((year) => (
-      //     <option key={year} value={year} className="focus:bg-slate-100">
-      //       {year}
-      //     </option>
-      //   ))}
-      // </select>
+  return (
+    // <select
+    //   name="year"
+    //   value={selectedYear}
+    //   className="p-2 dark:bg-slate-600 "
+    //   onChange={handleChange}
+    // >
+    //   {arrayOfYears.map((year) => (
+    //     <option key={year} value={year} className="focus:bg-slate-100">
+    //       {year}
+    //     </option>
+    //   ))}
+    // </select>
+    <Transition
+      appear={true}
+      show={arrayOfYears.length > 0}
+      enter="transition duration-700 ease-in-out"
+      enterFrom="opacity-0"
+      enterTo="opacity-100"
+      leave="transition duration-700 ease-in-out"
+      leaveFrom="opacity-100"
+      leaveTo="opacity-0"
+    >
       <Select
         //{ year: selectedYear, label: selectedYear }
         defaultValue={arrayOfYears.find((year) => year.value === selectedYear)}
@@ -78,7 +88,8 @@ export default function YearDropdown({
         styles={customStyles}
         onChange={handleChange}
       />
-    );
+    </Transition>
+  );
 }
 
 YearDropdown.propTypes = {

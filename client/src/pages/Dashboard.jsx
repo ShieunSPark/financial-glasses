@@ -8,7 +8,7 @@ import { TokenContext, UserContext } from "../App";
 import plaidCreateLinkTokenRequest from "../api/plaidCreateLinkTokenRequest";
 import plaidSetAccessToken from "../api/plaidSetAccessToken";
 import dashboardRequest from "../api/dashboardRequest";
-import dashboardChartRequest from "../api/dashboardChartRequest";
+import monthlySpendingRequest from "../api/monthlySpendingRequest";
 import accountsRequest from "../api/accountsRequest";
 import transactionsSyncRequest from "../api/transactionsSyncRequest";
 
@@ -87,8 +87,24 @@ export default function Dashboard() {
   // Sync transactions, then update chart data
   useEffect(() => {
     const getChartData = async () => {
-      const response = await dashboardChartRequest();
-      setChartData(response.categoriesSum);
+      const response = await monthlySpendingRequest();
+      const currentMonthNum = new Date().getMonth();
+      const currentYear = Number(new Date().getFullYear());
+
+      const currentMonthSpending = response.budget.monthlySpending.filter(
+        (entry) => entry.month === currentMonthNum && entry.year === currentYear
+      );
+
+      setChartData(
+        currentMonthSpending !== undefined
+          ? currentMonthSpending.categories
+              .filter((category) => category.sum > 0)
+              .map(({ name, sum, isTracked, budgetAmount }) => ({
+                name: name,
+                value: sum,
+              }))
+          : []
+      );
     };
 
     const syncTransactions = async () => {

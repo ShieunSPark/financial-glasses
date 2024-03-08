@@ -5,7 +5,7 @@ import { Transition } from "@headlessui/react";
 import { HiPencilAlt, HiTrash } from "react-icons/hi";
 
 import dashboardRequest from "../api/dashboardRequest";
-import dashboardChartRequest from "../api/dashboardChartRequest";
+
 import monthlySpendingRequest from "../api/monthlySpendingRequest";
 
 import TrackedCategory from "../components/TrackedCategory";
@@ -106,7 +106,7 @@ export default function Budget() {
     const delay = (milliseconds) =>
       new Promise((resolve) => setTimeout(resolve, milliseconds));
     const delayBudgetBarAnimation = async () => {
-      await delay(500);
+      await delay(250);
       setIsLoading(false);
     };
     delayBudgetBarAnimation();
@@ -170,7 +170,7 @@ export default function Budget() {
         </Transition>,
         document.body
       )}
-      <div className="flex justify-between items-center pt-4">
+      <div className="flex justify-between items-center pt-4 h-16">
         <div className="text-xl">
           {`${Intl.DateTimeFormat("en", { month: "long" }).format(
             new Date((selectedMonthNum + 1).toString())

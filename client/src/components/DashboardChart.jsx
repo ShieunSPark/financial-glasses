@@ -10,12 +10,6 @@ import {
 import PropTypes from "prop-types";
 
 export default function DashboardChart({ data }) {
-  const [chartData, setChartData] = useState([]);
-
-  useEffect(() => {
-    if (data.length > 0) setChartData(data.filter((sum) => sum.total > 0));
-  }, [data]);
-
   const COLORS = [
     "#fd7f6f",
     "#7eb0d5",
@@ -47,7 +41,7 @@ export default function DashboardChart({ data }) {
       <text
         x={x}
         y={y}
-        fill="white"
+        fill={"#DDDDDD"}
         textAnchor={x > cx ? "start" : "end"}
         dominantBaseline="central"
       >
@@ -61,7 +55,7 @@ export default function DashboardChart({ data }) {
       return (
         <div className="custom-tooltip bg-white p-2 w-full max-w-xs">
           <p className="label text-black text-wrap">{`${
-            payload[0].payload.category
+            payload[0].payload.name
           } : $${payload[0].value.toFixed(2)}`}</p>
         </div>
       );
@@ -72,8 +66,8 @@ export default function DashboardChart({ data }) {
 
   if (data.length === 0) {
     return (
-      <div className="h-[500px] w-5/6 bg-blue-100 dark:bg-blue-900 flex justify-center items-center">
-        <div className="italic">No data to show</div>
+      <div className="h-[500px] w-5/6 bg-slate-700  flex justify-center items-center">
+        <div className="italic text-[#DDDDDD]">No data to show</div>
       </div>
     );
   }
@@ -81,16 +75,15 @@ export default function DashboardChart({ data }) {
     <ResponsiveContainer width="90%" height={500}>
       <PieChart className="bg-slate-700">
         <Pie
-          dataKey="total"
+          dataKey="value"
           isAnimationActive={false}
-          data={chartData}
+          data={data}
           cx="50%"
           cy="45%"
           outerRadius={"70%"}
           fill="#8884d8"
           label={renderCustomizedLabel}
           legendType="square"
-          className="bg-slate-100"
         >
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -100,7 +93,7 @@ export default function DashboardChart({ data }) {
           offset={0}
           formatter={(value, name, props) => [
             `$${value.toFixed(2)}`,
-            `${props.payload.category}`,
+            `${props.payload.name}`,
           ]}
           content={<CustomTooltip />}
         />
@@ -109,9 +102,7 @@ export default function DashboardChart({ data }) {
           align="right"
           verticalAlign="middle"
           formatter={(value, entry, index) => (
-            <div className="w-24 text-xs text-wrap">
-              {entry.payload.category}
-            </div>
+            <div className="w-24 text-xs text-wrap">{entry.payload.name}</div>
           )}
         />
       </PieChart>
