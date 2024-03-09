@@ -96,8 +96,8 @@ export default function Dashboard() {
       );
 
       setChartData(
-        currentMonthSpending !== undefined
-          ? currentMonthSpending.categories
+        currentMonthSpending.length !== 0
+          ? currentMonthSpending[0].categories
               .filter((category) => category.sum > 0)
               .map(({ name, sum, isTracked, budgetAmount }) => ({
                 name: name,

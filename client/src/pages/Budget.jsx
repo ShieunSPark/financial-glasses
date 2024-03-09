@@ -10,13 +10,13 @@ import monthlySpendingRequest from "../api/monthlySpendingRequest";
 
 import TrackedCategory from "../components/TrackedCategory";
 import ConfirmDelete from "../components/ConfirmDelete";
+import DashboardChart from "../components/DashboardChart";
 import YearDropdown from "../components/YearDropdown";
 
 export default function Budget() {
   const [isLoading, setIsLoading] = useState(true);
   const [monthlySpending, setMonthlySpending] = useState([]);
   const [trackedCategories, setTrackedCategories] = useState([]);
-  // const [chartData, setChartData] = useState([]);
   const [buttonClicked, setButtonClicked] = useState(false);
   const [editClicked, setEditClicked] = useState(false);
   const [deleteClicked, setDeleteClicked] = useState(false);
@@ -36,6 +36,7 @@ export default function Budget() {
   );
   const [earliestMonthNum, setEarliestMonthNum] = useState(0);
   const [earliestYear, setEarliestYear] = useState(0);
+  const [chartData, setChartData] = useState([]);
 
   const navigate = useNavigate();
 
@@ -89,8 +90,19 @@ export default function Budget() {
             (category) => category.isTracked === true
           )
         );
+        setChartData(
+          selected.length !== 0
+            ? selected[0].categories
+                .filter((category) => category.sum > 0)
+                .map(({ name, sum, isTracked, budgetAmount }) => ({
+                  name: name,
+                  value: sum,
+                }))
+            : []
+        );
       } else {
         setTrackedCategories([]);
+        setChartData([]);
       }
 
       setIsLoading(true);
@@ -223,6 +235,9 @@ export default function Budget() {
           </div>
         ))}
       </div>
+      <div className="flex justify-center pt-3">
+        <DashboardChart data={chartData} />
+      </div>
       <div className="flex justify-center m-2 pt-2">
         <button
           className=" p-2 transition ease-in-out delay-50 bg-blue-500 text-white rounded-md hover:bg-indigo-500"
@@ -234,98 +249,116 @@ export default function Budget() {
         </button>
       </div>
 
-      {trackedCategories.map((trackedCategory) => {
-        const total = trackedCategory.sum;
+      {trackedCategories.length === 0 ? (
+        <Transition
+          appear={true}
+          show={true}
+          enter="transition duration-700 ease-in-out"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="transition duration-700 ease-in-out"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className="flex justify-center">
+            No tracked categories for this month. Add a category via the button
+            above!
+          </div>
+        </Transition>
+      ) : (
+        trackedCategories.map((trackedCategory) => {
+          const total = trackedCategory.sum;
 
-        const percentage = (total / trackedCategory.budgetAmount) * 100;
+          const percentage = (total / trackedCategory.budgetAmount) * 100;
 
-        return (
-          <Transition
-            key={trackedCategory.name}
-            appear={true}
-            show={true}
-            enter="transition duration-700 ease-in-out"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="transition duration-700 ease-in-out"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="flex flex-col items-center">
-              <div className="w-full relative">
-                <div className="flex justify-between items-end pt-2">
-                  <div className="pb-1">{trackedCategory.name}</div>
-                  <div className="pb-1 text-sm">
-                    ${total.toFixed()} of ${trackedCategory.budgetAmount}
+          return (
+            <Transition
+              key={trackedCategory.name}
+              appear={true}
+              show={true}
+              enter="transition duration-700 ease-in-out"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="transition duration-700 ease-in-out"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <div className="flex flex-col items-center">
+                <div className="w-full relative">
+                  <div className="flex justify-between items-end pt-2">
+                    <div className="pb-1">{trackedCategory.name}</div>
+                    <div className="pb-1 text-sm">
+                      ${total.toFixed()} of ${trackedCategory.budgetAmount}
+                    </div>
                   </div>
-                </div>
-                <div className="h-6 bg-gray-300 rounded-full">
-                  <div
-                    style={{
-                      width: `${
-                        isLoading ? 0 : percentage > 100 ? 100 : percentage
-                      }%`,
-                    }}
-                    className={`flex justify-end items-center h-full ${
-                      percentage < 80
-                        ? "bg-green-600"
-                        : percentage < 100
-                        ? "bg-yellow-600"
-                        : "bg-red-600"
-                    } transition-all duration-1000 ease-out rounded-full`}
-                  ></div>
-                </div>
-                <div className="absolute top-4 -right-12 flex flex-col">
-                  <div className="text-xs italic text-left pb-1.5">
-                    ({percentage.toFixed()}%)
+                  <div className="h-6 bg-gray-300 rounded-full">
+                    <div
+                      style={{
+                        width: `${
+                          isLoading ? 0 : percentage > 100 ? 100 : percentage
+                        }%`,
+                      }}
+                      className={`flex justify-end items-center h-full ${
+                        percentage < 80
+                          ? "bg-green-600"
+                          : percentage < 100
+                          ? "bg-yellow-600"
+                          : "bg-red-600"
+                      } transition-all duration-1000 ease-out rounded-full`}
+                    ></div>
                   </div>
-                  <div className="flex">
-                    <button
-                      onClick={() => {
-                        setEditClicked(true);
-                        setCurrentTrackedCategory(trackedCategory.name);
-                        setCurrentBudgetAmount(trackedCategory.budgetAmount);
-                      }}
-                    >
-                      <HiPencilAlt
-                        className="text-gray-400 hover:text-gray-600"
-                        size={"20"}
-                      />
-                    </button>
-                    <button
-                      onClick={() => {
-                        setDeleteClicked(true);
-                        setCurrentTrackedCategory(trackedCategory.name);
-                      }}
-                    >
-                      <HiTrash
-                        className="text-gray-400 hover:text-gray-600"
-                        size={"20"}
-                      />
-                    </button>
-                    {currentTrackedCategory === trackedCategory.name && (
-                      <ConfirmDelete
-                        show={deleteClicked}
-                        setIsLoading={setIsLoading}
-                        accountID={null}
-                        accountName={null}
-                        itemName={null}
-                        trackedCategory={currentTrackedCategory}
-                        selectedMonthNum={selectedMonthNum}
-                        selectedYear={selectedYear}
-                        onClose={() => {
-                          setDeleteClicked(false);
-                          setIsUpdated(true);
+                  <div className="absolute top-4 -right-12 flex flex-col">
+                    <div className="text-xs italic text-left pb-1.5">
+                      ({percentage.toFixed()}%)
+                    </div>
+                    <div className="flex">
+                      <button
+                        onClick={() => {
+                          setEditClicked(true);
+                          setCurrentTrackedCategory(trackedCategory.name);
+                          setCurrentBudgetAmount(trackedCategory.budgetAmount);
                         }}
-                      />
-                    )}
+                      >
+                        <HiPencilAlt
+                          className="text-gray-400 hover:text-gray-600"
+                          size={"20"}
+                        />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setDeleteClicked(true);
+                          setCurrentTrackedCategory(trackedCategory.name);
+                        }}
+                      >
+                        <HiTrash
+                          className="text-gray-400 hover:text-gray-600"
+                          size={"20"}
+                        />
+                      </button>
+                      {currentTrackedCategory === trackedCategory.name && (
+                        <ConfirmDelete
+                          show={deleteClicked}
+                          setIsLoading={setIsLoading}
+                          accountID={null}
+                          accountName={null}
+                          itemName={null}
+                          trackedCategory={currentTrackedCategory}
+                          selectedMonthNum={selectedMonthNum}
+                          selectedYear={selectedYear}
+                          onClose={() => {
+                            setDeleteClicked(false);
+                            setIsUpdated(true);
+                          }}
+                        />
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </Transition>
-        );
-      })}
+            </Transition>
+          );
+        })
+      )}
     </div>
   );
 }
