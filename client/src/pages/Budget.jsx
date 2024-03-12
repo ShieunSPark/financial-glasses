@@ -8,10 +8,10 @@ import dashboardRequest from "../api/dashboardRequest";
 
 import monthlySpendingRequest from "../api/monthlySpendingRequest";
 
-import TrackedCategory from "../components/TrackedCategory";
-import ConfirmDelete from "../components/ConfirmDelete";
-import DashboardChart from "../components/DashboardChart";
-import YearDropdown from "../components/YearDropdown";
+import TrackedCategory from "../components/Modal/TrackedCategory";
+import ConfirmDelete from "../components/Modal/ConfirmDelete";
+import DashboardChart from "../components/Chart/DashboardChart";
+import YearDropdown from "../components/Dropdown/YearDropdown";
 
 export default function Budget() {
   const [isLoading, setIsLoading] = useState(true);

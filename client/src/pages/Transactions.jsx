@@ -8,8 +8,8 @@ import accountsRequest from "../api/accountsRequest";
 import transactionsRequest from "../api/transactionsRequest";
 import transactionPutRequest from "../api/transactionPutRequest";
 
-import LoadingSpinner from "../components/LoadingSpinner";
-import TransactionTable from "../components/TransactionTable";
+import LoadingSpinner from "../components/Spinner/LoadingSpinner";
+import TransactionTable from "../components/Table/TransactionTable";
 
 export default function Transactions() {
   const { user, setUser } = useContext(UserContext);

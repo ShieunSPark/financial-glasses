@@ -3,8 +3,8 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Menu, Transition } from "@headlessui/react";
 import { HiDotsVertical } from "react-icons/hi";
 
-import { TokenContext, UserContext } from "../App";
-import logo from "../assets/fgLogo.svg";
+import { TokenContext, UserContext } from "../../App";
+import logo from "../../assets/fgLogo.svg";
 
 export default function Navbar() {
   // const { JWTtoken, setJWTtoken } = useContext(TokenContext);

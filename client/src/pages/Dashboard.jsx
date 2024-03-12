@@ -12,10 +12,10 @@ import monthlySpendingRequest from "../api/monthlySpendingRequest";
 import accountsRequest from "../api/accountsRequest";
 import transactionsSyncRequest from "../api/transactionsSyncRequest";
 
-import ConfirmDelete from "../components/ConfirmDelete";
+import ConfirmDelete from "../components/Modal/ConfirmDelete";
 // import DialogDelete from "../components/DialogDelete";
-import LoadingSpinner from "../components/LoadingSpinner";
-import DashboardChart from "../components/DashboardChart";
+import LoadingSpinner from "../components/Spinner/LoadingSpinner";
+import DashboardChart from "../components/Chart/DashboardChart";
 
 export default function Dashboard() {
   // const { JWTtoken, setJWTtoken } = useContext(TokenContext);

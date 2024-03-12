@@ -1,9 +1,9 @@
 import { useContext, useState } from "react";
 import { HiXCircle } from "react-icons/hi";
 
-import { UserContext } from "../App";
-import LoadingSpinner from "./LoadingSpinner";
-import CategoryDropdown from "./CategoryDropdown";
+import { UserContext } from "../../App";
+import LoadingSpinner from "../Spinner/LoadingSpinner";
+import CategoryDropdown from "../Dropdown/CategoryDropdown";
 
 export default function TrackedCategory({
   option,

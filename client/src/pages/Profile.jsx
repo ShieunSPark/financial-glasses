@@ -6,7 +6,7 @@ import { Transition } from "@headlessui/react";
 import { UserContext } from "../App";
 import profileRequest from "../api/profileRequest";
 
-import LoadingSpinner from "../components/LoadingSpinner";
+import LoadingSpinner from "../components/Spinner/LoadingSpinner";
 
 export default function Profile() {
   const { user, setUser } = useContext(UserContext);

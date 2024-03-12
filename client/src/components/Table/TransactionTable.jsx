@@ -10,7 +10,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import CategoryDropdown from "../components/CategoryDropdown";
+import CategoryDropdown from "../Dropdown/CategoryDropdown";
 
 export default function TransactionTable({
   show,

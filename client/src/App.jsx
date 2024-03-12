@@ -1,12 +1,12 @@
 import { createContext, useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import Error from "./components/Error";
+import Error from "./components/Error/Error";
 
 import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
-import Navbar from "./components/Navbar";
+import Navbar from "./components/Navbar/Navbar";
 import Dashboard from "./pages/Dashboard";
 import Transactions from "./pages/Transactions";
 import Budget from "./pages/Budget";
