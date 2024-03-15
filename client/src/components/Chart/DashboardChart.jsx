@@ -9,7 +9,7 @@ import {
 } from "recharts";
 import PropTypes from "prop-types";
 
-export default function DashboardChart({ data }) {
+export default function DashboardChart({ data, width, height }) {
   const COLORS = [
     "#fd7f6f",
     "#7eb0d5",
@@ -41,12 +41,31 @@ export default function DashboardChart({ data }) {
       <text
         x={x}
         y={y}
-        fill={"#DDDDDD"}
+        fill={
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "#FFFFFF"
+            : "#000000"
+        }
         textAnchor={x > cx ? "start" : "end"}
         dominantBaseline="central"
       >
         {`${(percent * 100).toFixed(0)}%`}
       </text>
+    );
+  };
+
+  const renderLegend = (props) => {
+    const { payload } = props;
+
+    return (
+      <ul className="w-32">
+        {payload.map((entry, index) => (
+          <div key={`item-${index}`}>
+            <li className={`text-[${entry.color}]`}>&#9632; {entry.value}</li>
+          </div>
+        ))}
+      </ul>
     );
   };
 
@@ -66,14 +85,16 @@ export default function DashboardChart({ data }) {
 
   if (data.length === 0) {
     return (
-      <div className="h-[500px] w-5/6 bg-slate-700  flex justify-center items-center">
-        <div className="italic text-[#DDDDDD]">No data to show</div>
+      <div
+        className={`h-[400px] w-5/6 bg-neutral-50 dark:bg-neutral-600  flex justify-center items-center`}
+      >
+        <div className="italic text-black dark:text-white">No data to show</div>
       </div>
     );
   }
   return (
-    <ResponsiveContainer width="90%" height={500}>
-      <PieChart className="bg-slate-700">
+    <ResponsiveContainer width={width} height={height}>
+      <PieChart className="bg-neutral-50 dark:bg-neutral-600">
         <Pie
           dataKey="value"
           isAnimationActive={false}
@@ -81,7 +102,6 @@ export default function DashboardChart({ data }) {
           cx="50%"
           cy="45%"
           outerRadius={"70%"}
-          fill="#8884d8"
           label={renderCustomizedLabel}
           legendType="square"
         >
@@ -102,8 +122,9 @@ export default function DashboardChart({ data }) {
           align="right"
           verticalAlign="middle"
           formatter={(value, entry, index) => (
-            <div className="w-24 text-xs text-wrap">{entry.payload.name}</div>
+            <div className="w-32 text-xs text-wrap">{entry.payload.name}</div>
           )}
+          // content={renderLegend}
         />
       </PieChart>
     </ResponsiveContainer>

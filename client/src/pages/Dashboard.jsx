@@ -16,6 +16,7 @@ import ConfirmDelete from "../components/Modal/ConfirmDelete";
 // import DialogDelete from "../components/DialogDelete";
 import LoadingSpinner from "../components/Spinner/LoadingSpinner";
 import DashboardChart from "../components/Chart/DashboardChart";
+import TransactionTable from "../components/Table/TransactionTable";
 
 export default function Dashboard() {
   // const { JWTtoken, setJWTtoken } = useContext(TokenContext);
@@ -221,7 +222,9 @@ export default function Dashboard() {
           </div>
           <div className="col-span-2 flex flex-col items-center">
             <h2 className="pt-4">{`This Month's Spending`}</h2>
-            <DashboardChart data={chartData} />
+            <DashboardChart data={chartData} width={"90%"} height={400} />
+            <h2 className="pt-4">Most Recent Transactions</h2>
+            {/* <TransactionTable /> */}
           </div>
         </div>
       </div>

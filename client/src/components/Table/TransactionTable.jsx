@@ -113,7 +113,7 @@ export default function TransactionTable({
         <div className="flex flex-col justify-between h-[650px]">
           <div className="overflow-y-auto">
             <table className="h-5/6 table-fixed w-full text-sm text-left rtl:text-right text-gray-600 dark:text-gray-400 ">
-              <thead className="h-12 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-400 uppercase sticky top-0">
+              <thead className="h-12 text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-400 uppercase sticky top-0">
                 {table.getHeaderGroups().map((headerGroup) => (
                   <tr key={headerGroup.id}>
                     {headerGroup.headers.map((header) => (
@@ -152,7 +152,7 @@ export default function TransactionTable({
                   return (
                     <tr
                       key={row.id}
-                      className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-200 hover:dark:bg-gray-600"
+                      className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 hover:dark:bg-gray-600"
                       onClick={
                         selectedButton === row.original.transaction_id
                           ? (e) => e.stopPropagation()

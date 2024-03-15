@@ -236,7 +236,7 @@ export default function Budget() {
         ))}
       </div>
       <div className="flex justify-center pt-3">
-        <DashboardChart data={chartData} />
+        <DashboardChart data={chartData} width={"90%"} height={500}/>
       </div>
       <div className="flex justify-center m-2 pt-2">
         <button
