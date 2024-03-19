@@ -94,6 +94,15 @@ export default function Budget() {
           selected.length !== 0
             ? selected[0].categories
                 .filter((category) => category.sum > 0)
+                .sort((a, b) => {
+                  let categoryA = a.name.toUpperCase();
+                  let categoryB = b.name.toUpperCase();
+                  return categoryA < categoryB
+                    ? -1
+                    : categoryA > categoryB
+                    ? 1
+                    : 0;
+                })
                 .map(({ name, sum, isTracked, budgetAmount }) => ({
                   name: name,
                   value: sum,
@@ -236,7 +245,7 @@ export default function Budget() {
         ))}
       </div>
       <div className="flex justify-center pt-3">
-        <DashboardChart data={chartData} width={"90%"} height={500}/>
+        <DashboardChart data={chartData} width={"90%"} height={500} />
       </div>
       <div className="flex justify-center m-2 pt-2">
         <button

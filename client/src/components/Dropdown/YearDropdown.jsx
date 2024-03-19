@@ -36,14 +36,19 @@ export default function YearDropdown({
 
   const handleChange = (e) => {
     setSelectedYear(Number(e.value));
-    if (Number(e.value) === earliestYear && selectedMonthNum < earliestMonthNum)
+    if (
+      Number(e.value) === earliestYear &&
+      selectedMonthNum < earliestMonthNum
+    ) {
       setSelectedMonthNum(earliestMonthNum);
-    else if (
+      window.localStorage.setItem("monthNum", earliestMonthNum);
+    } else if (
       Number(e.value) === Number(new Date().getFullYear()) &&
       selectedMonthNum > new Date().getMonth()
-    )
+    ) {
       setSelectedMonthNum(new Date().getMonth());
-
+      window.localStorage.setItem("monthNum", new Date().getMonth());
+    }
     window.localStorage.setItem("year", e.value);
   };
 
