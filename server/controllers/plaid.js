@@ -175,11 +175,13 @@ exports.set_access_token = asyncHandler(async (req, res, next) => {
 // Use RegEx to get rid of underscores, uppercase the first letter of each word,
 // and make all other letters lowercase. (Used in transaction_sync function below)
 const simplifyText = (string) =>
-  string
-    .replace(/_/g, " ")
-    .toLowerCase()
-    .replace(/\b\w/g, (s) => s.toUpperCase())
-    .replace(/\b(And|Or)\b/, (s) => s.toLowerCase());
+  string.toLowerCase === "tv and movies"
+    ? "TV and Movies"
+    : string
+        .replace(/_/g, " ")
+        .toLowerCase()
+        .replace(/\b\w/g, (s) => s.toUpperCase())
+        .replace(/\b(And|Or)\b/, (s) => s.toLowerCase());
 
 exports.transactions_sync = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);

@@ -120,8 +120,22 @@ exports.transactions_get = asyncHandler(async (req, res, next) => {
   }
 });
 
+// Function to clean up all caps primary categories text (e.g., TRAVEL -> Travel)
+const simplifyText = (string) =>
+  string.toLowerCase === "tv and movies"
+    ? "TV and Movies"
+    : string
+        .toLowerCase()
+        .replace(/\b\w/g, (s) => s.toUpperCase())
+        .replace(/\b(And|Or)\b/, (s) => s.toLowerCase());
+
 exports.transaction_put = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
+  const budget = await Budget.findOne({ user: user });
+
+  // let updatedBudget;
+  let initialCategory, newCategory, amount, selectedMonthNum, selectedYear;
+  let categoryWasModified = false;
 
   try {
     // Update the modified name or modified category of the transaction
@@ -136,10 +150,85 @@ exports.transaction_put = asyncHandler(async (req, res, next) => {
     if (
       req.body.modifiedCategory !== "" &&
       transaction.modifiedCategory !== req.body.modifiedCategory
-    )
-      transaction.modifiedCategory = req.body.modifiedCategory;
-    // transaction.markModified("modifiedName");
+    ) {
+      initialCategory = transaction.modifiedCategory;
+      amount = transaction.amount;
+      selectedYear = transaction.date.getFullYear();
+      selectedMonthNum = transaction.date.getMonth();
+      newCategory = simplifyText(req.body.modifiedCategory);
+      transaction.modifiedCategory = newCategory;
+      categoryWasModified = true;
+    }
     await transaction.save();
+
+    if (categoryWasModified) {
+      // Update budget to subtract the amount from its previous category
+      // and add the amount to the new category
+      const localBudget = JSON.parse(JSON.stringify(budget));
+
+      const transactionYear = transaction.date.getFullYear();
+      const transactionMonth = transaction.date.getMonth();
+
+      const databaseMonth = localBudget.monthlySpending.find(
+        (entry) =>
+          entry.year === transactionYear && entry.month === transactionMonth
+      );
+      const databaseCategories = databaseMonth.categories;
+      const databaseInitialCategory = databaseCategories.find(
+        (category) => category.name === initialCategory
+      );
+
+      databaseInitialCategory.sum -= amount;
+      // Remove the initial category from monthlySpending if it is $0
+      if (databaseInitialCategory.sum === 0) {
+        databaseCategories.splice(
+          databaseCategories.findIndex(({ name }) => name === initialCategory),
+          1
+        );
+      }
+
+      // Update new category. Make a category in budget if necessary
+      const databaseNewCategory = databaseCategories.find(
+        (category) => category.name === newCategory
+      );
+
+      if (databaseNewCategory === undefined) {
+        databaseCategories.push({
+          name: newCategory,
+          sum: amount,
+          isTracked: false,
+        });
+      } else {
+        databaseNewCategory.sum += amount;
+      }
+
+      budget.monthlySpending = localBudget.monthlySpending;
+      await budget.save();
+
+      /*
+      updatedBudget = await Budget.findOneAndUpdate(
+        { user: user },
+        {
+          $inc: {
+            "monthlySpending.$[entry].categories.$[trackedCategory].sum":
+              -1 * amount,
+          },
+        },
+        {
+          arrayFilters: [
+            {
+              $and: [
+                { "entry.month": selectedMonthNum },
+                { "entry.year": selectedYear },
+              ],
+            },
+            { "trackedCategory.name": initialCategory },
+          ],
+          new: true,
+        }
+      );
+      */
+    }
   } catch (err) {
     console.log(err);
     res.status(401).json({
@@ -149,7 +238,7 @@ exports.transaction_put = asyncHandler(async (req, res, next) => {
   }
 
   res.json({
-    message: "Transaction updated",
+    message: "Transaction and budget updated",
   });
 });
 
@@ -201,6 +290,8 @@ exports.monthlySpending_get = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
   const budget = await Budget.findOne({ user: user });
 
+  // Separating comparison logic for year and month since trying to filter by two
+  // conditions won't work with shorthand (a, b) => a - b
   budget.monthlySpending.sort((a, b) => {
     // Sort by year first
     if (a.year < b.year) {

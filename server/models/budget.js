@@ -65,8 +65,8 @@ const allCategories = [
     detailed: [
       "Casinos and Gambling",
       "Music and Audio",
-      "Sporting Events Amusement Parks and Museums",
-      "Tv and Movies",
+      "Sporting Events, Amusement Parks, and Museums",
+      "TV and Movies",
       "Video Games",
       "Other Entertainment",
     ],
@@ -74,7 +74,7 @@ const allCategories = [
   {
     primary: "Food and Drink",
     detailed: [
-      "Beer Wine and Liquor",
+      "Beer, Wine, and Liquor",
       "Coffee",
       "Fast Food",
       "Groceries",
