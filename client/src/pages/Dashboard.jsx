@@ -11,12 +11,13 @@ import dashboardRequest from "../api/dashboardRequest";
 import monthlySpendingRequest from "../api/monthlySpendingRequest";
 import accountsRequest from "../api/accountsRequest";
 import transactionsSyncRequest from "../api/transactionsSyncRequest";
+import transactionsRequest from "../api/transactionsRequest";
 
 import ConfirmDelete from "../components/Modal/ConfirmDelete";
 // import DialogDelete from "../components/DialogDelete";
 import LoadingSpinner from "../components/Spinner/LoadingSpinner";
 import DashboardChart from "../components/Chart/DashboardChart";
-import TransactionTable from "../components/Table/TransactionTable";
+import DashboardTable from "../components/Table/DashboardTable";
 
 export default function Dashboard() {
   // const { JWTtoken, setJWTtoken } = useContext(TokenContext);
@@ -31,6 +32,7 @@ export default function Dashboard() {
   const [selectedAccountName, setSelectedAccountName] = useState("");
   const [selectedItem, setSelectedItem] = useState("");
   const [chartData, setChartData] = useState([]);
+  const [recentTransactions, setRecentTransactions] = useState([]);
 
   const navigate = useNavigate();
 
@@ -108,6 +110,12 @@ export default function Dashboard() {
       );
     };
 
+    const getRecentTransations = async () => {
+      const response = await transactionsRequest();
+      setRecentTransactions(response.transactions.slice(0, 20));
+      setIsLoading(false);
+    };
+
     const syncTransactions = async () => {
       transactionsSyncRequest().then(() => {
         getChartData();
@@ -117,6 +125,7 @@ export default function Dashboard() {
 
     if (isLoggedIn) {
       syncTransactions();
+      getRecentTransations();
     }
   }, [isLoggedIn]);
 
@@ -224,7 +233,9 @@ export default function Dashboard() {
             <h2 className="pt-4">{`This Month's Spending`}</h2>
             <DashboardChart data={chartData} width={"90%"} height={400} />
             <h2 className="pt-4">Most Recent Transactions</h2>
-            {/* <TransactionTable /> */}
+            <DashboardTable
+              transactions={recentTransactions}
+            />
           </div>
         </div>
       </div>
