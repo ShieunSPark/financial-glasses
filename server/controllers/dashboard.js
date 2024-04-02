@@ -120,10 +120,19 @@ exports.transactions_get = asyncHandler(async (req, res, next) => {
   }
 });
 
+// Function to clean up all caps primary categories text (e.g., TRAVEL -> Travel)
+const simplifyText = (string) =>
+  string.toLowerCase === "tv and movies"
+    ? "TV and Movies"
+    : string
+        .toLowerCase()
+        .replace(/\b\w/g, (s) => s.toUpperCase())
+        .replace(/\b(And|Or)\b/, (s) => s.toLowerCase());
+
 exports.transaction_put = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
   let updatedBudget;
-  let initialCategory;
+  let initialCategory, amount;
 
   try {
     // Update the modified name or modified category of the transaction
@@ -140,7 +149,8 @@ exports.transaction_put = asyncHandler(async (req, res, next) => {
       transaction.modifiedCategory !== req.body.modifiedCategory
     ) {
       initialCategory = transaction.modifiedCategory;
-      transaction.modifiedCategory = req.body.modifiedCategory;
+      amount = transaction.amount;
+      transaction.modifiedCategory = simplifyText(req.body.modifiedCategory);
     }
     await transaction.save();
 
@@ -150,14 +160,8 @@ exports.transaction_put = asyncHandler(async (req, res, next) => {
       { user: user },
       {
         $set: {
-          "monthlySpending.$[entry].categories.$[trackedCategory].isTracked": false,
-          "monthlySpending.$[entry].categories.$[trackedCategory].budgetAmount": 0,
+          "monthlySpending.$[entry].categories.$[trackedCategory].sum": 0,
         },
-        // $pull: {
-        //   trackedCategories: {
-        //     trackedCategory: req.body.trackedCategory,
-        //   },
-        // },
       },
       {
         arrayFilters: [
@@ -233,6 +237,8 @@ exports.monthlySpending_get = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
   const budget = await Budget.findOne({ user: user });
 
+  // Separating comparison logic for year and month since trying to filter by two
+  // conditions won't work with shorthand (a, b) => a - b
   budget.monthlySpending.sort((a, b) => {
     // Sort by year first
     if (a.year < b.year) {
