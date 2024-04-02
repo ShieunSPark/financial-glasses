@@ -122,6 +122,8 @@ exports.transactions_get = asyncHandler(async (req, res, next) => {
 
 exports.transaction_put = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
+  let updatedBudget;
+  let initialCategory;
 
   try {
     // Update the modified name or modified category of the transaction
@@ -136,10 +138,40 @@ exports.transaction_put = asyncHandler(async (req, res, next) => {
     if (
       req.body.modifiedCategory !== "" &&
       transaction.modifiedCategory !== req.body.modifiedCategory
-    )
+    ) {
+      initialCategory = transaction.modifiedCategory;
       transaction.modifiedCategory = req.body.modifiedCategory;
-    // transaction.markModified("modifiedName");
+    }
     await transaction.save();
+
+    // Update budget to subtract the amount from its previous category
+    // and add the amount to the new category
+    updatedBudget = await Budget.findOneAndUpdate(
+      { user: user },
+      {
+        $set: {
+          "monthlySpending.$[entry].categories.$[trackedCategory].isTracked": false,
+          "monthlySpending.$[entry].categories.$[trackedCategory].budgetAmount": 0,
+        },
+        // $pull: {
+        //   trackedCategories: {
+        //     trackedCategory: req.body.trackedCategory,
+        //   },
+        // },
+      },
+      {
+        arrayFilters: [
+          {
+            $and: [
+              { "entry.month": selectedMonthNum },
+              { "entry.year": selectedYear },
+            ],
+          },
+          { "trackedCategory.name": trackedCategory },
+        ],
+        new: true,
+      }
+    );
   } catch (err) {
     console.log(err);
     res.status(401).json({
@@ -149,7 +181,7 @@ exports.transaction_put = asyncHandler(async (req, res, next) => {
   }
 
   res.json({
-    message: "Transaction updated",
+    message: "Transaction and budget updated",
   });
 });
 
