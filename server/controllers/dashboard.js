@@ -131,8 +131,11 @@ const simplifyText = (string) =>
 
 exports.transaction_put = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.session.passport.user);
-  let updatedBudget;
-  let initialCategory, amount;
+  const budget = await Budget.findOne({ user: user });
+
+  // let updatedBudget;
+  let initialCategory, newCategory, amount, selectedMonthNum, selectedYear;
+  let categoryWasModified = false;
 
   try {
     // Update the modified name or modified category of the transaction
@@ -150,32 +153,82 @@ exports.transaction_put = asyncHandler(async (req, res, next) => {
     ) {
       initialCategory = transaction.modifiedCategory;
       amount = transaction.amount;
-      transaction.modifiedCategory = simplifyText(req.body.modifiedCategory);
+      selectedYear = transaction.date.getFullYear();
+      selectedMonthNum = transaction.date.getMonth();
+      newCategory = simplifyText(req.body.modifiedCategory);
+      transaction.modifiedCategory = newCategory;
+      categoryWasModified = true;
     }
     await transaction.save();
 
-    // Update budget to subtract the amount from its previous category
-    // and add the amount to the new category
-    updatedBudget = await Budget.findOneAndUpdate(
-      { user: user },
-      {
-        $set: {
-          "monthlySpending.$[entry].categories.$[trackedCategory].sum": 0,
-        },
-      },
-      {
-        arrayFilters: [
-          {
-            $and: [
-              { "entry.month": selectedMonthNum },
-              { "entry.year": selectedYear },
-            ],
-          },
-          { "trackedCategory.name": trackedCategory },
-        ],
-        new: true,
+    if (categoryWasModified) {
+      // Update budget to subtract the amount from its previous category
+      // and add the amount to the new category
+      const localBudget = JSON.parse(JSON.stringify(budget));
+
+      const transactionYear = transaction.date.getFullYear();
+      const transactionMonth = transaction.date.getMonth();
+
+      const databaseMonth = localBudget.monthlySpending.find(
+        (entry) =>
+          entry.year === transactionYear && entry.month === transactionMonth
+      );
+      const databaseCategories = databaseMonth.categories;
+      const databaseInitialCategory = databaseCategories.find(
+        (category) => category.name === initialCategory
+      );
+
+      databaseInitialCategory.sum -= amount;
+      // Remove the initial category from monthlySpending if it is $0
+      if (databaseInitialCategory.sum === 0) {
+        databaseCategories.splice(
+          databaseCategories.findIndex(({ name }) => name === initialCategory),
+          1
+        );
       }
-    );
+
+      // Update new category. Make a category in budget if necessary
+      const databaseNewCategory = databaseCategories.find(
+        (category) => category.name === newCategory
+      );
+
+      if (databaseNewCategory === undefined) {
+        databaseCategories.push({
+          name: newCategory,
+          sum: amount,
+          isTracked: false,
+        });
+      } else {
+        databaseNewCategory.sum += amount;
+      }
+
+      budget.monthlySpending = localBudget.monthlySpending;
+      await budget.save();
+
+      /*
+      updatedBudget = await Budget.findOneAndUpdate(
+        { user: user },
+        {
+          $inc: {
+            "monthlySpending.$[entry].categories.$[trackedCategory].sum":
+              -1 * amount,
+          },
+        },
+        {
+          arrayFilters: [
+            {
+              $and: [
+                { "entry.month": selectedMonthNum },
+                { "entry.year": selectedYear },
+              ],
+            },
+            { "trackedCategory.name": initialCategory },
+          ],
+          new: true,
+        }
+      );
+      */
+    }
   } catch (err) {
     console.log(err);
     res.status(401).json({
