@@ -191,8 +191,10 @@ exports.transactions_sync = asyncHandler(async (req, res, next) => {
   // On my desktop PC, this sync function runs too quickly and duplicates transactions,
   // but on my laptop, it runs fine... maybe adding the line below will help?
   // UPDATE: I'm dumb... I disabled cache in the developers tools on my PC... T_T
-  const result = await Promise.all(
-    items.map(async (item) => {
+  try {
+    // Using a map() function instead of a for...of loop caused header issues
+    // This totally didn't take 4 weeks to figure out...
+    for (const item of items) {
       // Get access token and cursor for specified Item
       const accessToken = item.accessToken;
       const cursor = item.cursor;
@@ -223,10 +225,42 @@ exports.transactions_sync = asyncHandler(async (req, res, next) => {
           // );
         } while (keepGoing === true);
       } catch (err) {
-        res.status(401).json({
-          error: err,
-        });
-        return;
+        // return res.status(401).json({
+        //   error: err.response.data,
+        // });
+        try {
+          const configs = {
+            user: {
+              client_user_id: user.id,
+            },
+            client_name: "Financial Glasses",
+            country_codes: PLAID_COUNTRY_CODES,
+            language: "en",
+            // Set accessToken to force Link in update mode!
+            access_token: accessToken,
+          };
+
+          if (PLAID_REDIRECT_URI !== "") {
+            configs.redirect_uri = PLAID_REDIRECT_URI;
+          }
+
+          if (PLAID_ANDROID_PACKAGE_NAME !== "") {
+            configs.android_package_name = PLAID_ANDROID_PACKAGE_NAME;
+          }
+
+          const createTokenResponse = await plaidClient.linkTokenCreate(
+            configs
+          );
+          return res.json({
+            message: "Need to use update mode",
+            linkTokenData: createTokenResponse.data,
+          });
+        } catch (err) {
+          return res.status(403).json({
+            message: "Issue with update mode",
+            error: err,
+          });
+        }
       }
 
       // Save added transactions to database
@@ -367,12 +401,13 @@ exports.transactions_sync = asyncHandler(async (req, res, next) => {
       // Update cursor in Item
       item.cursor = allData.nextCursor;
       await item.save();
-
-      return allData;
-    })
-  );
-
-  res.json({
-    result: result,
-  });
+    }
+    res.json({
+      message: "Transactions syncing completed",
+    });
+  } catch (err) {
+    res.json({
+      error: err,
+    });
+  }
 });
