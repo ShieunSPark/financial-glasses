@@ -24,6 +24,7 @@ export default function Dashboard() {
   const { user, setUser } = useContext(UserContext);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isUpdateMode, setIsUpdateMode] = useState(false);
   const [linkToken, setLinkToken] = useState(null);
   const [numOfItems, setNumOfItems] = useState(0);
   const [itemsAndAccounts, setItemsAndAccounts] = useState([]);
@@ -47,7 +48,12 @@ export default function Dashboard() {
           await plaidSetAccessToken(public_token, user);
           navigate(0);
         };
-        setAccessToken();
+        if (!isUpdateMode) {
+          setAccessToken();
+        }
+      },
+      onExit: (error, metadata) => {
+        console.log(error, metadata);
       },
     },
     []
@@ -117,8 +123,14 @@ export default function Dashboard() {
     };
 
     const syncTransactions = async () => {
-      transactionsSyncRequest().then(() => {
+      transactionsSyncRequest().then((data) => {
         getChartData();
+        // If a bank item needs to be updated, change the link token
+        if (data.linkTokenData) {
+          console.log(`need to update: ${data.linkTokenData.link_token}`);
+          setLinkToken(data.linkTokenData.link_token);
+          setIsUpdateMode(true);
+        }
         setIsLoading(false);
       });
     };
@@ -172,11 +184,19 @@ export default function Dashboard() {
             )}
             <div className="flex justify-center items-center m-2 p-2">
               <button
-                className=" p-2 transition ease-in-out delay-50 bg-blue-500 text-white rounded-md hover:bg-indigo-500"
+                className={`p-2 transition ease-in-out delay-50 ${
+                  isUpdateMode
+                    ? "bg-red-500 hover:bg-red-700"
+                    : "bg-blue-500 hover:bg-indigo-500"
+                } text-white rounded-md `}
                 type="submit"
                 onClick={() => open()}
               >
-                {numOfItems === 0 ? "Connect a Bank" : "Connect Another Bank"}
+                {isUpdateMode
+                  ? "Need to Update"
+                  : numOfItems === 0
+                  ? "Connect a Bank"
+                  : "Connect Another Bank"}
               </button>
             </div>
 
@@ -233,9 +253,7 @@ export default function Dashboard() {
             <h2 className="pt-4">{`This Month's Spending`}</h2>
             <DashboardChart data={chartData} width={"90%"} height={400} />
             <h2 className="pt-4">Most Recent Transactions</h2>
-            <DashboardTable
-              transactions={recentTransactions}
-            />
+            <DashboardTable transactions={recentTransactions} />
           </div>
         </div>
       </div>
