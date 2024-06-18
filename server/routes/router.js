@@ -9,6 +9,10 @@ const plaid_controller = require("../controllers/plaid");
 const checkLoggedIn = require("../middleware/isLoggedIn");
 // const checkAdmin = require("./middleware/isAdmin");
 
+router.get("/", (req, res, next) => {
+  res.json({ name: "Financial Glasses" });
+});
+
 // POST signup
 router.post("/signup", auth_controller.signup_post);
 
