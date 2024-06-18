@@ -17,7 +17,7 @@ const router = require("./routes/router");
 const app = express();
 
 // Set up mongoose
-mongoose.connect(process.env.MONGO_CONNECTION_STRING);
+mongoose.connect(process.env.MONGODB_URI);
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "mongo connection error"));
 
@@ -43,7 +43,7 @@ app.use(
     saveUninitialized: false,
     // Save session in Mongo rather than local memory
     store: MongoStore.create({
-      mongoUrl: process.env.MONGO_CONNECTION_STRING,
+      mongoUrl: process.env.MONGODB_URI,
       ttl: 30 * 60, // 30 minutes * 60 seconds/min
       touchAfter: 9 * 60, // only update session after __ seconds
     }),
