@@ -1,5 +1,7 @@
 # Financial Glasses
 
+Check the project out live at https://financial-glasses.vercel.app/
+
 I used Intuit Mint for my budgeting needs since 2019. But since Mint has been migrated over to Credit Karma and doesn't have budgeting capabilities (and I need a web dev project to work on for my portfolio), Financial Glasses was born.
 
 <!-- ![Financial Glasses home page](client\src\assets\financial-glasses-home-screenshot.png) -->
