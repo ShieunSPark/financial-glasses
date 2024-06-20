@@ -24,7 +24,7 @@ db.on("error", console.error.bind(console, "mongo connection error"));
 
 app.use(
   cors({
-    origin: process.env.CLIENT_DOMAIN,
+    origin: [process.env.CLIENT_DOMAIN],
     credentials: true,
     methods: ["GET", "POST", "HEAD", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type"],
