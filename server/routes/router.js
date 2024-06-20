@@ -50,6 +50,7 @@ router.get(
   "/auth/google/callback",
   passport.authenticate("google", {
     successRedirect: process.env.CLIENT_DOMAIN + "/dashboard",
+    failureRedirect: process.env.CLIENT_DOMAIN + "/login",
     failureMessage: true,
   })
 );
