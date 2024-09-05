@@ -44,33 +44,35 @@ const plaidClient = new PlaidApi(configuration);
 
 exports.create_link_token = asyncHandler(async (req, res, next) => {
   // Get the client_user_id by searching for the current user
-  Promise.resolve()
-    .then(async function () {
-      const user = await User.findById(req.body.user._id);
-      const configs = {
-        user: {
-          // This should correspond to a unique id for the current user.
-          client_user_id: user.id,
-        },
-        client_name: "Financial Glasses",
-        products: PLAID_PRODUCTS,
-        optional_products: PLAID_OPTIONAL_PRODUCTS,
-        country_codes: PLAID_COUNTRY_CODES,
-        language: "en",
-      };
+  try {
+    const user = await User.findById(req.body.user._id);
+    const configs = {
+      user: {
+        // This should correspond to a unique id for the current user.
+        client_user_id: user.id,
+      },
+      client_name: "Financial Glasses",
+      products: PLAID_PRODUCTS,
+      optional_products: PLAID_OPTIONAL_PRODUCTS,
+      country_codes: PLAID_COUNTRY_CODES,
+      language: "en",
+    };
 
-      if (PLAID_REDIRECT_URI !== "") {
-        configs.redirect_uri = PLAID_REDIRECT_URI;
-      }
+    if (PLAID_REDIRECT_URI !== "") {
+      configs.redirect_uri = PLAID_REDIRECT_URI;
+    }
 
-      if (PLAID_ANDROID_PACKAGE_NAME !== "") {
-        configs.android_package_name = PLAID_ANDROID_PACKAGE_NAME;
-      }
+    if (PLAID_ANDROID_PACKAGE_NAME !== "") {
+      configs.android_package_name = PLAID_ANDROID_PACKAGE_NAME;
+    }
 
-      const createTokenResponse = await plaidClient.linkTokenCreate(configs);
-      res.json(createTokenResponse.data);
-    })
-    .catch(next);
+    const createTokenResponse = await plaidClient.linkTokenCreate(configs);
+    res.json(createTokenResponse.data);
+  } catch (err) {
+    res.status(400).json({
+      error: err,
+    });
+  }
 });
 
 // Convert Plaid public token to access token, then add item and account(s) to the database
