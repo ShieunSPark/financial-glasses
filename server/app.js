@@ -48,6 +48,10 @@ app.use(
       ttl: 30 * 60, // 30 minutes * 60 seconds/min
       touchAfter: 9 * 60, // only update session after __ seconds
     }),
+    cookie: {
+      secure: true, // Use HTTPS in production
+      sameSite: "None", // Allows cross-domain cookies
+    },
     // cookie: {
     //   maxAge: 1000 * 60 * 10, // 1000 ms/sec * 60 sec/min * 10 min
     //   secure: false,
