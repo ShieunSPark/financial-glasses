@@ -15,6 +15,7 @@ exports.dashboard_get = asyncHandler(async (req, res, next) => {
   const numOfItems = items.length;
   const budget = await Budget.findOne({ user: user });
 
+  console.log(user);
   // For development; probably can remove in production as a budget is made
   // at the /signup route
   if (!budget) {
