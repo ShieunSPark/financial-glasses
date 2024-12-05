@@ -1,6 +1,7 @@
 // const jwt = require("jsonwebtoken");
 
 module.exports = (req, res, next) => {
+  console.log(`req.session.passport: ${req.session.passport}`);
   if (req.isAuthenticated()) {
     next();
   } else {
