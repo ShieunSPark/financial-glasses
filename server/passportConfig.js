@@ -79,7 +79,7 @@ passport.use(
         },
         { googleID: profile.id }
       );
-      console.log(user);
+      console.log("passportConfig verify: ", user);
       if (!user) {
         const newUser = new User({
           googleID: profile.id,

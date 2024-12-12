@@ -1,7 +1,7 @@
 // const jwt = require("jsonwebtoken");
 
 module.exports = (req, res, next) => {
-  console.log(`req.session in isLoggedIn.js: ${req.session}`);
+  console.log("req.session in isLoggedIn.js:", req.session);
   if (req.isAuthenticated()) {
     next();
   } else {
