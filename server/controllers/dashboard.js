@@ -10,11 +10,13 @@ const Transaction = require("../models/transaction");
 const Budget = require("../models/budget");
 
 exports.dashboard_get = asyncHandler(async (req, res, next) => {
+  console.log("req.session on dashboard_get: ", req.session);
   const user = await User.findById(req.session.passport.user);
   const items = await Item.find({ user: user });
   const numOfItems = items.length;
   const budget = await Budget.findOne({ user: user });
 
+  console.log(`dashboard/get: ${user}`);
   // For development; probably can remove in production as a budget is made
   // at the /signup route
   if (!budget) {

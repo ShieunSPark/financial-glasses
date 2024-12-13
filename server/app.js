@@ -27,7 +27,7 @@ app.use(
     origin: process.env.CLIENT_DOMAIN,
     credentials: true,
     methods: ["GET", "POST", "HEAD", "PUT", "PATCH", "DELETE"],
-    allowedHeaders: ["Content-Type"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     exposedHeaders: ["Content-Type"],
   })
 );
@@ -49,13 +49,10 @@ app.use(
       touchAfter: 9 * 60, // only update session after __ seconds
     }),
     cookie: {
-      secure: true, // Use HTTPS in production
-      sameSite: "None", // Allows cross-domain cookies
+      maxAge: 1000 * 60 * 10, // 1000 ms/sec * 60 sec/min * 10 min
+      secure: process.env.NODE_ENV === "production", // Enable secure cookies in production
+      sameSite: "none", // Allow cross-origin requests
     },
-    // cookie: {
-    //   maxAge: 1000 * 60 * 10, // 1000 ms/sec * 60 sec/min * 10 min
-    //   secure: false,
-    // },
   })
 );
 
