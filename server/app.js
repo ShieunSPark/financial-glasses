@@ -48,11 +48,11 @@ app.use(
       ttl: 30 * 60, // 30 minutes * 60 seconds/min
       touchAfter: 9 * 60, // only update session after __ seconds
     }),
-    cookie: {
-      maxAge: 1000 * 60 * 10, // 1000 ms/sec * 60 sec/min * 10 min
-      secure: process.env.NODE_ENV === "production", // Enable secure cookies in production
-      sameSite: "none", // Allow cross-origin requests
-    },
+    // cookie: {
+    //   maxAge: 1000 * 60 * 10, // 1000 ms/sec * 60 sec/min * 10 min
+    //   secure: process.env.NODE_ENV === "production", // Enable secure cookies in production
+    //   sameSite: "none", // Allow cross-origin requests
+    // },
   })
 );
 
