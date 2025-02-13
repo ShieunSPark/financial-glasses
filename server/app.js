@@ -50,7 +50,7 @@ app.use(
     }),
     cookie: {
       maxAge: 1000 * 60 * 10, // 1000 ms/sec * 60 sec/min * 10 min
-      secure: false, // Enable secure cookies in production: process.env.NODE_ENV === "production"
+      secure: process.env.NODE_ENV === "production", // Enable secure cookies in production
       sameSite: "none", // Allow cross-origin requests
       httpOnly: true,
     },
@@ -77,6 +77,11 @@ app.use((req, res, next) => {
 
 // Routes
 app.use("/", router);
+
+app.use((req, res, next) => {
+  console.log("Incoming Cookies:", req.headers.cookie);
+  next();
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
