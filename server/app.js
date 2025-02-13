@@ -52,6 +52,7 @@ app.use(
       maxAge: 1000 * 60 * 10, // 1000 ms/sec * 60 sec/min * 10 min
       secure: process.env.NODE_ENV === "production", // Enable secure cookies in production
       sameSite: "none", // Allow cross-origin requests
+      httpOnly: true,
     },
   })
 );
