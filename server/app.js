@@ -17,6 +17,8 @@ const router = require("./routes/router");
 
 const app = express();
 
+app.set("trust proxy", 1);
+
 // Set up mongoose
 mongoose.connect(process.env.MONGODB_URI);
 const db = mongoose.connection;
