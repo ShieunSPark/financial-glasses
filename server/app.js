@@ -17,8 +17,6 @@ const router = require("./routes/router");
 
 const app = express();
 
-app.set("trust proxy", 1);
-
 // Set up mongoose
 mongoose.connect(process.env.MONGODB_URI);
 const db = mongoose.connection;
@@ -99,8 +97,8 @@ app.use(function (err, req, res, next) {
   });
 });
 
-app.listen(3000, function () {
-  console.log("Server is running on http://localhost:3000");
-});
+// app.listen(3000, function () {
+//   console.log("Server is running on http://localhost:3000");
+// });
 
 module.exports = app;
