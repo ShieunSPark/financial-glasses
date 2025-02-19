@@ -97,8 +97,8 @@ app.use(function (err, req, res, next) {
   });
 });
 
-// app.listen(3000, function () {
-//   console.log("Server is running on http://localhost:3000");
-// });
+app.listen(3000, function () {
+  console.log(`Server is running on ${process.env.SERVER_DOMAIN}:3000`);
+});
 
 module.exports = app;
