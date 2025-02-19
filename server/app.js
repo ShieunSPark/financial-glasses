@@ -26,7 +26,6 @@ app.use(
   cors({
     origin: process.env.CLIENT_DOMAIN,
     credentials: true,
-    methods: ["GET", "POST", "HEAD", "PUT", "PATCH", "DELETE"],
   })
 );
 app.use(logger("dev"));
