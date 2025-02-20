@@ -49,7 +49,7 @@ router.get(
 router.get(
   "/auth/google/callback",
   (req, res, next) => {
-    console.log("Before Passport authentication - Session:", req.session);
+    console.log("Before Passport authentication - Session:", req.session.id);
     next();
   },
   passport.authenticate("google", {
