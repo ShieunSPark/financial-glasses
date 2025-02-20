@@ -64,6 +64,7 @@ export default function Dashboard() {
     const verifyLoggedIn = async () => {
       dashboardRequest().then((data) => {
         if (data.error) {
+          console.log("Log in error: ", data.error);
           navigate("/");
           // Perhaps display a message saying the user is not logged in
         } else {

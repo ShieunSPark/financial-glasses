@@ -49,7 +49,7 @@ router.get(
 router.get(
   "/auth/google/callback",
   (req, res, next) => {
-    console.log("Before Passport authentication - Session:", req.session.id);
+    console.log("Before Passport authentication - Session:", req.session);
     req.session.save((err) => {
       if (err) {
         console.error("Session Save Error:", err);
@@ -58,10 +58,13 @@ router.get(
     next();
   },
   passport.authenticate("google", {
-    successRedirect: process.env.CLIENT_DOMAIN + "/dashboard",
+    //successRedirect: process.env.CLIENT_DOMAIN + "/dashboard",
     failureRedirect: process.env.CLIENT_DOMAIN + "/login",
     failureMessage: true,
-  })
+  }),
+  (req, res) => {
+    res.redirect(process.env.CLIENT_DOMAIN + "/dashboard");
+  }
 );
 
 // GET logout
