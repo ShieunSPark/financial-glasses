@@ -63,6 +63,7 @@ router.get(
     failureMessage: true,
   }),
   (req, res) => {
+    console.log("After Passport authentication - Session:", req.session);
     res.redirect(process.env.CLIENT_DOMAIN + "/dashboard");
   }
 );
