@@ -33,6 +33,8 @@ app.use(express.json());
 
 app.use(express.urlencoded({ extended: false }));
 
+app.set("trust proxy", 1);
+
 // Start passport session
 app.use(
   session({
