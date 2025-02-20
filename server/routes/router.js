@@ -50,6 +50,11 @@ router.get(
   "/auth/google/callback",
   (req, res, next) => {
     console.log("Before Passport authentication - Session:", req.session.id);
+    req.session.save((err) => {
+      if (err) {
+        console.error("Session Save Error:", err);
+      }
+    });
     next();
   },
   passport.authenticate("google", {
