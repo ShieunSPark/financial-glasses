@@ -77,6 +77,7 @@ export default function SignUp() {
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
               Create an account
             </h1>
+            {/* Display error messages here from user entering incorrect fields */}
             {error
               ? error.map((err) => (
                   <div className="text-red-400">{err.msg}</div>

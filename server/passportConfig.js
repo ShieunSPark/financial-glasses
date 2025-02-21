@@ -9,11 +9,11 @@ const User = require("./models/user");
 
 // Authentication
 passport.use(
-  new LocalStrategy(async (username, password, cb) => {
+  new LocalStrategy(async (username, password, done) => {
     try {
       const user = await User.findOne({ username: username });
       if (!user) {
-        return cb(null, false, {
+        return done(null, false, {
           message: "Incorrect username and/or password",
         });
       }
@@ -24,19 +24,19 @@ passport.use(
       // But first, check if the user has a password. If they used Google OAuth, they won't have a password
       // in the database
       if (!user.password) {
-        return cb(null, false, {
+        return done(null, false, {
           message: "Incorrect username and/or password",
         });
       }
-      const match = bcrypt.compare(password, user.password);
+      const match = await bcrypt.compare(password, user.password);
       if (!match) {
-        return cb(null, false, {
+        return done(null, false, {
           message: "Incorrect username and/or password",
         });
       }
-      return cb(null, user);
+      return done(null, user);
     } catch (err) {
-      return cb(err);
+      return done(err);
     }
   })
 );

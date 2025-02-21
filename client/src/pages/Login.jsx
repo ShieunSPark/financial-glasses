@@ -74,6 +74,7 @@ export default function Login() {
               <div>OR</div>
               <hr className="h-0.5 w-1/2 my-2 bg-gray-100 border-0" />
             </div>
+            {/* Display error messages here from user entering incorrect fields */}
             {error ? <div className="text-red-400 m-0">{error}</div> : null}
             <form className="space-y-4" onSubmit={loginSubmit}>
               <div>
