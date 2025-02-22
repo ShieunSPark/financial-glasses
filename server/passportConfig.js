@@ -92,12 +92,6 @@ passport.use(
         return done(null, newUser);
       }
 
-      // Manually log in the user
-      req.logIn(user, (err) => {
-        if (err) return done(err);
-        return done(null, user);
-      });
-
       return done(null, user);
     }
   )

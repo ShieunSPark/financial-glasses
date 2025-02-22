@@ -68,7 +68,10 @@ router.get(
     successRedirect: process.env.CLIENT_DOMAIN + "/dashboard",
     failureRedirect: process.env.CLIENT_DOMAIN + "/login",
     failureMessage: true,
-  })
+  }),
+  (req, res) => {
+    console.log(req.session.passport);
+  }
 );
 
 // GET logout
