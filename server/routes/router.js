@@ -23,7 +23,6 @@ router.post(
     passport.authenticate(
       "local",
       {
-        failureRedirect: process.env.CLIENT_DOMAIN + "/login",
         failureMessage: true,
       },
       function (err, user, info) {
@@ -34,9 +33,14 @@ router.post(
             message: info.message,
             user,
           });
+        req.logIn(user, (err) => {
+          if (err) return next(err);
 
-        // This code below is VERY important
-        req.login(user, next);
+          return res.json({
+            message: "Login successful",
+            user,
+          });
+        });
       }
     )(req, res, next);
   },

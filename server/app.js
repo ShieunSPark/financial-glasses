@@ -28,9 +28,12 @@ app.use(
     credentials: true,
   })
 );
+
+// Manually handle OPTIONS requests
+app.options("*", cors()); // Ensure preflight requests get the correct headers
+
 app.use(logger("dev"));
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: false }));
 
 app.set("trust proxy", 1);
@@ -96,7 +99,7 @@ app.use(function (err, req, res, next) {
 });
 
 app.listen(3000, function () {
-  console.log(`Server is running on ${process.env.SERVER_DOMAIN}:3000`);
+  console.log(`Server is running on ${process.env.SERVER_DOMAIN}`);
 });
 
 module.exports = app;

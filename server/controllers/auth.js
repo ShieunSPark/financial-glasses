@@ -105,11 +105,6 @@ exports.login_post = asyncHandler(async (req, res, next) => {
   //   }
   // );
 
-  // res.cookie("token", token, {
-  //   withCredentials: true,
-  //   httpOnly: false,
-  // });
-
   res.json({
     // token: token,
     user: person,
