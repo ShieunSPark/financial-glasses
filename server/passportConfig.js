@@ -48,13 +48,13 @@ passport.use(
 //       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 //       secretOrKey: process.env.JWT_SECRET_KEY,
 //     },
-//     (jwt_payload, cb) => {
+//     (jwt_payload, done) => {
 //       const user = User.findById(jwt_payload.id);
 
 //       if (user) {
-//         return cb(null, user);
+//         return done(null, user);
 //       }
-//       return cb(null, false);
+//       return done(null, false);
 //     }
 //   )
 // );
@@ -68,7 +68,7 @@ passport.use(
       callbackURL: process.env.SERVER_DOMAIN + "/auth/google/callback",
       scope: ["profile"],
     },
-    async function verify(accessToken, refreshToken, profile, cb) {
+    async function verify(accessToken, refreshToken, profile, done) {
       // Perform any additional verification or user lookup here
       // and return the user object
       const user = await User.findOneAndUpdate(
@@ -89,22 +89,29 @@ passport.use(
           status: "user",
         });
         await newUser.save();
-        return cb(null, newUser);
+        return done(null, newUser);
       }
-      return cb(null, user);
+
+      // Manually log in the user
+      req.logIn(user, (err) => {
+        if (err) return done(err);
+        return done(null, user);
+      });
+
+      return done(null, user);
     }
   )
 );
 
-passport.serializeUser(function (user, cb) {
-  cb(null, user.id);
+passport.serializeUser(function (user, done) {
+  done(null, user.id);
 });
 
-passport.deserializeUser(function (user, cb) {
+passport.deserializeUser(function (user, done) {
   try {
     const userInDB = User.findById(user);
-    cb(null, userInDB);
+    done(null, userInDB);
   } catch (err) {
-    cb(err);
+    done(err);
   }
 });
