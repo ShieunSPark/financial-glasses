@@ -65,14 +65,10 @@ router.get(
     next();
   },
   passport.authenticate("google", {
-    //successRedirect: process.env.CLIENT_DOMAIN + "/dashboard",
+    successRedirect: process.env.CLIENT_DOMAIN + "/dashboard",
     failureRedirect: process.env.CLIENT_DOMAIN + "/login",
     failureMessage: true,
-  }),
-  (req, res) => {
-    console.log("After Passport authentication - Session:", req.session);
-    res.redirect(process.env.CLIENT_DOMAIN + "/dashboard");
-  }
+  })
 );
 
 // GET logout
